@@ -1,25 +1,29 @@
 {
   "id": "pf2e-subsystem-helper",
   "title": "PF2e Subsystem Helper",
-  "description": "",
+  "description": "A module to implement various subsystems for PF2e that aren't included in the base system.",
   "version": "#{VERSION}#",
-  "library": "false",
-  "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 12,
-    "verified": 12,
-    "maximum": 12
+    "minimum": "12",
+    "verified": "12",
+    "maximum": "12"
   },
   "authors": [
     {
       "name": "Digitalshadowhawk",
       "url": "https://https://github.com/digitalshadowhawk/",
-      "discord": "digitalshadowhawk"
+      "discord": "digitalshadowhawk",
+      "flags": {}
     }
   ],
   "relationships": {
-    "systems": [],
-    "requires": []
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
   },
   "esmodules": [
     "scripts/module.js"
@@ -34,7 +38,8 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json"
+      "path": "languages/en.json",
+      "flags": {}
     }
   ],
   "url": "#{URL}#",
@@ -45,7 +50,9 @@
   "media": [
     {
       "type": "icon",
-      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
+      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4",
+      "loop": false,
+      "flags": {}
     }
   ]
 }
