@@ -25,14 +25,15 @@
       }
     ]
   },
-  "esmodules": [
-    "scripts/module.js"
-  ],
+  //"esmodules": [
+	//  "scripts/module.js"
+  //],
   "scripts": [
-    "scripts/lib/lib.js"
+    "scripts/lib/lib.js",
+	"scripts/pf2e-subsystem-helper.js"
   ],
   "styles": [
-    "styles/module.css"
+    "styles/pf2e-subsystem-helper.css",
   ],
   "languages": [
     {
