@@ -28,7 +28,7 @@ class PF2eSubsystemHelper {
  * Register our module's debug flag with developer mode's custom hook
  */
 Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
-	registerPackageDebugFlag(ToDoList.ID);
+	registerPackageDebugFlag(PF2eSubsystemHelper.ID);
 });
 
 class SubsystemData {	
@@ -95,8 +95,137 @@ class SubsystemForm extends FormApplication {
  * @property {string} label - The name of this Victory Point entry
  * @property {number} points - the numerical value of Victory Points that have been accrued
  */
-class Subsystem {
+class Subsystem{
+	constructor(id) {
+		const data = SubsystemData.getSubsystem(id)
+		this.name = data.name
+		this.type = data.type
+		if(this.type === "Research") {
+			PF2eSubsystemHelper.log(true, 'Research Subsystem Detected!')
+			this.library = new Library();
+		}
+		if(this.type === "Victory Points") {
+			PF2eSubsystemHelper.log(true, 'Victory Points Subsystem Detected!')
+			this.library = new Library();
+		}
+	}
+}
+
+class PointCounter {
+	constructor(name, points) {
+		if(points===undefined) {
+			this.points = 0
+		} else {
+			this.points = points
+		}
+		if(name===undefined) {
+			this.name = "Basic Counter"
+		} else {
+			this.name = name
+		}
+	}
 	
+}
+
+class Library extends PointCounter {
+	constructor(name, level, points) {
+		super(name,points)
+		if(level===undefined) {
+			this.level = 1
+		} else {
+			this.level = level
+		}
+		this.sources = []
+		this.thresholds = []
+	}
+	
+	getName() {
+		return this.name;
+	}
+	
+	addThreshold(value, description) {
+		this.thresholds.push(new Threshold(value,description));
+	}
+	
+	checkThresholds() {
+		this.thresholds.forEach((threshold) => {if(this.points >= threshold.value){threshold.thresholdMet = true} else { threshold.thresholdMet = false}})
+	}
+	
+	addSource(description,maxRP) {
+		this.sources.push(new Source(description,maxRP));
+	}
+	
+	addSource(description,maxRP,check) {
+		this.sources.push(new Source(description,maxRP).addCheck(check));
+	}
+	
+	addSource(description,maxRP,checkType,dc) {
+		this.sources.push(new Source(description,maxRP).addCheck(checkType,dc));
+	}
+	
+	removeSource(id){
+		if(this.sources.length < (id + 1)){
+			return;
+		}
+		this.sources.splice(id,1)
+	}
+	
+	earnRP(id,amount) {
+		const changedBy = this.sources[id].addEarnedRP(amount)
+		this.points += changedBy
+		return changedBy;
+	}
+}
+
+class Threshold {
+	constructor(value, description){
+		this.value = value
+		this.description = description
+		this.thresholdMet = false
+	}
+}
+
+class Source {
+	constructor(description, maxRP)
+	{
+		this.description = description
+		this.maxRP = maxRP
+		this.earnedRP = 0
+		this.checks = []
+	}
+	
+	setMaxRP(newMax) {
+		this.maxRP = newMax;
+	}
+	
+	setEarnedRP(earned) {
+		const increasedBy = earned - this.earned
+		this.earnedRP = earned
+		
+		return increasedBy;
+	}
+	
+	addEarnedRP(earned) {
+		let increasedBy = 0
+		
+		if (earned >= 0) {
+			increasedBy = Math.min(this.maxRP - this.earnedRP, this.earnedRP + earned)
+		} else {
+			increasedBy = Math.max(this.earnedRP * -1, earned)
+		}
+		this.earnedRP += increasedBy
+		return increasedBy;
+	}
+	
+	addCheck(check) {
+		this.checks = check
+		return this;
+	}
+	
+	addCheck(type, dc) {
+		this.checks.push("@Check[type:" + type + "|dc:" + dc + "]")
+		return this;
+	}
 }
 
 Hooks.on('init', function() {
