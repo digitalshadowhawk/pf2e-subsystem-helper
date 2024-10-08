@@ -1,0 +1,21 @@
+.subsystem-add {
+	color: #fff;
+}
+
+.create-subsystem-button {
+	background: transparent;
+	padding: 0;
+	color: white;
+	line-height: normal;
+	border: 0;
+	align-self: center;
+}
+
+.create-subsystem-button > i {
+	margin-right: 0;
+}
+
+.create-subsystem-button:hover, .create-subsystem-button:focus {
+	box-shadow: none;
+	text-shadow: 0 0 5px red;
+}
