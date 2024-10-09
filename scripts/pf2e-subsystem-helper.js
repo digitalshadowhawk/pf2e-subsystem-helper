@@ -31,43 +31,115 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
 	registerPackageDebugFlag(PF2eSubsystemHelper.ID);
 });
 
-class SubsystemData {	
-	// all subsystems
+class SubsystemDataModel extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields = foundry.data.fields;
+		return {
+			subsystemName: new fields.StringField({required: true, blank: false}),
+			subsystemType: new fields.StringField({required: true, blank: false}),
+			id: new fields.StringField({required: true, blank: false})
+		}
+	}	
+}
+
+class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields = foundry.data.fields;
+		return {
+			subsystemName: new fields.StringField({required: true, blank: false}),
+			subsystemType: new fields.StringField({required: true, blank: false}),
+			id: new fields.StringField({required: true, blank: false}),
+			library: new fields.SchemaField({
+				libraryName: new fields.StringField({required: true, blank: false}),
+				level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+				points: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+				thresholds: new fields.ArrayField(new fields.ObjectField({required: false})),
+				sources: new fields.ArrayField(new fields.ObjectField({required: false}))
+			})
+		}
+	}
+}
+
+class LibraryThreshold extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields =foundry.data.fields;
+		return {
+			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			description: new fields.StringField({required: true, blank: false})
+		}
+	}
+}
+
+class LibrarySource extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields =foundry.data.fields;
+		return {
+			description: new fields.StringField({required: true, blank: false}),
+			maxRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			earnedRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			checks: new fields.ArrayField(new fields.ObjectField({required: false}))
+		}
+	}
+}
+
+class InfluenceSubsystemDataModel extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields = foundry.data.fields;
+		return {
+			subsystemName: new fields.StringField({required: true, blank: false}),
+			subsystemType: new fields.StringField({required: true, blank: false}),
+			id: new fields.StringField({required: true, blank: false}),
+			npcs: new fields.ArrayField(new fields.ObjectField({required: false}))
+		}
+	}
+}
+
+class InfluenceNPC extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields =foundry.data.fields;
+		return {
+			name: new fields.StringField({required: true, blank: false}),
+			perception: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			will: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			thresholds: new fields.ArrayField(new fields.ObjectField({required: false})),
+			checks: new fields.ArrayField(new fields.ObjectField({required: false})),
+			resistances: new fields.StringField({required: false, blank: false}),
+			weaknesses: new fields.StringField({required: false, blank: false})
+		}
+	}
+}
+
+class InfluenceThreshold extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields =foundry.data.fields;
+		return {
+			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			description: new fields.StringField({required: true, blank: false})
+		}
+	}
+}
+
+class Check extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields =foundry.data.fields;
+		return {
+			type: new fields.StringField({required: true, blank: false}),
+			dc: new fields.NumberField({required: true, nullable: false, integer: true, positive: true})
+		}
+	}
+}
+
+class SubsystemData {
 	static get allSubsystems() {
-		//const allSubsystems = game.actors?.party
-		
 		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
 	}
-	
-	// get specified subsystem
-	static getSubsystem(subsystemID) {
-		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS)?.[subsystemID];
+
+	static saveDataModel(dataModel) {
+		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS, {[dataModel.id]: dataModel});
 	}
-	
-	// create subsystem
-	static createSubsystem(subsystemName, subsystemType, subsystemData) {
-		
-		const newSubsystem = {
-			name: subsystemName,
-			type: subsystemType,
-			...subsystemData,
-			id: foundry.utils.randomID(16)
-		}
-		
-		const newSubsystems = {
-			[newSubsystem.id]: newSubsystem
-		}
-		
-		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS, newSubsystems);
-	}
-	
-	// update subsystem
-	static updateSubsystem(subsystemID, updateData) {
-		const update = {
-			[subsystemID]: updateData
-		}
-		
-		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS, update);
+
+	static loadDataModel(id) {
+		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS)?.[id];
 	}
 	
 	// delete a specific subsystem by ID
@@ -81,150 +153,6 @@ class SubsystemData {
 	
 	static deleteAllSubsystems() {
 		return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
-	}
-}
-
-class SubsystemForm extends FormApplication {
-	
-}
-
-/**
- * A single Subsystem entry
- * @typedef {Object} VictoryPointBase
- * @property {string} id - a Unique ID to identify this Victory Point entry
- * @property {string} label - The name of this Victory Point entry
- * @property {number} points - the numerical value of Victory Points that have been accrued
- */
-class Subsystem{
-	constructor(id) {
-		const data = SubsystemData.getSubsystem(id)
-		this.name = data.name
-		this.type = data.type
-		if(this.type === "Research") {
-			PF2eSubsystemHelper.log(true, 'Research Subsystem Detected!')
-			this.library = new Library();
-		}
-		if(this.type === "Victory Points") {
-			PF2eSubsystemHelper.log(true, 'Victory Points Subsystem Detected!')
-			this.library = new Library();
-		}
-	}
-}
-
-class PointCounter {
-	constructor(name, points) {
-		if(points===undefined) {
-			this.points = 0
-		} else {
-			this.points = points
-		}
-		if(name===undefined) {
-			this.name = "Basic Counter"
-		} else {
-			this.name = name
-		}
-	}
-	
-}
-
-class Library extends PointCounter {
-	constructor(name, level, points) {
-		super(name,points)
-		if(level===undefined) {
-			this.level = 1
-		} else {
-			this.level = level
-		}
-		this.sources = []
-		this.thresholds = []
-	}
-	
-	getName() {
-		return this.name;
-	}
-	
-	addThreshold(value, description) {
-		this.thresholds.push(new Threshold(value,description));
-	}
-	
-	checkThresholds() {
-		this.thresholds.forEach((threshold) => {if(this.points >= threshold.value){threshold.thresholdMet = true} else { threshold.thresholdMet = false}})
-	}
-	
-	addSource(description,maxRP) {
-		this.sources.push(new Source(description,maxRP));
-	}
-	
-	addSource(description,maxRP,check) {
-		this.sources.push(new Source(description,maxRP).addCheck(check));
-	}
-	
-	addSource(description,maxRP,checkType,dc) {
-		this.sources.push(new Source(description,maxRP).addCheck(checkType,dc));
-	}
-	
-	removeSource(id){
-		if(this.sources.length < (id + 1)){
-			return;
-		}
-		this.sources.splice(id,1)
-	}
-	
-	earnRP(id,amount) {
-		const changedBy = this.sources[id].addEarnedRP(amount)
-		this.points += changedBy
-		return changedBy;
-	}
-}
-
-class Threshold {
-	constructor(value, description){
-		this.value = value
-		this.description = description
-		this.thresholdMet = false
-	}
-}
-
-class Source {
-	constructor(description, maxRP)
-	{
-		this.description = description
-		this.maxRP = maxRP
-		this.earnedRP = 0
-		this.checks = []
-	}
-	
-	setMaxRP(newMax) {
-		this.maxRP = newMax;
-	}
-	
-	setEarnedRP(earned) {
-		const increasedBy = earned - this.earned
-		this.earnedRP = earned
-		
-		return increasedBy;
-	}
-	
-	addEarnedRP(earned) {
-		let increasedBy = 0
-		
-		if (earned >= 0) {
-			increasedBy = Math.min(this.maxRP - this.earnedRP, this.earnedRP + earned)
-		} else {
-			increasedBy = Math.max(this.earnedRP * -1, earned)
-		}
-		this.earnedRP += increasedBy
-		return increasedBy;
-	}
-	
-	addCheck(check) {
-		this.checks = check
-		return this;
-	}
-	
-	addCheck(type, dc) {
-		this.checks.push("@Check[type:" + type + "|dc:" + dc + "]")
-		return this;
 	}
 }
 
