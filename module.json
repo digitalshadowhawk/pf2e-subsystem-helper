@@ -26,8 +26,10 @@
     ]
   },
   "scripts": [
-    "scripts/lib/lib.js",
-	"scripts/pf2e-subsystem-helper.js"
+	"scripts/lib/lib.mjs"
+  ],
+  "esmodules": [
+	"scripts/pf2e-subsystem-helper.mjs"
   ],
   "styles": [
     "styles/pf2e-subsystem-helper.css"

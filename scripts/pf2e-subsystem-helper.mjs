@@ -1,3 +1,9 @@
+import * as subsystem from './subsystem-data-models.mjs';
+
+globalThis.pf2esubsystemhelper = {
+	
+}
+//import { Tester } from "./research.mjs";
 class PF2eSubsystemHelper {
 	static ID = "pf2e-subsystem-helper";
 	
@@ -22,6 +28,8 @@ class PF2eSubsystemHelper {
 			console.log(this.ID, '|', ...args);
 		}
 	}
+	
+	
 }
 
 /**
@@ -30,104 +38,6 @@ class PF2eSubsystemHelper {
 Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
 	registerPackageDebugFlag(PF2eSubsystemHelper.ID);
 });
-
-class SubsystemDataModel extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields = foundry.data.fields;
-		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false})
-		}
-	}	
-}
-
-class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields = foundry.data.fields;
-		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			library: new fields.SchemaField({
-				libraryName: new fields.StringField({required: true, blank: false}),
-				level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-				points: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-				thresholds: new fields.ArrayField(new fields.ObjectField({required: false})),
-				sources: new fields.ArrayField(new fields.ObjectField({required: false}))
-			})
-		}
-	}
-}
-
-class LibraryThreshold extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields =foundry.data.fields;
-		return {
-			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			description: new fields.StringField({required: true, blank: false})
-		}
-	}
-}
-
-class LibrarySource extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields =foundry.data.fields;
-		return {
-			description: new fields.StringField({required: true, blank: false}),
-			maxRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			earnedRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			checks: new fields.ArrayField(new fields.ObjectField({required: false}))
-		}
-	}
-}
-
-class InfluenceSubsystemDataModel extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields = foundry.data.fields;
-		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			npcs: new fields.ArrayField(new fields.ObjectField({required: false}))
-		}
-	}
-}
-
-class InfluenceNPC extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields =foundry.data.fields;
-		return {
-			name: new fields.StringField({required: true, blank: false}),
-			perception: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			will: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			thresholds: new fields.ArrayField(new fields.ObjectField({required: false})),
-			checks: new fields.ArrayField(new fields.ObjectField({required: false})),
-			resistances: new fields.StringField({required: false, blank: false}),
-			weaknesses: new fields.StringField({required: false, blank: false})
-		}
-	}
-}
-
-class InfluenceThreshold extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields =foundry.data.fields;
-		return {
-			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			description: new fields.StringField({required: true, blank: false})
-		}
-	}
-}
-
-class Check extends foundry.abstract.DataModel {
-	static defineSchema() {
-		const fields =foundry.data.fields;
-		return {
-			type: new fields.StringField({required: true, blank: false}),
-			dc: new fields.NumberField({required: true, nullable: false, integer: true, positive: true})
-		}
-	}
-}
 
 class SubsystemData {
 	static get allSubsystems() {
@@ -139,7 +49,13 @@ class SubsystemData {
 	}
 
 	static loadDataModel(id) {
-		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS)?.[id];
+		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS)?.[id]
+		let instantiatedModel = {}
+		if(model.subsystemType==="research"){
+			instantiatedModel = new ResearchSubsystemDataModel(model.name, model.type,  model.id, model.libraries).reinstantiate()
+		}
+		
+		return instantiatedModel;
 	}
 	
 	// delete a specific subsystem by ID
