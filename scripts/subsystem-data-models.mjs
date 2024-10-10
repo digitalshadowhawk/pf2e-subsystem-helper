@@ -6,26 +6,11 @@ export class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			libraries: new fields.ArrayField(new fields.StringField())//new fields.ObjectField({required: false}))
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Research Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "research"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			libraries: new fields.ArrayField(new fields.StringField())
 		}
-	}
-	
-	constructor(name = "Research Subsystem", newid = foundry.utils.randomID(16), existingLibraries = [])
-	{
-		super({subsystemName: name, subsystemType: "research",  id: newid, libraries: existingLibraries})
-	}
-	
-	reinstantiate() {
-		this.libraries.forEach(loadLibrary);
-		
-		function loadLibrary(library, index, arr) {
-			arr[index] = new subtype.Library(library.libraryName, library.level, library.points, library.id, library.thresholds, library.sources).reinstantiate();
-		}
-		
-		return this;
 	}
 	
 	addLibrary(newLibrary) {
@@ -33,11 +18,17 @@ export class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Library - the object is not an Library')
 			return null;
 		}
-		return this.libraries.push(SubsystemData.saveDataModel(newLibrary, PF2eSubsystemHelper.FLAGS.LIBRARIES))
+		this.libraries.push(SubsystemData.saveDataModel(newLibrary, PF2eSubsystemHelper.FLAGS.LIBRARIES))
+		this.updateSource({libraries: this.libraries})
+		return newLibrary.id;
 	}
 	
 	getLibraryByID(id) {
-		return new Library(SubsystemData.loadDataModel(id));
+		return new subtype.Library(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.LIBRARIES));
+	}
+	
+	getLibraries() {
+		return this.libraries.map( id => this.getLibraryByID(id) );
 	}
 }
 
@@ -45,34 +36,29 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			counters: new fields.ArrayField(new fields.ObjectField({required: false}))
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Victory Points Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "victorypoints"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			counters: new fields.ArrayField(new fields.StringField())
 		}
-	}
-	
-	constructor(name = "Victory Points Subsystem", newid = foundry.utils.randomID(16), existingCounters = [])
-	{
-		super({subsystemName: name, subsystemType: "victorypoints",  id: newid, counters: existingCounters})
 	}
 	
 	addCounter(newCounter) {
 		if(!newCounter instanceof subtype.Counter) {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Counter - the object is not a Counter')
-			return;
+			return null;
 		}
-		return this.libraries.push(newCounter)
+		this.counters.push(SubsystemData.saveDataModel(newCounter, PF2eSubsystemHelper.FLAGS.COUNTERS))
+		this.updateSource({counters: this.counters})
+		return newCounter.id;
 	}
 	
-	reinstantiate() {
-		this.counters.forEach(loadCounter);
-		
-		function loadCounter(counter, index, arr) {
-			arr[index] = new subtype.Counter(counter.name, counter.points, counter.id);
-		}
-		
-		return this;
+	getCounterByID(id) {
+		return new subtype.Counter(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.COUNTERS));
+	}
+	
+	getCounter() {
+		return this.counters.map( id => this.getCounterByID(id) );
 	}
 	
 }
@@ -81,59 +67,29 @@ export class InfluenceSubsystemDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			npcs: new fields.ArrayField(new fields.ObjectField({required: false}))
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Influence Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "influence"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			npcs: new fields.ArrayField(new fields.StringField())
 		}
-	}
-	
-	constructor(name = "Influence Subsystem", newid = foundry.utils.randomID(16), existingNPCs = []) {
-		super({subsystemName: name, subsystemType: "influence", id: newid, npcs: existingNPCs})
-	}
-	
-	reinstantiate(){
-		this.npcs.forEach(loadNPC);
-		
-		function loadNPC(npc, index, arr) {
-			arr[index] = new subtype.InfluenceNPC(npc.name, npc.perception, npc.will, npc.id, npc.thresholds, npc.checks, npc.resistances, npc.weaknesses).reinstantiate();
-		}
-		
-		return this;
 	}
 	
 	addNPC(newNPC) {
-		if(!newNPC instanceof subtype.npc) {
+		if(!newNPC instanceof subtype.InfluenceNPC) {
 			PF2eSubsystemHelper.log(true, 'Cannot add new NPC - the object is not an NPC')
-			return;
+			return null;
 		}
-		return this.npcs.push(newNPC)
-	}
-	
-	getNPCByName(name) {
-		let output = {}
-		this.npcs.forEach(getNPC);
-		
-		function getNPC(npc) {
-			if(npc.name===name) {
-				output = npc
-				return;
-			}
-		}
-		return output;
+		this.npcs.push(SubsystemData.saveDataModel(newNPC, PF2eSubsystemHelper.FLAGS.NPCS))
+		this.updateSource({npcs: this.npcs})
+		return newNPC.id;
 	}
 	
 	getNPCByID(id) {
-		let output = {}
-		this.npcs.forEach(getNPC);
-		
-		function getNPC(npc) {
-			if(npc.id===id) {
-				output = npc
-				return;
-			}
-		}
-		return output;
+		return new subtype.InfluenceNPC(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.NPCS));
+	}
+	
+	getNPCs() {
+		return this.npcs.map( id => this.getNPCByID(id) );
 	}
 }
 
@@ -141,16 +97,11 @@ export class ChasesSubsystemDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
-			subsystemName: new fields.StringField({required: true, blank: false}),
-			subsystemType: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false}),
-			chases: new fields.ArrayField(new fields.ObjectField({required: false}))
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Chases Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "chases"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			chases: new fields.ArrayField(new fields.StringField())
 		}
-	}
-	
-	constructor(name = "Chases Subsystem", newid = foundry.utils.randomID(16), existingChases = [])
-	{
-		super({subsystemName: name, subsystemType: "chases",  id: newid, chases: existingChases})
 	}
 	
 	addChase(newChase) {
@@ -158,17 +109,17 @@ export class ChasesSubsystemDataModel extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Chase - the object is not a Chase')
 			return;
 		}
-		return this.chases.push(newChase)
+		this.chases.push(SubsystemData.saveDataModel(newChase, PF2eSubsystemHelper.FLAGS.CHASES))
+		this.updateSource({chases: this.chases})
+		return newChase.id;
 	}
 	
-	reinstantiate() {
-		this.chases.forEach(loadChases);
-		
-		function loadChases(chase, index, arr) {
-			arr[index] = new subtype.Chase(chase.name, chase.points, counter.id);
-		}
-		
-		return this;
+	getChaseByID(id) {
+		return new subtype.Chase(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHASES));
+	}
+	
+	getChases() {
+		return this.chases.map( id => this.getChaseByID(id) );
 	}
 	
 }

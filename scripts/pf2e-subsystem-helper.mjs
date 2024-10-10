@@ -11,7 +11,8 @@ export class PF2eSubsystemHelper {
 		SOURCES: 'sources',
 		THRESHOLDS: 'thresholds',
 		CHECKS: 'checks',
-		OBSTACLES: 'obstacles'
+		OBSTACLES: 'obstacles',
+		NPCS: 'npcs'
 	}
 	
 	static TEMPLATES = {
@@ -58,52 +59,86 @@ export class SubsystemData {
 
 	static loadDataModel(id, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
 		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, flag)?.[id]
-		/*let instantiatedModel = {}
-		if(model.subsystemType==="research"){
-			instantiatedModel = new subsystem.ResearchSubsystemDataModel(model.subsystemName,  model.id, model.libraries).reinstantiate()
-		} else if (model.subsystemType==="influence"){
-			instantiatedModel = new subsystem.InfluenceSubsystemDataModel(model.subsystemName, model.id, model.npcs).reinstantiate()
-		} else if (model.subsystemType==="chases"){
-			instantiatedModel = new subsystem.ChasesSubsystemDataModel(model.subsystemName, model.id, model.chases).reinstantiate()
-		} else if (model.subsystemType==="victorypoints"){
-			instantiatedModel = new subsystem.VictoryPointsDataModel(model.subsystemName, model.id, model.counters).reinstantiate()
-		}*/
+		let instantiatedModel = {}
+		if(model.type==="research"){
+			instantiatedModel = new subsystem.ResearchSubsystemDataModel(model)
+		} else if (model.type==="influence"){
+			instantiatedModel = new subsystem.InfluenceSubsystemDataModel(model)
+		} else if (model.type==="chases"){
+			instantiatedModel = new subsystem.ChasesSubsystemDataModel(model)
+		} else if (model.type==="victorypoints"){
+			instantiatedModel = new subsystem.VictoryPointsDataModel(model)
+		} else if (model.type==="library"){
+			instantiatedModel = new subtype.Library(model)
+		} else if (model.type==="librarysource"){
+			instantiatedModel = new subtype.LibrarySource(model)
+		} else if (model.type==="influencenpc"){
+			instantiatedModel = new subtype.InfluenceNPC(model)
+		} else if (model.type==="chase"){
+			instantiatedModel = new subtype.Chase(model)
+		} else if (model.type==="obstacle"){
+			instantiatedModel = new subtype.Obstacle(model)
+		} else if (model.type==="check"){
+			instantiatedModel = new subtype.Check(model)
+		} else if (model.type==="threshold"){
+			instantiatedModel = new subtype.Threshold(model)
+		} else {
+			PF2eSubsystemHelper.log(true, "Data Model not recognized.")
+		}
 		
-		return model;
+		return instantiatedModel;
 	}
 	
 	// delete a specific subsystem by ID
-	static deleteSubsystem(subsystemID) {
+	static deleteFlag(id, flag) {
 		const keyDeletion = {
-			[`-=${subsystemID}`]: null
+			[`-=${id}`]: null
 		}
 		
-		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS, keyDeletion);
+		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, flag, keyDeletion);
 	}
 	
-	static deleteAllSubsystems() {
-		return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
+	static deleteFlagType(flag) {
+		return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, flag);
+	}
+	
+	static deleteAllFlags() {		
+		for (const property in PF2eSubsystemHelper.FLAGS) {
+			PF2eSubsystemHelper.log(true, `${PF2eSubsystemHelper.FLAGS[property]}`);
+		}
+		
+		for (const property in PF2eSubsystemHelper.FLAGS){
+			PF2eSubsystemHelper.log(true, game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS[property]))
+		}
+		
+		//return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
+	}
+	
+	static showAllFlags() {
+		for (const property in PF2eSubsystemHelper.FLAGS){
+			PF2eSubsystemHelper.log(true, game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS[property]))
+		}
 	}
 
 	static populateDummies() {
-		const researchDummy = new subsystem.ResearchSubsystemDataModel("Dummy Research System", PF2eSubsystemHelper.generateID())
-		const libraryDummy = new subtype.Library("The Hags' Secret", 7, 0)
-		const librarySource1 = new subtype.LibrarySource("Sprite Swarm", 5, 0)
-		const librarySource1check1 = new subtype.Check("Diplomacy",23)
-		const librarySource1check2 = new subtype.Check("Society",23)
-		const librarySource1check3 = new subtype.Check("Athletics",28)
-		const librarySource2 = new subtype.LibrarySource("Field of Tomeflowers", 10, 0)
-		const librarySource2check1 = new subtype.Check("Academia Lore",18)
-		const librarySource2check2 = new subtype.Check("Library Lore",18)
-		const librarySource2check3 = new subtype.Check("Occultism",23)
-		const librarySource3 = new subtype.LibrarySource("Loremother Tree", 15, 0)
-		const librarySource3check1 = new subtype.Check("Performance",21)
-		const librarySource3check2 = new subtype.Check("Nature",23)
-		const libraryThreshold1 = new subtype.Threshold(5,"The PCs learn of apocryphal fey legends that say the coven members were once cruel fey queens now twisted by inner corruption. They learn basic details about hags and the hag mother's Call.")
-		const libraryThreshold2 = new subtype.Threshold(10,"The PCs learn that the coven gathers on a nearby mountaintop every full moon. Attaining this knowledge comes at a cost: hag malice solidifies into two will-o'-wisps, which attack the PCs.")
-		const libraryThreshold3 = new subtype.Threshold(15,"The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens.")
-		const libraryThreshold4 = new subtype.Threshold(20,"The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge.")
-		const libraryThreshold5 = new subtype.Threshold(30," A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade.")
+		const researchDummy = new subsystem.ResearchSubsystemDataModel()
+		const libraryDummy = new subtype.Library({libraryName: "The Hags' Secret", level: 7, points: 0})
+		const librarySource1 = new subtype.LibrarySource({description: "Sprite Swarm", maxRP: 5, earnedRP: 0})
+		const librarySource1check1 = new subtype.Check({checkType: "Diplomacy", dc: 23})
+		const librarySource1check2 = new subtype.Check({checkType: "Society", dc: 23})
+		const librarySource1check3 = new subtype.Check({checkType: "Athletics", dc: 28})
+		const librarySource2 = new subtype.LibrarySource({description:"Field of Tomeflowers", maxRP: 10, earnedRP: 0})
+		const librarySource2check1 = new subtype.Check({checkType: "Academia Lore", dc: 18})
+		const librarySource2check2 = new subtype.Check({checkType: "Library Lore", dc: 18})
+		const librarySource2check3 = new subtype.Check({checkType: "Occultism", dc: 23})
+		const librarySource3 = new subtype.LibrarySource({description: "Loremother Tree", maxRP: 15, earnedRP: 0})
+		const librarySource3check1 = new subtype.Check({checkType: "Performance", dc: 21})
+		const librarySource3check2 = new subtype.Check({checkType: "Nature", dc: 23})
+		const libraryThreshold1 = new subtype.Threshold({thresholdValue: 5, description: "The PCs learn of apocryphal fey legends that say the coven members were once cruel fey queens now twisted by inner corruption. They learn basic details about hags and the hag mother's Call."})
+		const libraryThreshold2 = new subtype.Threshold({thresholdValue: 10, description: "The PCs learn that the coven gathers on a nearby mountaintop every full moon. Attaining this knowledge comes at a cost: hag malice solidifies into two will-o'-wisps, which attack the PCs."})
+		const libraryThreshold3 = new subtype.Threshold({thresholdValue: 15, description: "The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens."})
+		const libraryThreshold4 = new subtype.Threshold({thresholdValue: 20, description: "The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge."})
+		const libraryThreshold5 = new subtype.Threshold({thresholdValue: 30, description: " A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade."})
 		librarySource1.addCheck(librarySource1check1)
 		librarySource1.addCheck(librarySource1check2)
 		librarySource1.addCheck(librarySource1check3)
@@ -121,9 +156,6 @@ export class SubsystemData {
 		libraryDummy.addThreshold(libraryThreshold4)
 		libraryDummy.addThreshold(libraryThreshold5)
 		researchDummy.addLibrary(libraryDummy)
-
-		PF2eSubsystemHelper.log(true, "This is the dummy before saving:")
-		PF2eSubsystemHelper.log(true, researchDummy)
 		
 		return this.saveDataModel(researchDummy);
 	}
@@ -277,6 +309,7 @@ function getFolders(partySheet) {
 
 
 globalThis.pf2esubsystemhelper = {
+	PF2eSubsystemHelper,
 	SubsystemData,
 	subsystem,
 	subtype

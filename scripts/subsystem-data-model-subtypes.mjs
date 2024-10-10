@@ -6,32 +6,14 @@ export class Library extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			libraryName: new fields.StringField({required: true, blank: false}),
-			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false}),
+			libraryName: new fields.StringField({required: true, blank: false, initial: "New Library"}),
+			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 1}),
+			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			thresholds: new fields.ArrayField(new fields.StringField()),
 			sources: new fields.ArrayField(new fields.StringField()),
-			id: new fields.StringField({required: true, blank: false})
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "library"})
 		}
-	}
-	
-	constructor(name = "New Library", newLevel = 1, newPoints = 1, newid = foundry.utils.randomID(16), existingThresholds = [], existingSources = []) {
-		super({libraryName: name, level: newLevel, points: newPoints, id: newid, thresholds: existingThresholds, sources: existingSources})
-	}
-	
-	reinstantiate(){
-		this.thresholds.forEach(loadThreshold);
-		this.sources.forEach(loadSource);
-		
-		function loadThreshold(threshold, index, arr) {
-			arr[index] = new Threshold(threshold.thresholdValue, threshold.description, threshold.id);
-		}
-		
-		function loadSource(source, index, arr) {
-			arr[index] = new LibrarySource(source.description, source.maxRP, source.earnedRP, source.id, source.checks).reinstantiate();
-		}
-		
-		return this;
 	}
 	
 	addThreshold(newThreshold) {
@@ -39,11 +21,17 @@ export class Library extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
 			return null;
 		}
-		return this.thresholds.push(SubsystemData.saveDataModel(newThreshold, PF2eSubsystemHelper.FLAGS.THRESHOLDS));
+		const id = this.thresholds.push(SubsystemData.saveDataModel(newThreshold, PF2eSubsystemHelper.FLAGS.THRESHOLDS))
+		this.updateSource({thresholds: this.thresholds})
+		return id;
 	}
 	
 	getThresholdByID(id) {
-		return new Threshold(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.THRESHOLDS));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.THRESHOLDS);
+	}
+	
+	getThresholds() {
+		return this.thresholds.map( id => this.getThresholdByID(id) );
 	}
 	
 	addSource(newSource) {
@@ -51,11 +39,17 @@ export class Library extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Library Source - the object is not a Library Source')
 			return null;
 		}
-		return this.sources.push(SubsystemData.saveDataModel(newSource, PF2eSubsystemHelper.FLAGS.SOURCES));
+		const id = this.sources.push(SubsystemData.saveDataModel(newSource, PF2eSubsystemHelper.FLAGS.SOURCES))
+		this.updateSource({sources: this.sources})
+		return id;
 	}
 	
 	getSourceByID(id) {
-		return new LibrarySource(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.SOURCES));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.SOURCES);
+	}
+	
+	getSources() {
+		return this.sources.map( id => this.getSourceByID(id) );
 	}
 }
 
@@ -63,26 +57,13 @@ export class LibrarySource extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			description: new fields.StringField({required: true, blank: false}),
-			maxRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			earnedRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: false}),
+			description: new fields.StringField({required: true, blank: false, initial: "New Source"}),
+			maxRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 1}),
+			earnedRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			checks: new fields.ArrayField(new fields.StringField()),
-			id: new fields.StringField({required: true, blank: false})
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "librarysource"})
 		}
-	}
-	
-	constructor(newDescription = "New Description", max = 5, earned = 1, newid = foundry.utils.randomID(16), existingChecks = []) {
-		super({description: newDescription, maxRP: max, earnedRP: earned, id: newid, checks: existingChecks})
-	}
-	
-	reinstantiate(){
-		this.checks.forEach(loadCheck);
-		
-		function loadCheck(check, index, arr) {
-			arr[index] = new Check(check.type, check.dc, check.id);
-		}
-		
-		return this;
 	}
 	
 	addCheck(newCheck) {
@@ -90,11 +71,17 @@ export class LibrarySource extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		return this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS));
+		const id = this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS))
+		this.updateSource({checks: this.checks})
+		return id;
 	}
 	
 	getCheckByID(id) {
-		return new Check(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS);
+	}
+	
+	getChecks() {
+		return this.checks.map( id => this.getCheckByID(id) );
 	}
 }
 
@@ -102,46 +89,34 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			name: new fields.StringField({required: true, blank: false}),
-			perception: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			will: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			name: new fields.StringField({required: true, blank: false, initial: "New NPC"}),
+			perception: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
+			will: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			thresholds: new fields.ArrayField(new fields.StringField()),
 			checks: new fields.ArrayField(new fields.StringField()),
-			resistances: new fields.StringField({required: false, blank: true}),
-			weaknesses: new fields.StringField({required: false, blank: true}),
-			id: new fields.StringField({required: true, blank: false})
+			resistances: new fields.StringField({required: false, blank: true, initial: ""}),
+			weaknesses: new fields.StringField({required: false, blank: true, initial: ""}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "influencenpc"})
 		}
-	}
-	
-	constructor(newName = "New NPC", newPerception = 1, newWill = 1, newid = foundry.utils.randomID(16), existingThresholds = [], existingChecks = [], resistances = "", weaknesses = "") {
-		super({name: newName, perception: newPerception, will: newWill, id: newid, thresholds: existingThresholds, checks: existingChecks, resistances, weaknesses})
-	}
-	
-	reinstantiate() {
-		this.thresholds.forEach(loadThreshold);
-		this.checks.forEach(loadCheck);
-		
-		function loadThreshold(threshold, index, arr) {
-			arr[index] = new Threshold(threshold.thresholdValue, threshold.description, threshold.id);
-		}
-		
-		function loadCheck(check, index, arr) {
-			arr[index] = new Check(check.type, check.dc, check.id);
-		}
-		
-		return this;
 	}
 	
 	addThreshold(newThreshold) {
 		if(!newThreshold instanceof Threshold) {
-			PF2eSubsystemHelper.log(true, 'Cannot add new Threshold - the object is not an Threshold')
-			return;
+			PF2eSubsystemHelper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
+			return null;
 		}
-		return this.thresholds.push(SubsystemData.saveDataModel(newThreshold, PF2eSubsystemHelper.FLAGS.THRESHOLDS));
+		const id = this.thresholds.push(SubsystemData.saveDataModel(newThreshold, PF2eSubsystemHelper.FLAGS.THRESHOLDS))
+		this.updateSource({thresholds: this.thresholds})
+		return id;
 	}
 	
 	getThresholdByID(id) {
-		return new Threshold(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.THRESHOLDS));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.THRESHOLDS);
+	}
+	
+	getThresholds() {
+		return this.thresholds.map( id => this.getThresholdByID(id) );
 	}
 	
 	addCheck(newCheck) {
@@ -149,40 +124,31 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		return this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS));
+		const id = this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS))
+		this.updateSource({checks: this.checks})
+		return id;
 	}
 	
 	getCheckByID(id) {
-		return new Check(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS);
+	}
+	
+	getChecks() {
+		return this.checks.map( id => this.getCheckByID(id) );
 	}
 }
-
-
 
 export class Chase extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			name: new fields.StringField({required: true, blank: false}),
-			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			name: new fields.StringField({required: true, blank: false, initial: "New Chase"}),
+			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 1}),
 			obstacles: new fields.ArrayField(new fields.StringField()),
-			objective: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false})
+			objective: new fields.StringField({required: true, blank: false, initial: "Survive"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "chase"})
 		}
-	}
-	
-	constructor(newName = "New Chase", newLevel = 1, newid = foundry.utils.randomID(16), newObjective = "Survive", existingObstacles = []) {
-		super({name: newName, level: newLevel, id: newid, objective: newObjective, obstacles: existingObstacles})
-	}
-	
-	reinstantiate() {
-		this.obstacles.forEach(loadObstacle);
-		
-		function loadObstacle(obstacle, index, arr) {
-			arr[index] = new Obstacle(obstacle.name, obstacle.level, obstacle.id, obstacle.checks);
-		}
-		
-		return this;
 	}
 	
 	addObstacle(newObstacle) {
@@ -190,11 +156,17 @@ export class Chase extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Obstacle - the object is not an Obstacle')
 			return;
 		}
-		return this.obstacles.push(SubsystemData.saveDataModel(newObstacle, PF2eSubsystemHelper.FLAGS.OBSTACLES));
+		const id = this.obstacles.push(SubsystemData.saveDataModel(newObstacle, PF2eSubsystemHelper.FLAGS.OBSTACLES))
+		this.updateObstacle({obstacles: this.obstacles})
+		return id;
 	}
 	
 	getObstacleByID(id) {
-		return new Obstacle(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.OBSTACLES));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.OBSTACLES);
+	}
+	
+	getObstacles() {
+		return this.obstacles.map( id => this.getObstacleByID(id) );
 	}
 }
 
@@ -202,25 +174,12 @@ export class Obstacle extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			name: new fields.StringField({required: true, blank: false}),
-			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
+			name: new fields.StringField({required: true, blank: false, initial: "New Obstacle"}),
+			level: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 1}),
 			checks: new fields.ArrayField(new fields.StringField()),
-			id: new fields.SringField({required: true, blank: false})
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "obstacle"})
 		}
-	}
-	
-	constructor(newName = "New Obstacle", newLevel = 1, newid = foundry.utils.randomID(16), existingChecks = []) {
-		super({name: newName, level: newLevel, id: newid, checks: existingChecks})
-	}
-	
-	reinstantiate(){
-		this.checks.forEach(loadCheck);
-		
-		function loadCheck(check, index, arr) {
-			arr[index] = new Check(check.type, check.dc, check.id);
-		}
-		
-		return this;
 	}
 	
 	addCheck(newCheck) {
@@ -228,11 +187,17 @@ export class Obstacle extends foundry.abstract.DataModel {
 			PF2eSubsystemHelper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		return this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS));
+		const id = this.checks.push(SubsystemData.saveDataModel(newCheck, PF2eSubsystemHelper.FLAGS.CHECKS))
+		this.updateSource({checks: this.checks})
+		return id;
 	}
 	
 	getCheckByID(id) {
-		return new Check(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS));
+		return SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.CHECKS);
+	}
+	
+	getChecks() {
+		return this.checks.map( id => this.getCheckByID(id) );
 	}
 }
 
@@ -240,18 +205,15 @@ export class Check extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			type: new fields.StringField({required: true, blank: false}),
-			dc: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			id: new fields.StringField({required: true, blank: false})
+			checkType: new fields.StringField({required: true, blank: false, initial: "Athletics"}),
+			dc: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 10}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "check"})
 		}
 	}
 	
-	constructor(newType = "Athletics", newDC = 10, newID = PF2eSubsystemHelper.generateID()) {
-		super({type: newType, dc: newDC, id: newID})
-	}
-	
 	getEnricher() {
-		return "@Check[type:"+this.type+"|dc:"+this.dc+"]";
+		return "@Check[type:"+this.checkType+"|dc:"+this.dc+"]";
 	}
 }
 
@@ -259,14 +221,11 @@ export class Counter extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			name: new fields.StringField({required: true, blank: false}),
-			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			id: new fields.StringField({required: true, blank: false})
+			name: new fields.StringField({required: true, blank: false, initial: "New Counter"}),
+			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "counter"})
 		}
-	}
-	
-	constructor(newName = "Counter", points = 1, newID) {
-		super({name: newName, points: newPoints, id: newID})
 	}
 }
 
@@ -274,13 +233,10 @@ export class Threshold extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields =foundry.data.fields;
 		return {
-			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true}),
-			description: new fields.StringField({required: true, blank: false}),
-			id: new fields.StringField({required: true, blank: false})
+			thresholdValue: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 1}),
+			description: new fields.StringField({required: true, blank: false, initial: "New Threshold"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			type: new fields.StringField({required: true, blank: false, initial: "threshold"})
 		}
-	}
-	
-	constructor(value = 1, newDescription = "New Description", newid = foundry.utils.randomID(16)) {
-		super({thresholdValue: value, description: newDescription,  id: newid})
 	}
 }
