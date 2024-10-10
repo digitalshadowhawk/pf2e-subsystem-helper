@@ -4,11 +4,9 @@
 
 .create-subsystem-button {
 	background: transparent;
-	padding: 0;
-	color: white;
+	/*padding: 0;*/
 	line-height: normal;
 	border: 0;
-	align-self: center;
 }
 
 .create-subsystem-button > i {

@@ -1,14 +1,17 @@
 import * as subsystem from './subsystem-data-models.mjs';
+import * as subtype from './subsystem-data-model-subtypes.mjs';
 
-globalThis.pf2esubsystemhelper = {
-	
-}
-//import { Tester } from "./research.mjs";
-class PF2eSubsystemHelper {
+
+export class PF2eSubsystemHelper {
 	static ID = "pf2e-subsystem-helper";
 	
 	static FLAGS = {
-		SUBSYSTEMS: 'subsystems'
+		SUBSYSTEMS: 'subsystems',
+		LIBRARIES: 'libraries',
+		SOURCES: 'sources',
+		THRESHOLDS: 'thresholds',
+		CHECKS: 'checks',
+		OBSTACLES: 'obstacles'
 	}
 	
 	static TEMPLATES = {
@@ -28,8 +31,11 @@ class PF2eSubsystemHelper {
 			console.log(this.ID, '|', ...args);
 		}
 	}
+
 	
-	
+	static generateID(){
+		return foundry.utils.randomID(16);
+	}
 }
 
 /**
@@ -39,23 +45,31 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
 	registerPackageDebugFlag(PF2eSubsystemHelper.ID);
 });
 
-class SubsystemData {
+export class SubsystemData {
+	
 	static get allSubsystems() {
 		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
 	}
 
-	static saveDataModel(dataModel) {
-		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS, {[dataModel.id]: dataModel});
+	static saveDataModel(dataModel, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
+		game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, flag, {[dataModel.id]: dataModel});
+		return dataModel.id;
 	}
 
-	static loadDataModel(id) {
-		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS)?.[id]
-		let instantiatedModel = {}
+	static loadDataModel(id, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
+		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, flag)?.[id]
+		/*let instantiatedModel = {}
 		if(model.subsystemType==="research"){
-			instantiatedModel = new ResearchSubsystemDataModel(model.name, model.type,  model.id, model.libraries).reinstantiate()
-		}
+			instantiatedModel = new subsystem.ResearchSubsystemDataModel(model.subsystemName,  model.id, model.libraries).reinstantiate()
+		} else if (model.subsystemType==="influence"){
+			instantiatedModel = new subsystem.InfluenceSubsystemDataModel(model.subsystemName, model.id, model.npcs).reinstantiate()
+		} else if (model.subsystemType==="chases"){
+			instantiatedModel = new subsystem.ChasesSubsystemDataModel(model.subsystemName, model.id, model.chases).reinstantiate()
+		} else if (model.subsystemType==="victorypoints"){
+			instantiatedModel = new subsystem.VictoryPointsDataModel(model.subsystemName, model.id, model.counters).reinstantiate()
+		}*/
 		
-		return instantiatedModel;
+		return model;
 	}
 	
 	// delete a specific subsystem by ID
@@ -69,6 +83,49 @@ class SubsystemData {
 	
 	static deleteAllSubsystems() {
 		return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
+	}
+
+	static populateDummies() {
+		const researchDummy = new subsystem.ResearchSubsystemDataModel("Dummy Research System", PF2eSubsystemHelper.generateID())
+		const libraryDummy = new subtype.Library("The Hags' Secret", 7, 0)
+		const librarySource1 = new subtype.LibrarySource("Sprite Swarm", 5, 0)
+		const librarySource1check1 = new subtype.Check("Diplomacy",23)
+		const librarySource1check2 = new subtype.Check("Society",23)
+		const librarySource1check3 = new subtype.Check("Athletics",28)
+		const librarySource2 = new subtype.LibrarySource("Field of Tomeflowers", 10, 0)
+		const librarySource2check1 = new subtype.Check("Academia Lore",18)
+		const librarySource2check2 = new subtype.Check("Library Lore",18)
+		const librarySource2check3 = new subtype.Check("Occultism",23)
+		const librarySource3 = new subtype.LibrarySource("Loremother Tree", 15, 0)
+		const librarySource3check1 = new subtype.Check("Performance",21)
+		const librarySource3check2 = new subtype.Check("Nature",23)
+		const libraryThreshold1 = new subtype.Threshold(5,"The PCs learn of apocryphal fey legends that say the coven members were once cruel fey queens now twisted by inner corruption. They learn basic details about hags and the hag mother's Call.")
+		const libraryThreshold2 = new subtype.Threshold(10,"The PCs learn that the coven gathers on a nearby mountaintop every full moon. Attaining this knowledge comes at a cost: hag malice solidifies into two will-o'-wisps, which attack the PCs.")
+		const libraryThreshold3 = new subtype.Threshold(15,"The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens.")
+		const libraryThreshold4 = new subtype.Threshold(20,"The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge.")
+		const libraryThreshold5 = new subtype.Threshold(30," A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade.")
+		librarySource1.addCheck(librarySource1check1)
+		librarySource1.addCheck(librarySource1check2)
+		librarySource1.addCheck(librarySource1check3)
+		librarySource2.addCheck(librarySource2check1)
+		librarySource2.addCheck(librarySource2check2)
+		librarySource2.addCheck(librarySource2check3)
+		librarySource3.addCheck(librarySource3check1)
+		librarySource3.addCheck(librarySource3check2)
+		libraryDummy.addSource(librarySource1)
+		libraryDummy.addSource(librarySource2)
+		libraryDummy.addSource(librarySource3)
+		libraryDummy.addThreshold(libraryThreshold1)
+		libraryDummy.addThreshold(libraryThreshold2)
+		libraryDummy.addThreshold(libraryThreshold3)
+		libraryDummy.addThreshold(libraryThreshold4)
+		libraryDummy.addThreshold(libraryThreshold5)
+		researchDummy.addLibrary(libraryDummy)
+
+		PF2eSubsystemHelper.log(true, "This is the dummy before saving:")
+		PF2eSubsystemHelper.log(true, researchDummy)
+		
+		return this.saveDataModel(researchDummy);
 	}
 }
 
@@ -204,7 +261,7 @@ function getFolders(partySheet) {
         let folder = `<li class="directory-item folder flexcol collapsed">
           <header class="folder-header flexrow">
             <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${obj}</h3>
-			<button type='button' class="create-subsystem-button create-${obj}-subsystem-button flex0" data-tooltip="Create New ${obj} Subsystem">
+			<button type='button' class="create-button create-subsystem-button create-${obj}-subsystem-button flex0" data-tooltip="Create New ${obj} Subsystem">
 				<i class="fa-solid subsystem-add fa-gears"></i>
 				<i class="fa-solid subsystem-add fa-plus"></i>
 			</button>
@@ -216,4 +273,11 @@ function getFolders(partySheet) {
         return folder;
     }).join("")
 
+}
+
+
+globalThis.pf2esubsystemhelper = {
+	SubsystemData,
+	subsystem,
+	subtype
 }

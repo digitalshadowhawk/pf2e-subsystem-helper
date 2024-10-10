@@ -1,8 +1,8 @@
 * Add Subsystem Types as extending SubsystemTracker data type
-* Add Settings to enable each subsystem individually
-* add section on Party Sheet to store SubsystemTrackers
+* ~~Add Settings to enable each subsystem individually~~
+* ~~add section on Party Sheet to store SubsystemTrackers~~
 
-# Reputation SubsystemTracker implements VictoryPoints
+# ReputationSubsystemDataModel implements VictoryPoints
 * add reputation levels and coresponding point levels as constants
 * add ReputationGroup class with two variables, name (String) and points (int) bounded by -50 to 50
 * add an array of groups that the party has reputation with (this can also include individual NPCs, however I recommend using Influence instead)
