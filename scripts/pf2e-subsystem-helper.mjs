@@ -2,7 +2,7 @@ import * as subsystem from './subsystem-data-models.mjs';
 import * as subtype from './subsystem-data-model-subtypes.mjs';
 
 
-export class PF2eSubsystemHelper {
+export class Helper {
 	static ID = "pf2e-subsystem-helper";
 	
 	static FLAGS = {
@@ -134,39 +134,39 @@ export class PF2eSubsystemHelper {
  * Register our module's debug flag with developer mode's custom hook
  */
 Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
-	registerPackageDebugFlag(PF2eSubsystemHelper.ID);
+	registerPackageDebugFlag(Helper.ID);
 });
 
-export class SubsystemData {
+export class Data {
 	
 	static get allSubsystems() {
-		return game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
+		return game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS);
 	}
 
-	static saveDataModel(dataModel, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
-		game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, flag, {[dataModel.id]: dataModel});
+	static saveDataModel(dataModel, flag = Helper.FLAGS.SUBSYSTEMS) {
+		game.actors?.party?.setFlag(Helper.ID, flag, {[dataModel.id]: dataModel});
 		return dataModel.id;
 	}
 
-	static loadDataModel(id, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
-		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, flag)?.[id]
+	static loadDataModel(id, flag = Helper.FLAGS.SUBSYSTEMS) {
+		const model = game.actors?.party?.getFlag(Helper.ID, flag)?.[id]
 		let instantiatedModel = {}
 		if(!model){
-			PF2eSubsystemHelper.log(true, "Object is not a valid Datamodel Model.")
+			Helper.log(true, "Object is not a valid Data Model.")
 			return null;
 		}
 		if(model.type==="research"){
-			instantiatedModel = new subsystem.ResearchSubsystemDataModel(model)
+			instantiatedModel = new subsystem.ResearchDataModel(model)
 		} else if (model.type==="influence"){
-			instantiatedModel = new subsystem.InfluenceSubsystemDataModel(model)
+			instantiatedModel = new subsystem.InfluenceDataModel(model)
 		} else if (model.type==="chases"){
-			instantiatedModel = new subsystem.ChasesSubsystemDataModel(model)
+			instantiatedModel = new subsystem.ChasesDataModel(model)
 		} else if (model.type==="victorypoints"){
-			instantiatedModel = new subsystem.VictoryPointsSubsystemDataModel(model)
+			instantiatedModel = new subsystem.VictoryPointsDataModel(model)
 		} else if (model.type==="infiltrations"){
-			instantiatedModel = new subsystem.InfiltrationSubsystemDataModel(model)
+			instantiatedModel = new subsystem.InfiltrationDataModel(model)
 		} else if (model.type==="reputations"){
-			instantiatedModel = new subsystem.ReputationSubsystemDataModel(model)
+			instantiatedModel = new subsystem.ReputationDataModel(model)
 		}else if (model.type==="library"){
 			instantiatedModel = new subtype.Library(model)
 		} else if (model.type==="librarysource"){
@@ -192,7 +192,7 @@ export class SubsystemData {
 		} else if (model.type==="counter"){
 			instantiatedModel = new subtype.Counter(model)
 		} else {
-			PF2eSubsystemHelper.log(true, "Data Model not recognized.")
+			Helper.log(true, "Data Model not recognized.")
 		}
 		
 		return instantiatedModel;
@@ -204,36 +204,58 @@ export class SubsystemData {
 			[`-=${id}`]: null
 		}
 		
-		return game.actors?.party?.setFlag(PF2eSubsystemHelper.ID, flag, keyDeletion);
+		return game.actors?.party?.setFlag(Helper.ID, flag, keyDeletion);
 	}
 	
 	static deleteFlagType(flag) {
-		return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, flag);
+		return game.actors?.party?.unsetFlag(Helper.ID, flag);
 	}
 	
 	static deleteAllFlags() {		
-		for (const property in PF2eSubsystemHelper.FLAGS){
-			PF2eSubsystemHelper.log(true, game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS[property]))
+		for (const property in Helper.FLAGS){
+			Helper.log(true, game.actors?.party?.unsetFlag(Helper.ID, Helper.FLAGS[property]))
 		}
 	}
 	
 	static showAllFlags() {
-		for (const property in PF2eSubsystemHelper.FLAGS){
-			PF2eSubsystemHelper.log(true, game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS[property]))
+		for (const property in Helper.FLAGS){
+			Helper.log(true, game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS[property]))
 		}
+	}
+
+	static getAllSubsystems() {
+		var output = []
+		for (const property in game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS)){
+			output.push(this.loadDataModel(property))
+		}
+		//Helper.log(true, output)
+		return output
+	}
+
+	static getAllOfSubsystemType(newType) {
+		var output = []
+		this.getAllSubsystems().forEach(element => {
+			//Helper.log(true, element)
+			//Helper.log(true, element.type)
+			//Helper.log(true, type)
+			if(element.type===newType){
+				output.push(element)
+			}
+		})
+		return output;
 	}
 
 	static populateDummies() {
 		
 		//Victory Point Subsystem Dummies
-		const victoryPointDummy = new subsystem.VictoryPointsSubsystemDataModel()
+		const victoryPointDummy = new subsystem.VictoryPointsDataModel()
 		const counter1 = new subtype.Counter()
 		victoryPointDummy.addCounter(counter1)
 
 		this.saveDataModel(victoryPointDummy)
 
 		//Chase Subsystem Dummies
-		const chaseDummy = new subsystem.ChasesSubsystemDataModel()
+		const chaseDummy = new subsystem.ChasesDataModel()
 		const chase1 = new subtype.Chase({name: "Underground Obstacles" , objective: "Win."})
 		const chaseObstacle1 = new subtype.ChaseObstacle({name: "Crumbling Corridor", level: 1, goal:1})
 		const chaseObstacle1Check1 = new subtype.Check({checkType: "Acrobatics", dc: 13})
@@ -265,7 +287,7 @@ export class SubsystemData {
 		this.saveDataModel(chaseDummy)
 
 		//Influence Subsystem Dummies
-		const influenceDummy = new subsystem.InfluenceSubsystemDataModel()
+		const influenceDummy = new subsystem.InfluenceDataModel()
 		const npc1 = new subtype.InfluenceNPC({name: "Danphy Mollwether", perception: 9, will: 12, resistances: "The landlord thinks in practical terms, with little patience for the “good-for-nothings” of the troupe. Appeals directed at sympathy alone increase the check's DC by 2.", weaknesses: "Mr. Mollwether used to visit the theater often as a small child, and performing one of his favorite old songs or plays brings tears to his eyes and reduces the Performance DC by 2."})
 		const npcThreshold1 = new subtype.Threshold({thresholdValue: 4, description: "Mr. Mollwether gives the troupe 1 week to get him his back rent, with interest, before evicting them."})
 		const npcThreshold2 = new subtype.Threshold({thresholdValue: 6, description: "Mr. Mollwether gives the troupe 1 month to get him his back rent before evicting them."})
@@ -297,7 +319,7 @@ export class SubsystemData {
 		this.saveDataModel(influenceDummy)
 
 		//Research Subsystem Dummies
-		const researchDummy = new subsystem.ResearchSubsystemDataModel()
+		const researchDummy = new subsystem.ResearchDataModel()
 		const library1 = new subtype.Library({libraryName: "The Hags' Secret", level: 7, points: 0})
 		const librarySource1 = new subtype.LibrarySource({description: "Sprite Swarm", maxRP: 5, earnedRP: 0})
 		const librarySource1check1 = new subtype.Check({checkType: "Diplomacy", dc: 23})
@@ -337,7 +359,7 @@ export class SubsystemData {
 		this.saveDataModel(researchDummy);
 
 		//Infiltration Subsystem Dummies
-		const infiltrationDummy = new subsystem.InfiltrationSubsystemDataModel()
+		const infiltrationDummy = new subsystem.InfiltrationDataModel()
 		const infiltration1 = new subtype.Infiltration({name: "Sample Infiltration"})
 		const infiltrationObstacle1 = new subtype.InfiltrationObstacle({goal: 2, goalType: "individual"})
 		const infiltrationObstacle1Check1 = new subtype.Check({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
@@ -385,42 +407,42 @@ export class SubsystemData {
 }
 
 Hooks.on('init', function() {
-	game.settings.register(PF2eSubsystemHelper.ID, "Reputation", {
+	game.settings.register(Helper.ID, "Reputation", {
 		name: "Use the Reputation Subsystem",
 		scope: "world",
 		config: "true",
 		default: "false",
 		type: Boolean
 	});
-	game.settings.register(PF2eSubsystemHelper.ID, "Influence", {
+	game.settings.register(Helper.ID, "Influence", {
 		name: "Use the Influence Subsystem",
 		scope: "world",
 		config: "true",
 		default: "false",
 		type: Boolean
 	});
-	game.settings.register(PF2eSubsystemHelper.ID, "Infiltration", {
+	game.settings.register(Helper.ID, "Infiltration", {
 		name: "Use the Infiltration Subsystem",
 		scope: "world",
 		config: "true",
 		default: "false",
 		type: Boolean
 	});
-	game.settings.register(PF2eSubsystemHelper.ID, "Research", {
+	game.settings.register(Helper.ID, "Research", {
 		name: "Use the Research Subsystem",
 		scope: "world",
 		config: "true",
 		default: "false",
 		type: Boolean
 	});
-	game.settings.register(PF2eSubsystemHelper.ID, "Chases", {
+	game.settings.register(Helper.ID, "Chases", {
 		name: "Use the Chases Subsystem",
 		scope: "world",
 		config: "true",
 		default: "false",
 		type: Boolean
 	});
-	game.settings.register(PF2eSubsystemHelper.ID, "Victory Points", {
+	game.settings.register(Helper.ID, "VictoryPoints", {
 		name: "Use the Victory Points Subsystem",
 		scope: "world",
 		config: "true",
@@ -429,23 +451,24 @@ Hooks.on('init', function() {
 	});
 });
 
-Hooks.on('getPartySheetPF2eHeaderButtons', function(app, buttons) {
+/*Hooks.on('getPartySheetPF2eHeaderButtons', function(app, buttons) {
 	if (!game.user.isGM) {return;}
 	
 	buttons.unshift({
 		label: "Subsystems",
 		icon: "fa fa-gears",
-		class: `${PF2eSubsystemHelper.ID}-tab`,
+		class: `${Helper.ID}-tab`,
 		onclick: () => {
 			(new SubsystemForm({actor:app.actor}, async () => {
 			setTimeout(() => { app.render(true, { tab: "sub-system"}) }, 0);
 			})).render(true);
 		}
 	});
-});
+});*/
 
 Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
-    if (!game.user.isGM && !game.settings.get(PF2eSubsystemHelper.ID, "Reputation")) {return;}
+    Helper.log(true, game.settings.get(Helper.ID, "Reputation")?.config)
+	if (!game.user.isGM || !(game.settings.get(Helper.ID, "Reputation")||game.settings.get(Helper.ID, "Influence")||game.settings.get(Helper.ID, "VictoryPoints")||game.settings.get(Helper.ID, "Chases")||game.settings.get(Helper.ID, "Infiltration")||game.settings.get(Helper.ID, "Research"))) {return;}
 	
 	const content = `
 	<section class="tab sidebar-tab directory flexcol subsystem-section">
@@ -470,22 +493,22 @@ Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
     })
 	
 	html.on('click', '.create-Reputation-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Reputation Button Clicked!');
+		Helper.log(true, 'Reputation Button Clicked!');
 	});
 	html.on('click', '.create-Influence-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Influence Button Clicked!');
+		Helper.log(true, 'Influence Button Clicked!');
 	});
 	html.on('click', '.create-Infiltration-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Infiltration Button Clicked!');
+		Helper.log(true, 'Infiltration Button Clicked!');
 	});
 	html.on('click', '.create-Research-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Research Button Clicked!');
+		Helper.log(true, 'Research Button Clicked!');
 	});
 	html.on('click', '.create-Chases-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Chases Button Clicked!');
+		Helper.log(true, 'Chases Button Clicked!');
 	});
-	html.on('click', '.create-Victory Points-subsystem-button', (event) => {
-		PF2eSubsystemHelper.log(true, 'Victory Points Button Clicked!');
+	html.on('click', '.create-VictoryPoints-subsystem-button', (event) => {
+		Helper.log(true, 'Victory Points Button Clicked!');
 	});
 });
 
@@ -493,27 +516,27 @@ function getFolders(partySheet) {
 	
 	const enabledFolders = []
 	
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Reputation")) {
-		enabledFolders.push('Reputation');
+	if (game.settings.get(Helper.ID, "Reputation")) {
+		enabledFolders.push('reputation')
 	}
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Influence")) {
-		enabledFolders.push('Influence');
+	if (game.settings.get(Helper.ID, "Influence")) {
+		enabledFolders.push('influence')
 	}
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Infiltration")) {
-		enabledFolders.push('Infiltration');
+	if (game.settings.get(Helper.ID, "Infiltration")) {
+		enabledFolders.push('infiltrations')
 	}
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Research")) {
-		enabledFolders.push('Research');
+	if (game.settings.get(Helper.ID, "Research")) {
+		enabledFolders.push('research')
 	}
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Chases")) {
-		enabledFolders.push('Chases');
+	if (game.settings.get(Helper.ID, "Chases")) {
+		enabledFolders.push('chases')
 	}
-	if (game.settings.get(PF2eSubsystemHelper.ID, "Victory Points")) {
-		enabledFolders.push('Victory Points');
+	if (game.settings.get(Helper.ID, "VictoryPoints")) {
+		enabledFolders.push('victorypoints');
 	}
-	
+
 	return enabledFolders.map(obj=>{
-        let folder = `<li class="directory-item folder flexcol collapsed">
+		let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
           <header class="folder-header flexrow">
             <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${obj}</h3>
 			<button type='button' class="create-button create-subsystem-button create-${obj}-subsystem-button flex0" data-tooltip="Create New ${obj} Subsystem">
@@ -521,19 +544,32 @@ function getFolders(partySheet) {
 				<i class="fa-solid subsystem-add fa-plus"></i>
 			</button>
           </header>
-          <ol class="subdirectory">
-                
-          </ol>
+          <ol class="subdirectory">`+
+			getSubdirectory(obj)
+		  +`</ol>
         </li>`
         return folder;
     }).join("")
 
 }
 
+function getSubdirectory(subsystemString){
+	let subsystemArray = Data.getAllOfSubsystemType(subsystemString)
+	return subsystemArray.map(obj=>{
+		let entry =`<li class="directory-item subsystem flexrow" stlye="display: flex;">
+				<h4 class="entry-name">
+					<a>${obj.subsystemName}</a>
+					<span class="subsystem-${obj.type}">${obj.type}</span>
+				</h4>
+			</li>`
+		return entry;
+	}).join("")
+}
+
 
 globalThis.pf2esubsystemhelper = {
-	PF2eSubsystemHelper,
-	SubsystemData,
+	Helper,
+	Data,
 	subsystem,
 	subtype
 }
