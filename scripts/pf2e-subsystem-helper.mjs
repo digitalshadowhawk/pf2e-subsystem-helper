@@ -8,15 +8,106 @@ export class PF2eSubsystemHelper {
 	static FLAGS = {
 		SUBSYSTEMS: 'subsystems',
 		LIBRARIES: 'libraries',
+		REPUTATIONS: 'reputations',
 		SOURCES: 'sources',
 		THRESHOLDS: 'thresholds',
 		CHECKS: 'checks',
-		OBSTACLES: 'obstacles',
-		NPCS: 'npcs'
+		CHASES: 'chases',
+		CHASEOBSTACLES: 'chaseobstacles',
+		NPCS: 'npcs',
+		INFILTRATIONS: 'infiltrations',
+		INFILTRATIONOBSTACLES: 'infiltrationobstacles',
+		COMPLICATIONS: 'complications',
+		COUNTERS: 'counters'
 	}
 	
 	static TEMPLATES = {
 		PF2ESUBSYSYSTEMHELPER: `modules/${this.ID}/templates/pf2e-subsystem-helper.hbs`
+	}
+
+	static DCS = {
+		0:14,1:15,2:16,3:18,4:19,5:20,6:22,7:23,8:24,9:26,10:27,11:28,12:30,13:31,14:32,15:34,16:35,17:36,18:38,19:39,20:40,21:42,22:44,23:46,24:48,25:50
+	}
+
+	static ADJUSTMENTS = {
+		INCREDIBLYEASY: -10,
+		VERYEASY: -5,
+		EASY: -2,
+		STANDARD: 0,
+		HARD: 2,
+		VERYHARD: 5,
+		INCREDIBLYHARD: 10
+	}
+
+	static REPUTATIONS = {
+		LEVELS: {
+			REVERED: {
+				LABEL: "Revered",
+				LOWER: 30,
+				UPPER: 50,
+				RAISED: "Major favor",
+				LOWERED: "Moderate or major disservice",
+				EFFECT: "The group reveres the PCs as heroes and celebrities. Every member has heard of the PCs, is helpful toward them, and would take major risks to assist them. Only major favors accrue Reputation Points, and only moderate or major disservices can reduce them."
+			},
+			ADMIRED: {
+				LABEL: "Admired",
+				LOWER: 15,
+				UPPER: 29,
+				RAISED: "Major favor",
+				LOWERED: "Any disservice",
+				EFFECT: "The PCs have earned this group's admiration. The majority of the group knows about the PCs and have an extremely favorable opinion toward them. Many members of the group are helpful toward the PCs, and those who aren't are friendly. Only major favors accrue Reputation Points."
+			},
+			LIKED: {
+				LABEL: "Liked",
+				LOWER: 5,
+				UPPER: 14,
+				RAISED: "Moderate or major favor",
+				LOWERED: "Any disservice",
+				EFFECT: "The PCs have gained this group's favor. Many members of the group know about the PCs, and those who do are usually friendly to them. At this reputation, only moderate and major favors accrue Reputation Points; it takes more to impress the group further."
+			},
+			IGNORED: {
+				LABEL: "Ignored",
+				LOWER: -4,
+				UPPER: 4,
+				RAISED: "Any favor",
+				LOWERED: "Any disservice",
+				EFFECT: "The PCs either aren't on this group's radar or the group knows about the PCs but is generally ambivalent toward them. This carries no special benefits or detriments."
+			},
+			DISLIKED: {
+				LABEL: "Disliked",
+				LOWER: -14,
+				UPPER: -5,
+				RAISED: "Any favor",
+				LOWERED: "Moderate or major disservice",
+				EFFECT: "The PCs have a poor reputation among members of this group. Many members of the group know about the PCs, and are usually unfriendly to them. At this reputation, only moderate and major disservices reduce Reputation Points."
+			},
+			HATED: {
+				LABEL: "Hated",
+				LOWER: -29,
+				UPPER: -15,
+				RAISED: "Any favor",
+				LOWERED: "Major disservice",
+				EFFECT: "The PCs have earned this group's ire. The vast majority of the group knows about the PCs and have an extremely unfavorable opinion toward them. Many members of the group are hostile toward the PCs, and those who aren't are unfriendly. When presented an easy opportunity to hurt the PCs, the group will jump at the chance. Only major disservices can still reduce Reputation Points."
+			},
+			HUNTED: {
+				LABEL: "Hunted",
+				LOWER: -30,
+				UPPER: -30,
+				RAISED: "Moderate or major favor",
+				LOWERED: "Major disservice",
+				EFFECT: "The group actively hunts the PCs as scapegoats or nemeses, even at significant cost to itself. Every member has heard of the PCs, is hostile toward them, and would take major risks to thwart or destroy them. Only major disservices can still reduce Reputation Points, and only moderate or major favors can increase them."
+			}
+		},
+		SERVICES: {
+			MINOR: "Minor favors are simple, basic tasks that don't take too much effort for a PC to perform or much time at the table. Minor favors grant 1 Reputation Point.",
+			MODERATE: "Moderate favors require a significant amount of effort and often take up a session or a noticeable chunk of a single session to complete. Moderate favors grant 2 Reputation Points.",
+			MAJOR: "Major favors are a sizable endeavor, typically an entire quest involving several sessions. Major favors grant 5 Reputation Points."
+		},
+		DISSERVICES: {
+			MINOR: "Minor disservices could be small but significant missteps, or accumulated slights and inconveniences. Minor disservices take away 1 Reputation Point.",
+			MODERATE: "Moderate disservices are more than just a nuisance or annoyance, generally significantly hindering the group's efforts or violating a fundamental tenet of the group's beliefs in a significant but not egregious way. Moderate disservices take away 2 Reputation Points.",
+			MAJOR: "Major disservices are incredibly antagonistic to a group, usually a single brazen act, such as thwarting a cult's apocalyptic doomsday plan. Major disservices take away at least 5 Reputation Points, or more if they are particularly egregious. They might be so terrible that the PCs immediately lose all their Reputation Points and then lose 5 more Reputation Points."
+		}
 	}
 	
   /**
@@ -32,7 +123,7 @@ export class PF2eSubsystemHelper {
 			console.log(this.ID, '|', ...args);
 		}
 	}
-
+	static random = foundry.utils.randomID(16)
 	
 	static generateID(){
 		return foundry.utils.randomID(16);
@@ -60,6 +151,10 @@ export class SubsystemData {
 	static loadDataModel(id, flag = PF2eSubsystemHelper.FLAGS.SUBSYSTEMS) {
 		const model = game.actors?.party?.getFlag(PF2eSubsystemHelper.ID, flag)?.[id]
 		let instantiatedModel = {}
+		if(!model){
+			PF2eSubsystemHelper.log(true, "Object is not a valid Datamodel Model.")
+			return null;
+		}
 		if(model.type==="research"){
 			instantiatedModel = new subsystem.ResearchSubsystemDataModel(model)
 		} else if (model.type==="influence"){
@@ -67,8 +162,12 @@ export class SubsystemData {
 		} else if (model.type==="chases"){
 			instantiatedModel = new subsystem.ChasesSubsystemDataModel(model)
 		} else if (model.type==="victorypoints"){
-			instantiatedModel = new subsystem.VictoryPointsDataModel(model)
-		} else if (model.type==="library"){
+			instantiatedModel = new subsystem.VictoryPointsSubsystemDataModel(model)
+		} else if (model.type==="infiltrations"){
+			instantiatedModel = new subsystem.InfiltrationSubsystemDataModel(model)
+		} else if (model.type==="reputations"){
+			instantiatedModel = new subsystem.ReputationSubsystemDataModel(model)
+		}else if (model.type==="library"){
 			instantiatedModel = new subtype.Library(model)
 		} else if (model.type==="librarysource"){
 			instantiatedModel = new subtype.LibrarySource(model)
@@ -76,12 +175,22 @@ export class SubsystemData {
 			instantiatedModel = new subtype.InfluenceNPC(model)
 		} else if (model.type==="chase"){
 			instantiatedModel = new subtype.Chase(model)
-		} else if (model.type==="obstacle"){
-			instantiatedModel = new subtype.Obstacle(model)
+		} else if (model.type==="chaseobstacle"){
+			instantiatedModel = new subtype.ChaseObstacle(model)
+		} else if (model.type==="infiltration"){
+			instantiatedModel = new subtype.Infiltration(model)
+		} else if (model.type==="infiltrationobstacle"){
+			instantiatedModel = new subtype.InfiltrationObstacle(model)
+		} else if (model.type==="complication"){
+			instantiatedModel = new subtype.Complication(model)
+		} else if (model.type==="reputation"){
+			instantiatedModel = new subtype.Reputation(model)
 		} else if (model.type==="check"){
 			instantiatedModel = new subtype.Check(model)
 		} else if (model.type==="threshold"){
 			instantiatedModel = new subtype.Threshold(model)
+		} else if (model.type==="counter"){
+			instantiatedModel = new subtype.Counter(model)
 		} else {
 			PF2eSubsystemHelper.log(true, "Data Model not recognized.")
 		}
@@ -103,15 +212,9 @@ export class SubsystemData {
 	}
 	
 	static deleteAllFlags() {		
-		for (const property in PF2eSubsystemHelper.FLAGS) {
-			PF2eSubsystemHelper.log(true, `${PF2eSubsystemHelper.FLAGS[property]}`);
-		}
-		
 		for (const property in PF2eSubsystemHelper.FLAGS){
 			PF2eSubsystemHelper.log(true, game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS[property]))
 		}
-		
-		//return game.actors?.party?.unsetFlag(PF2eSubsystemHelper.ID, PF2eSubsystemHelper.FLAGS.SUBSYSTEMS);
 	}
 	
 	static showAllFlags() {
@@ -121,8 +224,81 @@ export class SubsystemData {
 	}
 
 	static populateDummies() {
+		
+		//Victory Point Subsystem Dummies
+		const victoryPointDummy = new subsystem.VictoryPointsSubsystemDataModel()
+		const counter1 = new subtype.Counter()
+		victoryPointDummy.addCounter(counter1)
+
+		this.saveDataModel(victoryPointDummy)
+
+		//Chase Subsystem Dummies
+		const chaseDummy = new subsystem.ChasesSubsystemDataModel()
+		const chase1 = new subtype.Chase({name: "Underground Obstacles" , objective: "Win."})
+		const chaseObstacle1 = new subtype.ChaseObstacle({name: "Crumbling Corridor", level: 1, goal:1})
+		const chaseObstacle1Check1 = new subtype.Check({checkType: "Acrobatics", dc: 13})
+		const chaseObstacle1Check2 = new subtype.Check({checkType: "Crafting", dc: 15})
+		const chaseObstacle2 = new subtype.ChaseObstacle({name: "Fungus Grotto", level: 1, goal:1})
+		const chaseObstacle2Check1 = new subtype.Check({checkType: "Fortitude", dc: 15})
+		const chaseObstacle2Check2 = new subtype.Check({checkType: "Survival", dc: 13})
+		const chaseObstacle3 = new subtype.ChaseObstacle({name: "Pit Trap", level: 1, goal:2})
+		const chaseObstacle3Check1 = new subtype.Check({checkType: "Athletics", dc: 13})
+		const chaseObstacle3Check2 = new subtype.Check({checkType: "Perception", dc: 15})
+		const chaseObstacle4 = new subtype.ChaseObstacle({name: "Wandering Gelatinous Cube", level: 1, goal:2})
+		const chaseObstacle4Check1 = new subtype.Check({checkType: "Occultism", dc: 18})
+		const chaseObstacle4Check2 = new subtype.Check({checkType: "Stealth", dc: 15})
+
+		chaseObstacle1.addCheck(chaseObstacle1Check1)
+		chaseObstacle1.addCheck(chaseObstacle1Check2)
+		chaseObstacle2.addCheck(chaseObstacle2Check1)
+		chaseObstacle2.addCheck(chaseObstacle2Check2)
+		chaseObstacle3.addCheck(chaseObstacle3Check1)
+		chaseObstacle3.addCheck(chaseObstacle3Check2)
+		chaseObstacle4.addCheck(chaseObstacle4Check1)
+		chaseObstacle4.addCheck(chaseObstacle4Check2)
+		chase1.addObstacle(chaseObstacle1)
+		chase1.addObstacle(chaseObstacle2)
+		chase1.addObstacle(chaseObstacle3)
+		chase1.addObstacle(chaseObstacle4)
+		chaseDummy.addChase(chase1)
+
+		this.saveDataModel(chaseDummy)
+
+		//Influence Subsystem Dummies
+		const influenceDummy = new subsystem.InfluenceSubsystemDataModel()
+		const npc1 = new subtype.InfluenceNPC({name: "Danphy Mollwether", perception: 9, will: 12, resistances: "The landlord thinks in practical terms, with little patience for the “good-for-nothings” of the troupe. Appeals directed at sympathy alone increase the check's DC by 2.", weaknesses: "Mr. Mollwether used to visit the theater often as a small child, and performing one of his favorite old songs or plays brings tears to his eyes and reduces the Performance DC by 2."})
+		const npcThreshold1 = new subtype.Threshold({thresholdValue: 4, description: "Mr. Mollwether gives the troupe 1 week to get him his back rent, with interest, before evicting them."})
+		const npcThreshold2 = new subtype.Threshold({thresholdValue: 6, description: "Mr. Mollwether gives the troupe 1 month to get him his back rent before evicting them."})
+		const npcThreshold3 = new subtype.Threshold({thresholdValue: 8, description: "Mr. Mollwether allows the troupe to stay, reduces their rent, and forgives half their debt."})
+		const npcDiscovery1 = new subtype.Check({checkType: "Mercantile Lore", dc: 13})
+		const npcDiscovery2 = new subtype.Check({checkType: "Perception", dc: 18})
+		const npcDiscovery3 = new subtype.Check({checkType: "Society", dc: 16})
+		const npcCheck1 = new subtype.Check({checkType: "Accounting Lore", dc: 16})
+		const npcCheck2 = new subtype.Check({checkType: "Crafting", dc: 16})
+		const npcCheck3 = new subtype.Check({checkType: "Intimidation", dc: 20})
+		const npcCheck4 = new subtype.Check({checkType: "Performance", dc: 20})
+		const npcCheck5 = new subtype.Check({checkType: "Diplomacy", dc: 22})
+		const npcCheck6 = new subtype.Check({checkType: "Deception", dc: 24})
+
+		npc1.addThreshold(npcThreshold1)
+		npc1.addThreshold(npcThreshold2)
+		npc1.addThreshold(npcThreshold3)
+		npc1.addDiscoveryCheck(npcDiscovery1)
+		npc1.addDiscoveryCheck(npcDiscovery2)
+		npc1.addDiscoveryCheck(npcDiscovery3)
+		npc1.addCheck(npcCheck1)
+		npc1.addCheck(npcCheck2)
+		npc1.addCheck(npcCheck3)
+		npc1.addCheck(npcCheck4)
+		npc1.addCheck(npcCheck5)
+		npc1.addCheck(npcCheck6)
+		influenceDummy.addNPC(npc1)
+
+		this.saveDataModel(influenceDummy)
+
+		//Research Subsystem Dummies
 		const researchDummy = new subsystem.ResearchSubsystemDataModel()
-		const libraryDummy = new subtype.Library({libraryName: "The Hags' Secret", level: 7, points: 0})
+		const library1 = new subtype.Library({libraryName: "The Hags' Secret", level: 7, points: 0})
 		const librarySource1 = new subtype.LibrarySource({description: "Sprite Swarm", maxRP: 5, earnedRP: 0})
 		const librarySource1check1 = new subtype.Check({checkType: "Diplomacy", dc: 23})
 		const librarySource1check2 = new subtype.Check({checkType: "Society", dc: 23})
@@ -139,6 +315,7 @@ export class SubsystemData {
 		const libraryThreshold3 = new subtype.Threshold({thresholdValue: 15, description: "The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens."})
 		const libraryThreshold4 = new subtype.Threshold({thresholdValue: 20, description: "The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge."})
 		const libraryThreshold5 = new subtype.Threshold({thresholdValue: 30, description: " A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade."})
+		
 		librarySource1.addCheck(librarySource1check1)
 		librarySource1.addCheck(librarySource1check2)
 		librarySource1.addCheck(librarySource1check3)
@@ -147,17 +324,63 @@ export class SubsystemData {
 		librarySource2.addCheck(librarySource2check3)
 		librarySource3.addCheck(librarySource3check1)
 		librarySource3.addCheck(librarySource3check2)
-		libraryDummy.addSource(librarySource1)
-		libraryDummy.addSource(librarySource2)
-		libraryDummy.addSource(librarySource3)
-		libraryDummy.addThreshold(libraryThreshold1)
-		libraryDummy.addThreshold(libraryThreshold2)
-		libraryDummy.addThreshold(libraryThreshold3)
-		libraryDummy.addThreshold(libraryThreshold4)
-		libraryDummy.addThreshold(libraryThreshold5)
-		researchDummy.addLibrary(libraryDummy)
+		library1.addSource(librarySource1)
+		library1.addSource(librarySource2)
+		library1.addSource(librarySource3)
+		library1.addThreshold(libraryThreshold1)
+		library1.addThreshold(libraryThreshold2)
+		library1.addThreshold(libraryThreshold3)
+		library1.addThreshold(libraryThreshold4)
+		library1.addThreshold(libraryThreshold5)
+		researchDummy.addLibrary(library1)
 		
-		return this.saveDataModel(researchDummy);
+		this.saveDataModel(researchDummy);
+
+		//Infiltration Subsystem Dummies
+		const infiltrationDummy = new subsystem.InfiltrationSubsystemDataModel()
+		const infiltration1 = new subtype.Infiltration({name: "Sample Infiltration"})
+		const infiltrationObstacle1 = new subtype.InfiltrationObstacle({goal: 2, goalType: "individual"})
+		const infiltrationObstacle1Check1 = new subtype.Check({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
+		const infiltrationObstacle1Check2 = new subtype.Check({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
+		const infiltrationObstacle1Check3 = new subtype.Check({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		const infiltrationObstacle2 = new subtype.InfiltrationObstacle({goal: 1, goalType: "group"})
+		const infiltrationObstacle2Check1 = new subtype.Check({checkType: "Athletics", level: 1, adjustment: "HARD"}).calculateDC()
+		const infiltrationObstacle2Check2 = new subtype.Check({checkType: "Thievery", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		const infiltrationObstacle3 = new subtype.InfiltrationObstacle({goal: 3, goalType: "group"})
+		const infiltrationObstacle3Check1 = new subtype.Check({checkType: "Thievery", level: 1, adjustment: "HARD"}).calculateDC()
+		const awarenessThreshold1 = new subtype.Threshold({thresholdValue: 5, description: "Suspicions are raised. Increase the DCs for obstacles by 1. The first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold2 = new subtype.Threshold({thresholdValue: 10, description: "The first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold3 = new subtype.Threshold({thresholdValue: 15, description: "Increase the DCs for obstacles by a total of 2, and the first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold4 = new subtype.Threshold({thresholdValue: 20, description: "The infiltration fails."})
+		const complication1 = new subtype.Complication({trigger: "The PCs reach 5 Awareness Points for the first time.", description: "Someone thinks they recognize you, and you must either convince them otherwise before slipping away or find a way to dodge the person entirely.", outcome: {success: "You convince or otherwise dodge the person.", failure: "You are recognized, and the party accrues 1 AP.", criticalFailure: "As failure, but the party accrues 2 AP."}})
+		const complication1Check1 = new subtype.Check({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
+		const complication1Check2 = new subtype.Check({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
+		const complication1Check3 = new subtype.Check({checkType: "Performance", level: 1, adjustment: "HARD"}).calculateDC()
+		const complication1Check4 = new subtype.Check({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		
+		complication1.addCheck(complication1Check1)
+		complication1.addCheck(complication1Check2)
+		complication1.addCheck(complication1Check3)
+		complication1.addCheck(complication1Check4)
+		infiltrationObstacle1.addCheck(infiltrationObstacle1Check1)
+		infiltrationObstacle1.addCheck(infiltrationObstacle1Check2)
+		infiltrationObstacle1.addCheck(infiltrationObstacle1Check3)
+		infiltrationObstacle2.addCheck(infiltrationObstacle2Check1)
+		infiltrationObstacle2.addCheck(infiltrationObstacle2Check2)
+		infiltrationObstacle3.addCheck(infiltrationObstacle3Check1)
+		infiltration1.addAwarenessThreshold(awarenessThreshold1)
+		infiltration1.addAwarenessThreshold(awarenessThreshold2)
+		infiltration1.addAwarenessThreshold(awarenessThreshold3)
+		infiltration1.addAwarenessThreshold(awarenessThreshold4)
+		infiltration1.addComplication(complication1)
+		infiltration1.addObstacle(infiltrationObstacle1)
+		infiltration1.addObstacle(infiltrationObstacle2)
+		infiltration1.addObstacle(infiltrationObstacle3)
+		infiltration1.addObjective("Get to the target.")
+		infiltration1.addOpportunity("Requirements The PC has successfully completed an individual objective and some other PCs have not. Having completed your objective, you help an ally who is still trying to reach that goal. Describe how you are helping. This gives the ally the benefits of Following the Expert (Player Core 438). In unusual cases, the GM might allow you to attempt a relevant skill check to overcome the obstacle on behalf of the other PC instead.")
+		infiltrationDummy.addInfiltration(infiltration1)
+
+		this.saveDataModel(infiltrationDummy)
 	}
 }
 

@@ -8,7 +8,7 @@ export class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Research Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "research"}),
-			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
 			libraries: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -32,13 +32,13 @@ export class ResearchSubsystemDataModel extends foundry.abstract.DataModel {
 	}
 }
 
-export class VictoryPointsDataModel extends foundry.abstract.DataModel {
+export class VictoryPointsSubsystemDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Victory Points Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "victorypoints"}),
-			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
 			counters: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -69,7 +69,7 @@ export class InfluenceSubsystemDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Influence Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "influence"}),
-			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
 			npcs: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -99,7 +99,7 @@ export class ChasesSubsystemDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Chases Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "chases"}),
-			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID()}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
 			chases: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -120,6 +120,68 @@ export class ChasesSubsystemDataModel extends foundry.abstract.DataModel {
 	
 	getChases() {
 		return this.chases.map( id => this.getChaseByID(id) );
+	}
+	
+}
+
+export class InfiltrationSubsystemDataModel extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields = foundry.data.fields;
+		return {
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Infiltration Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "infiltrations"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
+			infiltrations: new fields.ArrayField(new fields.StringField())
+		}
+	}
+	
+	addInfiltration(newInfiltration) {
+		if(!newInfiltration instanceof subtype.Infiltration){
+			PF2eSubsystemHelper.log(true, 'Cannot add new Infiltration - the object is not a Infiltration')
+			return;
+		}
+		this.infiltrations.push(SubsystemData.saveDataModel(newInfiltration, PF2eSubsystemHelper.FLAGS.INFILTRATIONS))
+		this.updateSource({infiltrations: this.infiltrations})
+		return newInfiltration.id;
+	}
+	
+	getInfiltrationByID(id) {
+		return new subtype.Infiltration(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.INFILTRATIONS));
+	}
+	
+	getInfiltrations() {
+		return this.infiltrations.map( id => this.getInfiltrationByID(id) );
+	}
+	
+}
+
+export class ReputationSubsystemDataModel extends foundry.abstract.DataModel {
+	static defineSchema() {
+		const fields = foundry.data.fields;
+		return {
+			subsystemName: new fields.StringField({required: true, blank: false, initial: "Reputation Subsystem"}),
+			type: new fields.StringField({required: true, blank: false, initial: "reputations"}),
+			id: new fields.StringField({required: true, blank: false, initial: PF2eSubsystemHelper.generateID}),
+			reputations: new fields.ArrayField(new fields.StringField())
+		}
+	}
+	
+	addReputation(newReputation) {
+		if(!newReputation instanceof subtype.Reputation){
+			PF2eSubsystemHelper.log(true, 'Cannot add new Reputation - the object is not a Reputation')
+			return;
+		}
+		this.reputations.push(SubsystemData.saveDataModel(newReputation, PF2eSubsystemHelper.FLAGS.REPUTATIONS))
+		this.updateSource({reputations: this.reputations})
+		return newReputation.id;
+	}
+	
+	getReputationByID(id) {
+		return new subtype.Reputation(SubsystemData.loadDataModel(id, PF2eSubsystemHelper.FLAGS.REPUTATIONS));
+	}
+	
+	getReputations() {
+		return this.reputations.map( id => this.getReputationByID(id) );
 	}
 	
 }
