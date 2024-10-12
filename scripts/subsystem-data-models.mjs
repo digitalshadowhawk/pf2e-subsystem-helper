@@ -30,6 +30,22 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 	getLibraries() {
 		return this.libraries.map( id => this.getLibraryByID(id) );
 	}
+
+	getMechanicName() {
+		return "Library";
+	}
+
+	toHTML(){
+		return this.libraries.map(element => {
+			let model = this.getLibraryByID(element)
+			Helper.log(true, 'subsystems Line 43')
+			let entry = `<research-library class="directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</research-library>`
+
+			return entry;
+		});
+	}
 }
 
 export class VictoryPointsDataModel extends foundry.abstract.DataModel {
@@ -59,6 +75,22 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 	
 	getCounter() {
 		return this.counters.map( id => this.getCounterByID(id) );
+	}
+
+	getMechanicName() {
+		return "Counter";
+	}
+
+	toHTML(){
+		return this.counters.map(element => {
+			let model = this.getCounterByID(element)
+			Helper.log(true, 'subsystems Line 89')
+			let entry = `<victorypoints-counter class="directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</victorypoints-counter>`
+
+			return entry;
+		});
 	}
 	
 }
@@ -91,6 +123,22 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 	getNPCs() {
 		return this.npcs.map( id => this.getNPCByID(id) );
 	}
+
+	getMechanicName() {
+		return "NPC";
+	}
+
+	toHTML(){
+		return this.npcs.map(element => {
+			let model = this.getNPCByID(element)
+			Helper.log(true, 'subsystems Line 136')
+			let entry = `<influence-npc class="directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</influence-npc>`
+
+			return entry;
+		});
+	}
 }
 
 export class ChasesDataModel extends foundry.abstract.DataModel {
@@ -121,7 +169,22 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 	getChases() {
 		return this.chases.map( id => this.getChaseByID(id) );
 	}
-	
+
+	getMechanicName() {
+		return "Chase";
+	}
+
+	toHTML(){
+		return this.chases.map(element => {
+			let model = this.getChaseByID(element)
+			Helper.log(true, 'subsystems Line 182')
+			let entry = `<li class="chases-chases directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</li>`
+
+			return entry;
+		});
+	}	
 }
 
 export class InfiltrationDataModel extends foundry.abstract.DataModel {
@@ -152,7 +215,22 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	getInfiltrations() {
 		return this.infiltrations.map( id => this.getInfiltrationByID(id) );
 	}
-	
+
+	getMechanicName() {
+		return "Infiltration";
+	}
+
+	toHTML(){
+		return this.infiltrations.map(element => {
+			let model = this.getInfiltrationByID(element)
+			Helper.log(true, 'subsystems Line 228')
+			let entry = `<infiltration-infiltration class="directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</infiltration-infiltration>`
+
+			return entry;
+		});
+	}	
 }
 
 export class ReputationDataModel extends foundry.abstract.DataModel {
@@ -182,6 +260,22 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 	
 	getReputations() {
 		return this.reputations.map( id => this.getReputationByID(id) );
+	}
+
+	getMechanicName() {
+		return "Reputation";
+	}
+
+	toHTML(){
+		return this.reputations.map(element => {
+			let model = this.getReputationNyID(element)
+			Helper.log(true, 'subsystem Line 274')
+			let entry = `<reputation-reputation class="directory-item flexcol collapsed" style="display: flex;">
+				${model.toHTML()}
+			</reputation-reputation>`
+
+			return entry;
+		});
 	}
 	
 }

@@ -17,6 +17,7 @@ export class Helper {
 		NPCS: 'npcs',
 		INFILTRATIONS: 'infiltrations',
 		INFILTRATIONOBSTACLES: 'infiltrationobstacles',
+		INFILTRATIONPOINTS: 'infiltrationpoints',
 		COMPLICATIONS: 'complications',
 		COUNTERS: 'counters'
 	}
@@ -536,34 +537,26 @@ function getFolders(partySheet) {
 	}
 
 	return enabledFolders.map(obj=>{
-		let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
-          <header class="folder-header flexrow">
-            <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${obj}</h3>
-			<button type='button' class="create-button create-subsystem-button create-${obj}-subsystem-button flex0" data-tooltip="Create New ${obj} Subsystem">
-				<i class="fa-solid subsystem-add fa-gears"></i>
-				<i class="fa-solid subsystem-add fa-plus"></i>
-			</button>
-          </header>
-          <ol class="subdirectory">`+
-			getSubdirectory(obj)
-		  +`</ol>
-        </li>`
-        return folder;
+		let models = Data.getAllOfSubsystemType(obj)
+		Helper.log(true, models)
+		return models.map(element => {
+			let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
+			<header class="folder-header flexrow">
+	            <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${element.subsystemName}</h3>
+				<button class="create-button create-subsystem-button create-${element.type}-subsystem-button flex0" data-tooltip="Create New ${element.getMechanicName()}">
+					<i class="fa-solid subsystem-add fa-gears"></i>
+					<i class="fa-solid subsystem-add fa-plus"></i>
+				</button>
+        	</header>
+       		<ol class="subdirectory">
+				${element.toHTML()}
+			</ol>
+       		</li>`
+
+		return folder;
+		}).join("")
     }).join("")
 
-}
-
-function getSubdirectory(subsystemString){
-	let subsystemArray = Data.getAllOfSubsystemType(subsystemString)
-	return subsystemArray.map(obj=>{
-		let entry =`<li class="directory-item subsystem flexrow" stlye="display: flex;">
-				<h4 class="entry-name">
-					<a>${obj.subsystemName}</a>
-					<span class="subsystem-${obj.type}">${obj.type}</span>
-				</h4>
-			</li>`
-		return entry;
-	}).join("")
 }
 
 

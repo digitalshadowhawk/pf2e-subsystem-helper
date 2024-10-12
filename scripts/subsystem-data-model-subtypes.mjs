@@ -51,6 +51,22 @@ export class Library extends foundry.abstract.DataModel {
 	getSources() {
 		return this.sources.map( id => this.getSourceByID(id) );
 	}
+
+	toHTML(){
+		let output = `<h3>${this.libraryName}</h3>
+		<div>Level: ${this.level}</div>
+		<div>Points: ${this.points}</div>
+		${this.thresholds.map(element=> {
+			Helper.log(true, 'subtypes Line 61')
+			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
+		}).join("")}
+		${this.sources.map(element=> {
+			Helper.log(true, 'subtypes Line 65')
+			return Data.loadDataModel(element,Helper.FLAGS.SOURCES).toHTML()
+		}).join("")}
+		`
+		return output;
+	}
 }
 
 export class LibrarySource extends foundry.abstract.DataModel {
@@ -82,6 +98,18 @@ export class LibrarySource extends foundry.abstract.DataModel {
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
+	}
+
+	toHTML(){
+		let output = `<h3>${this.description}</h3>
+		<div>Earned RP: ${this.earnedRP}</div>
+		<div>Max RP: ${this.maxRP}</div>
+		${this.checks.map(element=> {
+			Helper.log(true, 'subtypes Line 109')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}
+		`
+		return output;
 	}
 }
 
@@ -155,6 +183,28 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	getDicoveryChecks() {
 		return this.discoveries.map( id => this.getCheckByID(id) );
 	}
+
+	toHTML(){
+		let output = `<h3>${this.name}</h3>
+		<div>Perception: +${this.perception}</div>
+		<div>Will: +${this.will}</div>
+		<div>Resistances: ${this.resistances}</div>
+		<div>Weaknesses: ${this.weaknesses}</div>
+		${this.thresholds.map(element=> {
+			Helper.log(true, 'subtypes Line 195')
+			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
+		}).join("")}
+		${this.discoveries.map(element=> {
+			Helper.log(true, 'subtypes Line 199')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}
+		${this.checks.map(element=> {
+			Helper.log(true, 'subtypes Line 203')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}
+		`
+		return output;
+	}
 }
 
 export class Chase extends foundry.abstract.DataModel {
@@ -185,6 +235,21 @@ export class Chase extends foundry.abstract.DataModel {
 	
 	getObstacles() {
 		return this.obstacles.map( id => this.getObstacleByID(id) );
+	}
+
+	toHTML(){
+		let output = `<header class="flexrow" style="position: relative;">
+			<h3 class="noborder">${this.name}</h3>
+		</header>
+		<ol class="subdirectory">
+		<li class="directory-item flexrow">Objective: ${this.objective}</li>
+		${this.obstacles.map(element=> {
+			Helper.log(true, 'subtypes Line 245')
+			return `<li class="directory-item flexcol">` + Data.loadDataModel(element,Helper.FLAGS.CHASEOBSTACLES).toHTML()+ `</li>`
+		}).join("")}
+		</ol>
+		`
+		return output;
 	}
 }
 
@@ -218,6 +283,20 @@ export class ChaseObstacle extends foundry.abstract.DataModel {
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
+	}
+
+	toHTML(){
+		let output = `<h3>${this.name}</h3><div class="flexrow"><div class="flexcol">
+		<div>Level: ${this.level}</div>
+		<div class="flexrow">
+		<div>Points: ${this.points}</div>
+		<div>Goal: ${this.goal}</div></div></div>
+		<div class="flexcol">${this.checks.map(element=> {
+			Helper.log(true, 'subtypes Line 291')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}</div></div>
+		`
+		return output;
 	}
 }
 
@@ -309,6 +388,34 @@ export class Infiltration extends foundry.abstract.DataModel {
 	getOpportunities() {
 		return this.opportunities;
 	}
+
+	toHTML(){
+		let output = `<h3>${this.name}</h3>
+		<div>Awareness Points: ${this.awarenessPoints}</div>
+		<div>Edge Points: ${this.edgePoints}</div>
+		<div>Goal: ${this.goal}</div>
+		<div>Objectives</div>
+		${this.objectives.map(element=> {
+			return `<div>Objective: ${element}</div>`
+		}).join("")}
+		${this.opportunities.map(element=> {
+			return `<div>Opportunity: ${element}</div>`
+		}).join("")}
+		${this.obstacles.map(element=> {
+			Helper.log(true, 'subtypes Line 401')
+			return Data.loadDataModel(element,Helper.FLAGS.INFILTRATIONOBSTACLES).toHTML()
+		}).join("")}
+		${this.awarenessThresholds.map(element=> {
+			Helper.log(true, 'subtypes Line 405')
+			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
+		}).join("")}
+		${this.complications.map(element=> {
+			Helper.log(true, 'subtypes Line 409')
+			return Data.loadDataModel(element,Helper.FLAGS.COMPLICATIONS).toHTML()
+		}).join("")}
+		`
+		return output;
+	}
 }
 
 export class InfiltrationObstacle extends foundry.abstract.DataModel {
@@ -318,6 +425,7 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			goal: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 2}),
 			goalType: new fields.StringField({required: true, blank: false, initial: "group"}),
+			infiltrationPoints: new fields.ArrayField(new fields.StringField()),
 			checks: new fields.ArrayField(new fields.StringField()),
 			description: new fields.StringField({required: true, blank: false, initial: "New Description"}),
 			outcome: new fields.SchemaField({
@@ -347,6 +455,53 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
+	}
+	
+	addPointCounter(newCounter) {
+		if(!newCounter instanceof Counter) {
+			Helper.log(true, 'Cannot add new Check - the object is not a Check')
+			return;
+		}
+		const id = this.infiltrationPoints.push(Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS))
+		this.updateSource({infiltrationPoints: this.infiltrationPoints})
+		return id;
+	}
+	
+	getPointCounterByID(id) {
+		return Data.loadDataModel(id, Helper.FLAGS.COUNTERS);
+	}
+	
+	getPointCounters() {
+		return this.checks.map( id => this.getPointCountersByID(id) );
+	}
+
+	generatePointCounters(partySheet) {
+		if(this.goalType==="group"){
+			this.infiltrationPoints = [new Counter({name: "Player 1"})]
+		} else if(this.goalType==="individual") {
+			this.infiltrationPoints = [new Counter({name: "Player 1"}), new Counter({name: "Player 2"}), new Counter({name: "Player 3"}), new Counter({name: "Player 4"})]
+		}
+	}
+
+	toHTML(){
+		let output = `<h3>${this.description}</h3>
+		<div>Points: ${this.points}</div>
+		<div>Goal: ${this.goal} (${this.goalType})</div>
+		<div>Objectives</div>
+		${this.infiltrationPoints.map(element=> {
+			Helper.log(true, 'subtypes Line 488')
+			return Data.loadDataModel(element,Helper.FLAGS.INFILTRATIONPOINTS).toHTML()
+		}).join("")}
+		${this.checks.map(element=> {
+			Helper.log(true, 'subtypes Line 492')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}
+		<div>Critical Success: ${this.outcome.criticalSuccess}</div>
+		<div>Success: ${this.outcome.success}</div>
+		<div>Failure: ${this.outcome.failure}</div>
+		<div>Critical Failure: ${this.outcome.criticalFailure}</div>
+		`
+		return output;
 	}
 }
 
@@ -385,6 +540,21 @@ export class Complication extends foundry.abstract.DataModel {
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
+
+	toHTML(){
+		let output = `<h3>Trigger: ${this.trigger}</h3>
+		<div>Description: ${this.descriiption}</div>
+		${this.checks.map(element=> {
+			Helper.log(true, 'subtypes Line 544')
+			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
+		}).join("")}
+		<div>Critical Success: ${this.outcome.criticalSuccess}</div>
+		<div>Success: ${this.outcome.success}</div>
+		<div>Failure: ${this.outcome.failure}</div>
+		<div>Critical Failure: ${this.outcome.criticalFailure}</div>
+		`
+		return output;
+	}
 }
 
 export class Reputation extends foundry.abstract.DataModel {
@@ -402,6 +572,13 @@ export class Reputation extends foundry.abstract.DataModel {
 	updateFromPoints() {
 
 	}
+
+	toHTML(){
+		let output = `<h3>Group: ${this.name}</h3>
+		<div>Points: ${this.points} (${this.reputation})</div>
+		`
+		return output;
+	}
 }
 
 export class Check extends foundry.abstract.DataModel {
@@ -412,18 +589,31 @@ export class Check extends foundry.abstract.DataModel {
 			partyLevel: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 1}),
 			adjustment: new fields.StringField({required: true, blank: false, initial: "STANDARD"}),
 			dc: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 15}),
+			calculated: new fields.BooleanField({initial: false}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "check"})
 		}
 	}
 
 	calculateDC() {
-		this.updateSource({dc: Helper.DCS?.[this.partyLevel] + Helper.ADJUSTMENTS?.[this.adjustment]});
+		this.updateSource({dc: Helper.DCS?.[this.partyLevel] + Helper.ADJUSTMENTS?.[this.adjustment], calculated: true});
 		return this;
 	}
 	
 	getEnricher() {
 		return "@Check[type:"+this.checkType+"|dc:"+this.dc+"]";
+	}
+
+	toHTML(){
+		let output = ``
+		if(this.calculated){
+			//output = `<div>${this.getEnricher()} (${this.adjustment} Level ${this.partyLevel} DC)</div>`
+			output = `<div>DC ${this.dc} ${this.checkType} Check (${this.adjustment} Level ${this.partyLevel} DC)</div>`
+		} else {
+			//output =`<div>${this.getEnricher()}</div>`
+			output =`<div>DC ${this.dc} ${this.checkType} Check</div>`
+		}
+		return output;
 	}
 }
 
@@ -437,6 +627,11 @@ export class Counter extends foundry.abstract.DataModel {
 			type: new fields.StringField({required: true, blank: false, initial: "counter"})
 		}
 	}
+
+	toHTML(){
+		let output = `<div>${this.name}: ${this.points}</div>`
+		return output;
+	}
 }
 
 export class Threshold extends foundry.abstract.DataModel {
@@ -448,5 +643,10 @@ export class Threshold extends foundry.abstract.DataModel {
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "threshold"})
 		}
+	}
+
+	toHTML(){
+		let output = `<div>${this.thresholdValue}: ${this.description}</div>`
+		return output;
 	}
 }
