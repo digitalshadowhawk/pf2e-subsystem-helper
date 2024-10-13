@@ -8,7 +8,7 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Research Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "research"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'research'}),
 			libraries: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -18,7 +18,8 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Library - the object is not an Library')
 			return null;
 		}
-		this.libraries.push(Data.saveDataModel(newLibrary, Helper.FLAGS.LIBRARIES))
+		this.libraries.push(newLibrary.id)
+		Data.saveDataModel(newLibrary, Helper.FLAGS.LIBRARIES)
 		this.updateSource({libraries: this.libraries})
 		return newLibrary.id;
 	}
@@ -46,6 +47,23 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 			return entry;
 		});
 	}
+
+	concatenate() {
+		const wrapper = {
+			subsystemName: this.subsystemName,
+			type: this.type,
+			id: this.id,
+			libraries: {}
+		}
+		this.libraries.forEach(element => {
+			Helper.log(true, "Logging Library element")
+			Helper.log(true, element)
+			wrapper.libraries[element] = Data.loadDataModel(element, Helper.FLAGS.LIBRARIES).concatenate()
+		
+			Helper.log(true, wrapper)
+		})
+		return wrapper;
+	}
 }
 
 export class VictoryPointsDataModel extends foundry.abstract.DataModel {
@@ -54,7 +72,7 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Victory Points Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "victorypoints"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'victorypoints'}),
 			counters: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -64,7 +82,8 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Counter - the object is not a Counter')
 			return null;
 		}
-		this.counters.push(Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS))
+		this.counters.push(newCounter.id)
+		Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS)
 		this.updateSource({counters: this.counters})
 		return newCounter.id;
 	}
@@ -101,7 +120,7 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Influence Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "influence"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'influence'}),
 			npcs: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -111,7 +130,8 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new NPC - the object is not an NPC')
 			return null;
 		}
-		this.npcs.push(Data.saveDataModel(newNPC, Helper.FLAGS.NPCS))
+		this.npcs.push(newNPC.id)
+		Data.saveDataModel(newNPC, Helper.FLAGS.NPCS)
 		this.updateSource({npcs: this.npcs})
 		return newNPC.id;
 	}
@@ -147,7 +167,7 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Chases Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "chases"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'chases'}),
 			chases: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -157,7 +177,8 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Chase - the object is not a Chase')
 			return;
 		}
-		this.chases.push(Data.saveDataModel(newChase, Helper.FLAGS.CHASES))
+		this.chases.push(newChase.id)
+		Data.saveDataModel(newChase, Helper.FLAGS.CHASES)
 		this.updateSource({chases: this.chases})
 		return newChase.id;
 	}
@@ -193,7 +214,7 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Infiltration Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "infiltrations"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'infiltration'}),
 			infiltrations: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -203,7 +224,8 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Infiltration - the object is not a Infiltration')
 			return;
 		}
-		this.infiltrations.push(Data.saveDataModel(newInfiltration, Helper.FLAGS.INFILTRATIONS))
+		this.infiltrations.push(newInfiltration.id)
+		Data.saveDataModel(newInfiltration, Helper.FLAGS.INFILTRATIONS)
 		this.updateSource({infiltrations: this.infiltrations})
 		return newInfiltration.id;
 	}
@@ -239,7 +261,7 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Reputation Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "reputations"}),
-			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
+			id: new fields.StringField({required: true, blank: false, initial: 'reputations'}),
 			reputations: new fields.ArrayField(new fields.StringField())
 		}
 	}
@@ -249,7 +271,8 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Reputation - the object is not a Reputation')
 			return;
 		}
-		this.reputations.push(Data.saveDataModel(newReputation, Helper.FLAGS.REPUTATIONS))
+		this.reputations.push(newReputation.id)
+		Data.saveDataModel(newReputation, Helper.FLAGS.REPUTATIONS)
 		this.updateSource({reputations: this.reputations})
 		return newReputation.id;
 	}

@@ -1,0 +1,45 @@
+<div id="subsystem-helper-tab" data-application-part="composite">
+  <div class="content">
+    <research-library class="directory-item flexcol collapsed" style="display: flex;">
+      <h1>{{researchSubsystem.subsystemName}}</h1>
+     {{#each researchSubsystem.libraries}}
+       <h2>Library Name: {{libraryName}}</h2>
+       <div>Library Level: {{level}}</div>
+       <div>Research Points: {{points}}</div>
+       <h3>Thresholds:</h3>
+       {{#each thresholds}}
+         <li>{{thresholdValue}}: {{description}}</li>
+       {{/each}}
+       <h3>Sources:</h3>
+       {{#each sources}}
+         <h4>{{description}}</h4>
+         <div>{{earnedRP}} / {{maxRP}} Research Points earned</div>
+         <div>Checks:</div>
+         {{#each checks}}
+           <div>DC {{dc}} {{checkType}} Check</div>
+         {{/each}}
+       {{/each}}
+     {{/each}}
+    </research-library>
+    <ul>
+      <li>{{influenceSubsystem.subsystemName}}</li>
+      <li>NPCs: {{influenceSubsystem.npcs}}</li>
+    </ul>
+    <ul>
+      <li>{{reputationSubsystem.subsystemName}}</li>
+      <li>Reputations: {{reputationSubsystem.reputations}}</li>  
+    </ul>
+    <ul>
+      <li>{{chasesSubsystem.subsystemName}}</li>
+      <li>Chases: {{chasesSubsystem.chases}}</li>  
+    </ul>
+    <ul>
+      <li>{{infiltrationSubsystem.subsystemName}}</li>
+      <li>Infiltrations: {{infiltrationSubsystem.infiltrations}}</li>  
+    </ul>
+    <ul>
+      <li>{{victorypointsSubsystem.subsystemName}}</li>
+      <li>Counter IDs: {{victorypointsSubsystem.counters}}</li>  
+    </ul>
+  </div>
+</div>

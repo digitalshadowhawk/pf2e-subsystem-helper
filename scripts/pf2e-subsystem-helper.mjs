@@ -1,6 +1,8 @@
 import * as subsystem from './subsystem-data-models.mjs';
 import * as subtype from './subsystem-data-model-subtypes.mjs';
 
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
+
 
 export class Helper {
 	static ID = "pf2e-subsystem-helper";
@@ -145,16 +147,15 @@ export class Data {
 	}
 
 	static saveDataModel(dataModel, flag = Helper.FLAGS.SUBSYSTEMS) {
-		game.actors?.party?.setFlag(Helper.ID, flag, {[dataModel.id]: dataModel});
-		return dataModel.id;
+		return game.actors?.party?.setFlag(Helper.ID, flag, {[dataModel.id]: dataModel});
 	}
 
 	static loadDataModel(id, flag = Helper.FLAGS.SUBSYSTEMS) {
 		const model = game.actors?.party?.getFlag(Helper.ID, flag)?.[id]
 		let instantiatedModel = {}
 		if(!model){
-			Helper.log(true, "Object is not a valid Data Model.")
-			return null;
+			Helper.log(true, "Object is not a valid Data Model")
+			return {};
 		}
 		if(model.type==="research"){
 			instantiatedModel = new subsystem.ResearchDataModel(model)
@@ -225,26 +226,16 @@ export class Data {
 	}
 
 	static getAllSubsystems() {
-		var output = []
-		for (const property in game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS)){
-			output.push(this.loadDataModel(property))
-		}
-		//Helper.log(true, output)
+		var output = game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS)
 		return output
 	}
 
-	static getAllOfSubsystemType(newType) {
-		var output = []
-		this.getAllSubsystems().forEach(element => {
-			//Helper.log(true, element)
-			//Helper.log(true, element.type)
-			//Helper.log(true, type)
-			if(element.type===newType){
-				output.push(element)
-			}
-		})
+	/*static getSubsystemOfType(newType) {
+		var output = game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS)?.[newType]
+		Helper.log(true, "Getting subsystem")
+		Helper.log(true, output)
 		return output;
-	}
+	}*/
 
 	static populateDummies() {
 		
@@ -471,19 +462,21 @@ Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
     Helper.log(true, game.settings.get(Helper.ID, "Reputation")?.config)
 	if (!game.user.isGM || !(game.settings.get(Helper.ID, "Reputation")||game.settings.get(Helper.ID, "Influence")||game.settings.get(Helper.ID, "VictoryPoints")||game.settings.get(Helper.ID, "Chases")||game.settings.get(Helper.ID, "Infiltration")||game.settings.get(Helper.ID, "Research"))) {return;}
 	
-	const content = `
-	<section class="tab sidebar-tab directory flexcol subsystem-section">
-		<ol class="directory-list subsystem-list">
-			${getFolders(partySheet)}
-		</ol>
-	</section>
-	
-	`
+	let context ={
+		researchSubsystem: Data.loadDataModel('research').concatenate(),
+		influenceSubsystem: Data.loadDataModel('influence'),
+		reputationSubsystem: Data.loadDataModel('reputation'),
+		chasesSubsystem: Data.loadDataModel('chases'),
+		infiltrationSubsystem: Data.loadDataModel('infiltration'),
+		victorypointsSubsystem: Data.loadDataModel('victorypoints')
+	}
+
+	//Helper.log(true, this)
+	//const inject = Handlebars.compile(`./modules/pf2e-subsystem-helper/templates/pf2e-subsystem-helper.hbs`, {context, allowProtoMethodsByDefault: true, allowProtoPropertiesByDefault: true})
 
 	html.find('.sub-nav:not(.sub-sub-nav)').append('<a data-tab="subsystems" class="">Subsystems</a>')
-    html.find('.container').append(`<div class="tab" data-tab="subsystems" data-region="subsystems"><div class="content">${content}</div></div>`)
-	
-	html.find('.container').find('.subsystem-list').find('.directory-item').on("click", async function(event) {
+    html.find('.container').append('<div class="tab" data-tab="subsystems" data-region="subsystems"> </div>')
+	html.find('.container').find('.subsystems').find('.directory-item').on("click", async function(event) {
         event.preventDefault();
         let target = $(event.currentTarget);
         if (target.hasClass('collapsed')) {
@@ -492,6 +485,12 @@ Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
               target.addClass('collapsed')
         }
     })
+
+	Helper.log("this before instantiating subsystemTab")
+	Helper.log(this)
+
+	this.subsystemTab ??= new (this.pf2esubsystemhelper.App.SubsystemForm({window: {frame: false, applicationPart: 'composite'}}))
+	this.subsystemTab.render({force: true});
 	
 	html.on('click', '.create-Reputation-subsystem-button', (event) => {
 		Helper.log(true, 'Reputation Button Clicked!');
@@ -537,26 +536,65 @@ function getFolders(partySheet) {
 	}
 
 	return enabledFolders.map(obj=>{
-		let models = Data.getAllOfSubsystemType(obj)
-		Helper.log(true, models)
-		return models.map(element => {
-			let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
-			<header class="folder-header flexrow">
-	            <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${element.subsystemName}</h3>
-				<button class="create-button create-subsystem-button create-${element.type}-subsystem-button flex0" data-tooltip="Create New ${element.getMechanicName()}">
-					<i class="fa-solid subsystem-add fa-gears"></i>
-					<i class="fa-solid subsystem-add fa-plus"></i>
-				</button>
-        	</header>
-       		<ol class="subdirectory">
-				${element.toHTML()}
-			</ol>
-       		</li>`
+		Helper.log(true, obj)
+		let model = Data.loadDataModel(obj)
+		Helper.log(true, model)
+		let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
+		<header class="folder-header flexrow">
+            <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${model.subsystemName}</h3>
+			<button class="create-button create-subsystem-button create-${model.type}-subsystem-button flex0" data-tooltip="Create New ${element.getMechanicName()}">
+				<i class="fa-solid subsystem-add fa-gears"></i>
+				<i class="fa-solid subsystem-add fa-plus"></i>
+			</button>
+       	</header>
+   		<ol class="subdirectory">
+			${model.toHTML()}
+		</ol>
+   		</li>`
 
 		return folder;
-		}).join("")
-    }).join("")
+	}).join("")
+}
 
+export class SubsystemForm extends HandlebarsApplicationMixin(ApplicationV2) {
+	static DEFAULT_OPTIONS = {
+		id: "subsystem-form",
+		form: {
+			closeOnSubmit: false
+		},
+		position: {
+			width: 640,
+			height: "auto"
+		},
+		tag: "form"
+	}
+
+	get title() {
+		return `Subsystems`;
+	}
+
+	static PARTS = {
+		header: {
+			template: "./modules/pf2e-subsystem-helper/templates/pf2e-subsystem-helper.hbs"
+		}
+	}
+
+	_prepareContext(options) {
+		return {
+			researchSubsystem: Data.loadDataModel('research').concatenate(),
+			influenceSubsystem: Data.loadDataModel('influence'),
+			reputationSubsystem: Data.loadDataModel('reputation'),
+			chasesSubsystem: Data.loadDataModel('chases'),
+			infiltrationSubsystem: Data.loadDataModel('infiltration'),
+			victorypointsSubsystem: Data.loadDataModel('victorypoints')
+		}
+	}
+
+	async #onSubmit(event, form, formData) {
+		await Data.saveDataModel(formData)
+
+		this.render();
+	}
 }
 
 
@@ -564,5 +602,6 @@ globalThis.pf2esubsystemhelper = {
 	Helper,
 	Data,
 	subsystem,
-	subtype
+	subtype,
+	SubsystemForm
 }

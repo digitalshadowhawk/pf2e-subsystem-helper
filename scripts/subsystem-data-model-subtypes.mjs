@@ -21,9 +21,10 @@ export class Library extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
 			return null;
 		}
-		const id = this.thresholds.push(Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS))
+		this.thresholds.push(newThreshold.id)
+		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
 		this.updateSource({thresholds: this.thresholds})
-		return id;
+		return newThreshold.id;
 	}
 	
 	getThresholdByID(id) {
@@ -39,9 +40,10 @@ export class Library extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Library Source - the object is not a Library Source')
 			return null;
 		}
-		const id = this.sources.push(Data.saveDataModel(newSource, Helper.FLAGS.SOURCES))
+		this.sources.push(newSource.id)
+		Data.saveDataModel(newSource, Helper.FLAGS.SOURCES)
 		this.updateSource({sources: this.sources})
-		return id;
+		return newSource.id;
 	}
 	
 	getSourceByID(id) {
@@ -67,6 +69,27 @@ export class Library extends foundry.abstract.DataModel {
 		`
 		return output;
 	}
+
+	concatenate() {
+		const wrapper = {
+			libraryName: this.libraryName,
+			type: this.type,
+			id: this.id,
+			level: this.level,
+			points: this.points,
+			thresholds: {},
+			sources: {}
+		}
+		this.thresholds.forEach(element => {
+			Helper.log(true, element)
+			wrapper.thresholds[element] = Data.loadDataModel(element, Helper.FLAGS.THRESHOLDS)
+		})
+		this.sources.forEach(element => {
+			Helper.log(true, element)
+			wrapper.sources[element] = Data.loadDataModel(element, Helper.FLAGS.SOURCES).concatenate()
+		})
+		return wrapper;
+	}
 }
 
 export class LibrarySource extends foundry.abstract.DataModel {
@@ -87,9 +110,10 @@ export class LibrarySource extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.checks.push(Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS))
+		this.checks.push(newCheck.id)
+		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
-		return id;
+		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
@@ -110,6 +134,22 @@ export class LibrarySource extends foundry.abstract.DataModel {
 		}).join("")}
 		`
 		return output;
+	}
+
+	concatenate() {
+		const wrapper = {
+			description: this.description,
+			type: this.type,
+			id: this.id,
+			maxRP: this.maxRP,
+			earnedRP: this.earnedRP,
+			checks: {}
+		}
+		this.checks.forEach(element => {
+			Helper.log(true, element)
+			wrapper.checks[element] = Data.loadDataModel(element, Helper.FLAGS.CHECKS)
+		})
+		return wrapper;
 	}
 }
 
@@ -135,9 +175,10 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
 			return null;
 		}
-		const id = this.thresholds.push(Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS))
+		this.thresholds.push(newThreshold.id)
+		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
 		this.updateSource({thresholds: this.thresholds})
-		return id;
+		return newThreshold.id;
 	}
 	
 	getThresholdByID(id) {
@@ -153,9 +194,10 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.checks.push(Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS))
+		this.checks.push(newCheck.id)
+		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
-		return id;
+		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
@@ -171,9 +213,10 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Discovery Check - the object is not a Check')
 			return;
 		}
-		const id = this.discoveries.push(Data.saveDataModel(newDiscovery, Helper.FLAGS.CHECKS))
+		this.discoveries.push(newDiscovery.id)
+		Data.saveDataModel(newDiscovery, Helper.FLAGS.CHECKS)
 		this.updateSource({discoveries: this.discoveries})
-		return id;
+		return newDiscovery.id;
 	}
 	
 	getDiscoveryCheckByID(id) {
@@ -224,9 +267,10 @@ export class Chase extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Chase Obstacle - the object is not an Chase Obstacle')
 			return;
 		}
-		const id = this.obstacles.push(Data.saveDataModel(newObstacle, Helper.FLAGS.CHASEOBSTACLES))
+		this.obstacles.push(newObstacle.id)
+		Data.saveDataModel(newObstacle, Helper.FLAGS.CHASEOBSTACLES)
 		this.updateSource({obstacles: this.obstacles})
-		return id;
+		return newObstacle.id;
 	}
 	
 	getObstacleByID(id) {
@@ -272,9 +316,10 @@ export class ChaseObstacle extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.checks.push(Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS))
+		this.checks.push(newCheck.id)
+		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
-		return id;
+		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
@@ -331,9 +376,10 @@ export class Infiltration extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Infiltration Obstacle - the object is not an Infiltration Obstacle')
 			return;
 		}
-		const id = this.obstacles.push(Data.saveDataModel(newObstacle, Helper.FLAGS.INFILTRATIONOBSTACLES))
+		this.obstacles.push(newObstacle.id)
+		Data.saveDataModel(newObstacle, Helper.FLAGS.INFILTRATIONOBSTACLES)
 		this.updateSource({obstacles: this.obstacles})
-		return id;
+		return newObstacle.id;
 	}
 	
 	getObstacleByID(id) {
@@ -349,9 +395,10 @@ export class Infiltration extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Infiltration Threshold - the object is not a Threshold')
 			return null;
 		}
-		const id = this.awarenessThresholds.push(Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS))
+		this.awarenessThresholds.push(newThreshold.id)
+		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
 		this.updateSource({awarenessThresholds: this.awarenessThresholds})
-		return id;
+		return newThreshold.id;
 	}
 	
 	getAwarenessThresholdByID(id) {
@@ -367,9 +414,10 @@ export class Infiltration extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Complication - the object is not a Complication')
 			return null;
 		}
-		const id = this.complications.push(Data.saveDataModel(newComplication, Helper.FLAGS.COMPLICATIONS))
+		this.complications.push(newComplication.id)
+		Data.saveDataModel(newComplication, Helper.FLAGS.COMPLICATIONS)
 		this.updateSource({complications: this.complications})
-		return id;
+		return newComplication.id;
 	}
 	
 	getComplicationByID(id) {
@@ -444,9 +492,10 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.checks.push(Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS))
+		this.checks.push(newCheck.id)
+		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
-		return id;
+		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
@@ -462,9 +511,10 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.infiltrationPoints.push(Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS))
+		this.infiltrationPoints.push(newCounter.id)
+		Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS)
 		this.updateSource({infiltrationPoints: this.infiltrationPoints})
-		return id;
+		return newCounter.id;
 	}
 	
 	getPointCounterByID(id) {
@@ -528,9 +578,10 @@ export class Complication extends foundry.abstract.DataModel {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		const id = this.checks.push(Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS))
+		this.checks.push(newCheck.id)
+		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
-		return id;
+		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
