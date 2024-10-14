@@ -40,29 +40,12 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 		return this.libraries.map(element => {
 			let model = this.getLibraryByID(element)
 			Helper.log(true, 'subsystems Line 43')
-			let entry = `<research-library class="directory-item flexcol collapsed" style="display: flex;">
+			let entry = `<research-library class="directory-item folder flexcol collapsed" style="display: flex;">
 				${model.toHTML()}
 			</research-library>`
 
 			return entry;
 		});
-	}
-
-	concatenate() {
-		const wrapper = {
-			subsystemName: this.subsystemName,
-			type: this.type,
-			id: this.id,
-			libraries: {}
-		}
-		this.libraries.forEach(element => {
-			Helper.log(true, "Logging Library element")
-			Helper.log(true, element)
-			wrapper.libraries[element] = Data.loadDataModel(element, Helper.FLAGS.LIBRARIES).concatenate()
-		
-			Helper.log(true, wrapper)
-		})
-		return wrapper;
 	}
 }
 

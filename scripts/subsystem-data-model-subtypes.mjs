@@ -55,7 +55,10 @@ export class Library extends foundry.abstract.DataModel {
 	}
 
 	toHTML(){
-		let output = `<h3>${this.libraryName}</h3>
+		let output = `<header class="folder-header flexrow">
+		<h3>${this.libraryName}</h3>
+		</header>
+		<ol class="subdirectory">
 		<div>Level: ${this.level}</div>
 		<div>Points: ${this.points}</div>
 		${this.thresholds.map(element=> {
@@ -66,29 +69,9 @@ export class Library extends foundry.abstract.DataModel {
 			Helper.log(true, 'subtypes Line 65')
 			return Data.loadDataModel(element,Helper.FLAGS.SOURCES).toHTML()
 		}).join("")}
+		</ol>
 		`
 		return output;
-	}
-
-	concatenate() {
-		const wrapper = {
-			libraryName: this.libraryName,
-			type: this.type,
-			id: this.id,
-			level: this.level,
-			points: this.points,
-			thresholds: {},
-			sources: {}
-		}
-		this.thresholds.forEach(element => {
-			Helper.log(true, element)
-			wrapper.thresholds[element] = Data.loadDataModel(element, Helper.FLAGS.THRESHOLDS)
-		})
-		this.sources.forEach(element => {
-			Helper.log(true, element)
-			wrapper.sources[element] = Data.loadDataModel(element, Helper.FLAGS.SOURCES).concatenate()
-		})
-		return wrapper;
 	}
 }
 
@@ -134,22 +117,6 @@ export class LibrarySource extends foundry.abstract.DataModel {
 		}).join("")}
 		`
 		return output;
-	}
-
-	concatenate() {
-		const wrapper = {
-			description: this.description,
-			type: this.type,
-			id: this.id,
-			maxRP: this.maxRP,
-			earnedRP: this.earnedRP,
-			checks: {}
-		}
-		this.checks.forEach(element => {
-			Helper.log(true, element)
-			wrapper.checks[element] = Data.loadDataModel(element, Helper.FLAGS.CHECKS)
-		})
-		return wrapper;
 	}
 }
 
