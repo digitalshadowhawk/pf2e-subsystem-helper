@@ -26,14 +26,21 @@
     ]
   },
   "scripts": [
-	"scripts/lib/lib.mjs"
+	"src/lib/lib.mjs"
   ],
   "esmodules": [
-	"scripts/pf2e-subsystem-helper.mjs"
+    "index.js",
+  	"src/pf2e-subsystem-helper.mjs"
   ],
   "styles": [
     "styles/pf2e-subsystem-helper.css"
   ],
+  "flags": {
+    "hotReload": {
+      "extensions": ["json"],
+      "paths": ["languages"]
+    }
+  },
   "languages": [
     {
       "lang": "en",
@@ -42,6 +49,7 @@
       "flags": {}
     }
   ],
+  "socket": false,
   "url": "#{URL}#",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
@@ -54,5 +62,8 @@
       "loop": false,
       "flags": {}
     }
-  ]
+  ],
+  "protected": false,
+  "coreTranslation": false,
+  "library": false
 }

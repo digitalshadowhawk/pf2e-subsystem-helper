@@ -140,6 +140,7 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
 	registerPackageDebugFlag(Helper.ID);
 });
 
+
 export class Data {
 	
 	static get allSubsystems() {

@@ -1,6 +1,6 @@
 {
     "MODULE.hello": "hello",
 	"PF2E-SUBSYSTEM-HELPER": {
-	
+		"title": "PF2e Subsystem Helper"
 	}
 }
