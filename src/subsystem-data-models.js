@@ -1,6 +1,7 @@
 import * as subtype from './subsystem-data-model-subtypes.js';
 import { Helper } from "./pf2e-subsystem-helper.js";
 import { Data } from "./pf2e-subsystem-helper.js";
+import { constants } from './constants.js';
 
 export class ResearchDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
@@ -14,18 +15,18 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addLibrary(newLibrary) {
-		if(!newLibrary instanceof subtype.Library) {
+		if(!newLibrary instanceof subtype.LibraryDataModel) {
 			Helper.log(true, 'Cannot add new Library - the object is not an Library')
 			return null;
 		}
 		this.libraries.push(newLibrary.id)
-		Data.saveDataModel(newLibrary, Helper.FLAGS.LIBRARIES)
+		Data.saveDataModel(newLibrary, constants.FLAGS.LIBRARIES)
 		this.updateSource({libraries: this.libraries})
 		return newLibrary.id;
 	}
 	
 	getLibraryByID(id) {
-		return new subtype.Library(Data.loadDataModel(id, Helper.FLAGS.LIBRARIES));
+		return new subtype.Library(Data.loadDataModel(id, constants.FLAGS.LIBRARIES));
 	}
 	
 	getLibraries() {
@@ -47,23 +48,6 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 			return entry;
 		});
 	}
-
-	concatenate() {
-		const wrapper = {
-			subsystemName: this.subsystemName,
-			type: this.type,
-			id: this.id,
-			libraries: {}
-		}
-		this.libraries.forEach(element => {
-			Helper.log(true, "Logging Library element")
-			Helper.log(true, element)
-			wrapper.libraries[element] = Data.loadDataModel(element, Helper.FLAGS.LIBRARIES).concatenate()
-		
-			Helper.log(true, wrapper)
-		})
-		return wrapper;
-	}
 }
 
 export class VictoryPointsDataModel extends foundry.abstract.DataModel {
@@ -78,18 +62,18 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addCounter(newCounter) {
-		if(!newCounter instanceof subtype.Counter) {
+		if(!newCounter instanceof subtype.CounterDataModel) {
 			Helper.log(true, 'Cannot add new Counter - the object is not a Counter')
 			return null;
 		}
 		this.counters.push(newCounter.id)
-		Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS)
+		Data.saveDataModel(newCounter, constants.FLAGS.COUNTERS)
 		this.updateSource({counters: this.counters})
 		return newCounter.id;
 	}
 	
 	getCounterByID(id) {
-		return new subtype.Counter(Data.loadDataModel(id, Helper.FLAGS.COUNTERS));
+		return new subtype.Counter(Data.loadDataModel(id, constants.FLAGS.COUNTERS));
 	}
 	
 	getCounter() {
@@ -99,19 +83,6 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 	getMechanicName() {
 		return "Counter";
 	}
-
-	toHTML(){
-		return this.counters.map(element => {
-			let model = this.getCounterByID(element)
-			Helper.log(true, 'subsystems Line 89')
-			let entry = `<victorypoints-counter class="directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</victorypoints-counter>`
-
-			return entry;
-		});
-	}
-	
 }
 
 export class InfluenceDataModel extends foundry.abstract.DataModel {
@@ -126,18 +97,18 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addNPC(newNPC) {
-		if(!newNPC instanceof subtype.InfluenceNPC) {
+		if(!newNPC instanceof subtype.InfluenceNPCDataModel) {
 			Helper.log(true, 'Cannot add new NPC - the object is not an NPC')
 			return null;
 		}
 		this.npcs.push(newNPC.id)
-		Data.saveDataModel(newNPC, Helper.FLAGS.NPCS)
+		Data.saveDataModel(newNPC, constants.FLAGS.NPCS)
 		this.updateSource({npcs: this.npcs})
 		return newNPC.id;
 	}
 	
 	getNPCByID(id) {
-		return new subtype.InfluenceNPC(Data.loadDataModel(id, Helper.FLAGS.NPCS));
+		return new subtype.InfluenceNPC(Data.loadDataModel(id, constants.FLAGS.NPCS));
 	}
 	
 	getNPCs() {
@@ -146,18 +117,6 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 
 	getMechanicName() {
 		return "NPC";
-	}
-
-	toHTML(){
-		return this.npcs.map(element => {
-			let model = this.getNPCByID(element)
-			Helper.log(true, 'subsystems Line 136')
-			let entry = `<influence-npc class="directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</influence-npc>`
-
-			return entry;
-		});
 	}
 }
 
@@ -173,18 +132,18 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addChase(newChase) {
-		if(!newChase instanceof subtype.Chase){
+		if(!newChase instanceof subtype.ChaseDataModel){
 			Helper.log(true, 'Cannot add new Chase - the object is not a Chase')
 			return;
 		}
 		this.chases.push(newChase.id)
-		Data.saveDataModel(newChase, Helper.FLAGS.CHASES)
+		Data.saveDataModel(newChase, constants.FLAGS.CHASES)
 		this.updateSource({chases: this.chases})
 		return newChase.id;
 	}
 	
 	getChaseByID(id) {
-		return new subtype.Chase(Data.loadDataModel(id, Helper.FLAGS.CHASES));
+		return new subtype.Chase(Data.loadDataModel(id, constants.FLAGS.CHASES));
 	}
 	
 	getChases() {
@@ -194,18 +153,6 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 	getMechanicName() {
 		return "Chase";
 	}
-
-	toHTML(){
-		return this.chases.map(element => {
-			let model = this.getChaseByID(element)
-			Helper.log(true, 'subsystems Line 182')
-			let entry = `<li class="chases-chases directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</li>`
-
-			return entry;
-		});
-	}	
 }
 
 export class InfiltrationDataModel extends foundry.abstract.DataModel {
@@ -220,18 +167,18 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addInfiltration(newInfiltration) {
-		if(!newInfiltration instanceof subtype.Infiltration){
+		if(!newInfiltration instanceof subtype.InfiltrationDataModel){
 			Helper.log(true, 'Cannot add new Infiltration - the object is not a Infiltration')
 			return;
 		}
 		this.infiltrations.push(newInfiltration.id)
-		Data.saveDataModel(newInfiltration, Helper.FLAGS.INFILTRATIONS)
+		Data.saveDataModel(newInfiltration, constants.FLAGS.INFILTRATIONS)
 		this.updateSource({infiltrations: this.infiltrations})
 		return newInfiltration.id;
 	}
 	
 	getInfiltrationByID(id) {
-		return new subtype.Infiltration(Data.loadDataModel(id, Helper.FLAGS.INFILTRATIONS));
+		return new subtype.Infiltration(Data.loadDataModel(id, constants.FLAGS.INFILTRATIONS));
 	}
 	
 	getInfiltrations() {
@@ -241,18 +188,6 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	getMechanicName() {
 		return "Infiltration";
 	}
-
-	toHTML(){
-		return this.infiltrations.map(element => {
-			let model = this.getInfiltrationByID(element)
-			Helper.log(true, 'subsystems Line 228')
-			let entry = `<infiltration-infiltration class="directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</infiltration-infiltration>`
-
-			return entry;
-		});
-	}	
 }
 
 export class ReputationDataModel extends foundry.abstract.DataModel {
@@ -267,18 +202,18 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 	}
 	
 	addReputation(newReputation) {
-		if(!newReputation instanceof subtype.Reputation){
+		if(!newReputation instanceof subtype.ReputationDataModel){
 			Helper.log(true, 'Cannot add new Reputation - the object is not a Reputation')
 			return;
 		}
 		this.reputations.push(newReputation.id)
-		Data.saveDataModel(newReputation, Helper.FLAGS.REPUTATIONS)
+		Data.saveDataModel(newReputation, constants.FLAGS.REPUTATIONS)
 		this.updateSource({reputations: this.reputations})
 		return newReputation.id;
 	}
 	
 	getReputationByID(id) {
-		return new subtype.Reputation(Data.loadDataModel(id, Helper.FLAGS.REPUTATIONS));
+		return new subtype.Reputation(Data.loadDataModel(id, constants.FLAGS.REPUTATIONS));
 	}
 	
 	getReputations() {
@@ -287,18 +222,5 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 
 	getMechanicName() {
 		return "Reputation";
-	}
-
-	toHTML(){
-		return this.reputations.map(element => {
-			let model = this.getReputationNyID(element)
-			Helper.log(true, 'subsystem Line 274')
-			let entry = `<reputation-reputation class="directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</reputation-reputation>`
-
-			return entry;
-		});
-	}
-	
+	}	
 }

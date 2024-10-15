@@ -1,8 +1,9 @@
 
 import { Helper } from "./pf2e-subsystem-helper.js";
 import { Data } from "./pf2e-subsystem-helper.js";
+import { constants } from './constants.js';
 
-export class Library extends foundry.abstract.DataModel {
+export class LibraryDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -17,18 +18,18 @@ export class Library extends foundry.abstract.DataModel {
 	}
 	
 	addThreshold(newThreshold) {
-		if(!newThreshold instanceof Threshold) {
+		if(!newThreshold instanceof ThresholdDataModel) {
 			Helper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
 			return null;
 		}
 		this.thresholds.push(newThreshold.id)
-		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
+		Data.saveDataModel(newThreshold, constants.FLAGS.THRESHOLDS)
 		this.updateSource({thresholds: this.thresholds})
 		return newThreshold.id;
 	}
 	
 	getThresholdByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.THRESHOLDS);
+		return Data.loadDataModel(id, constants.FLAGS.THRESHOLDS);
 	}
 	
 	getThresholds() {
@@ -36,63 +37,26 @@ export class Library extends foundry.abstract.DataModel {
 	}
 	
 	addSource(newSource) {
-		if(!newSource instanceof LibrarySource) {
+		if(!newSource instanceof LibrarySourceDataModel) {
 			Helper.log(true, 'Cannot add new Library Source - the object is not a Library Source')
 			return null;
 		}
 		this.sources.push(newSource.id)
-		Data.saveDataModel(newSource, Helper.FLAGS.SOURCES)
+		Data.saveDataModel(newSource, constants.FLAGS.SOURCES)
 		this.updateSource({sources: this.sources})
 		return newSource.id;
 	}
 	
 	getSourceByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.SOURCES);
+		return Data.loadDataModel(id, constants.FLAGS.SOURCES);
 	}
 	
 	getSources() {
 		return this.sources.map( id => this.getSourceByID(id) );
 	}
-
-	toHTML(){
-		let output = `<h3>${this.libraryName}</h3>
-		<div>Level: ${this.level}</div>
-		<div>Points: ${this.points}</div>
-		${this.thresholds.map(element=> {
-			Helper.log(true, 'subtypes Line 61')
-			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
-		}).join("")}
-		${this.sources.map(element=> {
-			Helper.log(true, 'subtypes Line 65')
-			return Data.loadDataModel(element,Helper.FLAGS.SOURCES).toHTML()
-		}).join("")}
-		`
-		return output;
-	}
-
-	concatenate() {
-		const wrapper = {
-			libraryName: this.libraryName,
-			type: this.type,
-			id: this.id,
-			level: this.level,
-			points: this.points,
-			thresholds: {},
-			sources: {}
-		}
-		this.thresholds.forEach(element => {
-			Helper.log(true, element)
-			wrapper.thresholds[element] = Data.loadDataModel(element, Helper.FLAGS.THRESHOLDS)
-		})
-		this.sources.forEach(element => {
-			Helper.log(true, element)
-			wrapper.sources[element] = Data.loadDataModel(element, Helper.FLAGS.SOURCES).concatenate()
-		})
-		return wrapper;
-	}
 }
 
-export class LibrarySource extends foundry.abstract.DataModel {
+export class LibrarySourceDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -106,54 +70,26 @@ export class LibrarySource extends foundry.abstract.DataModel {
 	}
 	
 	addCheck(newCheck) {
-		if(!newCheck instanceof Check) {
+		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.checks.push(newCheck.id)
-		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHECKS);
+		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
 	}
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
-
-	toHTML(){
-		let output = `<h3>${this.description}</h3>
-		<div>Earned RP: ${this.earnedRP}</div>
-		<div>Max RP: ${this.maxRP}</div>
-		${this.checks.map(element=> {
-			Helper.log(true, 'subtypes Line 109')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}
-		`
-		return output;
-	}
-
-	concatenate() {
-		const wrapper = {
-			description: this.description,
-			type: this.type,
-			id: this.id,
-			maxRP: this.maxRP,
-			earnedRP: this.earnedRP,
-			checks: {}
-		}
-		this.checks.forEach(element => {
-			Helper.log(true, element)
-			wrapper.checks[element] = Data.loadDataModel(element, Helper.FLAGS.CHECKS)
-		})
-		return wrapper;
-	}
 }
 
-export class InfluenceNPC extends foundry.abstract.DataModel {
+export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -171,18 +107,18 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	}
 	
 	addThreshold(newThreshold) {
-		if(!newThreshold instanceof Threshold) {
+		if(!newThreshold instanceof ThresholdDataModel) {
 			Helper.log(true, 'Cannot add new Library Threshold - the object is not a Threshold')
 			return null;
 		}
 		this.thresholds.push(newThreshold.id)
-		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
+		Data.saveDataModel(newThreshold, constants.FLAGS.THRESHOLDS)
 		this.updateSource({thresholds: this.thresholds})
 		return newThreshold.id;
 	}
 	
 	getThresholdByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.THRESHOLDS);
+		return Data.loadDataModel(id, constants.FLAGS.THRESHOLDS);
 	}
 	
 	getThresholds() {
@@ -190,18 +126,18 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	}
 	
 	addCheck(newCheck) {
-		if(!newCheck instanceof Check) {
+		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.checks.push(newCheck.id)
-		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHECKS);
+		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
 	}
 	
 	getChecks() {
@@ -209,12 +145,12 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	}
 	
 	addDiscoveryCheck(newDiscovery) {
-		if(!newDiscovery instanceof Check) {
+		if(!newDiscovery instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Discovery Check - the object is not a Check')
 			return;
 		}
 		this.discoveries.push(newDiscovery.id)
-		Data.saveDataModel(newDiscovery, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newDiscovery, constants.FLAGS.CHECKS)
 		this.updateSource({discoveries: this.discoveries})
 		return newDiscovery.id;
 	}
@@ -226,31 +162,9 @@ export class InfluenceNPC extends foundry.abstract.DataModel {
 	getDicoveryChecks() {
 		return this.discoveries.map( id => this.getCheckByID(id) );
 	}
-
-	toHTML(){
-		let output = `<h3>${this.name}</h3>
-		<div>Perception: +${this.perception}</div>
-		<div>Will: +${this.will}</div>
-		<div>Resistances: ${this.resistances}</div>
-		<div>Weaknesses: ${this.weaknesses}</div>
-		${this.thresholds.map(element=> {
-			Helper.log(true, 'subtypes Line 195')
-			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
-		}).join("")}
-		${this.discoveries.map(element=> {
-			Helper.log(true, 'subtypes Line 199')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}
-		${this.checks.map(element=> {
-			Helper.log(true, 'subtypes Line 203')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}
-		`
-		return output;
-	}
 }
 
-export class Chase extends foundry.abstract.DataModel {
+export class ChaseDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -263,41 +177,26 @@ export class Chase extends foundry.abstract.DataModel {
 	}
 	
 	addObstacle(newObstacle) {
-		if(!newObstacle instanceof ChaseObstacle) {
+		if(!newObstacle instanceof ChaseObstacleDataModel) {
 			Helper.log(true, 'Cannot add new Chase Obstacle - the object is not an Chase Obstacle')
 			return;
 		}
 		this.obstacles.push(newObstacle.id)
-		Data.saveDataModel(newObstacle, Helper.FLAGS.CHASEOBSTACLES)
+		Data.saveDataModel(newObstacle, constants.FLAGS.CHASEOBSTACLES)
 		this.updateSource({obstacles: this.obstacles})
 		return newObstacle.id;
 	}
 	
 	getObstacleByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHASEOBSTACLES);
+		return Data.loadDataModel(id, constants.FLAGS.CHASEOBSTACLES);
 	}
 	
 	getObstacles() {
 		return this.obstacles.map( id => this.getObstacleByID(id) );
 	}
-
-	toHTML(){
-		let output = `<header class="flexrow" style="position: relative;">
-			<h3 class="noborder">${this.name}</h3>
-		</header>
-		<ol class="subdirectory">
-		<li class="directory-item flexrow">Objective: ${this.objective}</li>
-		${this.obstacles.map(element=> {
-			Helper.log(true, 'subtypes Line 245')
-			return `<li class="directory-item flexcol">` + Data.loadDataModel(element,Helper.FLAGS.CHASEOBSTACLES).toHTML()+ `</li>`
-		}).join("")}
-		</ol>
-		`
-		return output;
-	}
 }
 
-export class ChaseObstacle extends foundry.abstract.DataModel {
+export class ChaseObstacleDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -312,40 +211,26 @@ export class ChaseObstacle extends foundry.abstract.DataModel {
 	}
 	
 	addCheck(newCheck) {
-		if(!newCheck instanceof Check) {
+		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.checks.push(newCheck.id)
-		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHECKS);
+		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
 	}
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
-
-	toHTML(){
-		let output = `<h3>${this.name}</h3><div class="flexrow"><div class="flexcol">
-		<div>Level: ${this.level}</div>
-		<div class="flexrow">
-		<div>Points: ${this.points}</div>
-		<div>Goal: ${this.goal}</div></div></div>
-		<div class="flexcol">${this.checks.map(element=> {
-			Helper.log(true, 'subtypes Line 291')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}</div></div>
-		`
-		return output;
-	}
 }
 
-export class Infiltration extends foundry.abstract.DataModel {
+export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -372,18 +257,18 @@ export class Infiltration extends foundry.abstract.DataModel {
 	}
 	
 	addObstacle(newObstacle) {
-		if(!newObstacle instanceof InfiltrationObstacle) {
+		if(!newObstacle instanceof InfiltrationObstacleDataModel) {
 			Helper.log(true, 'Cannot add new Infiltration Obstacle - the object is not an Infiltration Obstacle')
 			return;
 		}
 		this.obstacles.push(newObstacle.id)
-		Data.saveDataModel(newObstacle, Helper.FLAGS.INFILTRATIONOBSTACLES)
+		Data.saveDataModel(newObstacle, constants.FLAGS.INFILTRATIONOBSTACLES)
 		this.updateSource({obstacles: this.obstacles})
 		return newObstacle.id;
 	}
 	
 	getObstacleByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.INFILTRATIONOBSTACLES);
+		return Data.loadDataModel(id, constants.FLAGS.INFILTRATIONOBSTACLES);
 	}
 	
 	getObstacles() {
@@ -391,18 +276,18 @@ export class Infiltration extends foundry.abstract.DataModel {
 	}
 	
 	addAwarenessThreshold(newThreshold) {
-		if(!newThreshold instanceof Threshold) {
+		if(!newThreshold instanceof ThresholdDataModel) {
 			Helper.log(true, 'Cannot add new Infiltration Threshold - the object is not a Threshold')
 			return null;
 		}
 		this.awarenessThresholds.push(newThreshold.id)
-		Data.saveDataModel(newThreshold, Helper.FLAGS.THRESHOLDS)
+		Data.saveDataModel(newThreshold, constants.FLAGS.THRESHOLDS)
 		this.updateSource({awarenessThresholds: this.awarenessThresholds})
 		return newThreshold.id;
 	}
 	
 	getAwarenessThresholdByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.THRESHOLDS);
+		return Data.loadDataModel(id, constants.FLAGS.THRESHOLDS);
 	}
 	
 	getAwarenessThresholds() {
@@ -410,18 +295,18 @@ export class Infiltration extends foundry.abstract.DataModel {
 	}
 	
 	addComplication(newComplication) {
-		if(!newComplication instanceof Complication) {
+		if(!newComplication instanceof ComplicationDataModel) {
 			Helper.log(true, 'Cannot add new Complication - the object is not a Complication')
 			return null;
 		}
 		this.complications.push(newComplication.id)
-		Data.saveDataModel(newComplication, Helper.FLAGS.COMPLICATIONS)
+		Data.saveDataModel(newComplication, constants.FLAGS.COMPLICATIONS)
 		this.updateSource({complications: this.complications})
 		return newComplication.id;
 	}
 	
 	getComplicationByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.COMPLICATIONS);
+		return Data.loadDataModel(id, constants.FLAGS.COMPLICATIONS);
 	}
 	
 	getComplications() {
@@ -436,37 +321,9 @@ export class Infiltration extends foundry.abstract.DataModel {
 	getOpportunities() {
 		return this.opportunities;
 	}
-
-	toHTML(){
-		let output = `<h3>${this.name}</h3>
-		<div>Awareness Points: ${this.awarenessPoints}</div>
-		<div>Edge Points: ${this.edgePoints}</div>
-		<div>Goal: ${this.goal}</div>
-		<div>Objectives</div>
-		${this.objectives.map(element=> {
-			return `<div>Objective: ${element}</div>`
-		}).join("")}
-		${this.opportunities.map(element=> {
-			return `<div>Opportunity: ${element}</div>`
-		}).join("")}
-		${this.obstacles.map(element=> {
-			Helper.log(true, 'subtypes Line 401')
-			return Data.loadDataModel(element,Helper.FLAGS.INFILTRATIONOBSTACLES).toHTML()
-		}).join("")}
-		${this.awarenessThresholds.map(element=> {
-			Helper.log(true, 'subtypes Line 405')
-			return Data.loadDataModel(element,Helper.FLAGS.THRESHOLDS).toHTML()
-		}).join("")}
-		${this.complications.map(element=> {
-			Helper.log(true, 'subtypes Line 409')
-			return Data.loadDataModel(element,Helper.FLAGS.COMPLICATIONS).toHTML()
-		}).join("")}
-		`
-		return output;
-	}
 }
 
-export class InfiltrationObstacle extends foundry.abstract.DataModel {
+export class InfiltrationObstacleDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -488,18 +345,18 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 	}
 	
 	addCheck(newCheck) {
-		if(!newCheck instanceof Check) {
+		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.checks.push(newCheck.id)
-		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHECKS);
+		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
 	}
 	
 	getChecks() {
@@ -507,18 +364,18 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 	}
 	
 	addPointCounter(newCounter) {
-		if(!newCounter instanceof Counter) {
+		if(!newCounter instanceof CounterDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.infiltrationPoints.push(newCounter.id)
-		Data.saveDataModel(newCounter, Helper.FLAGS.COUNTERS)
+		Data.saveDataModel(newCounter, constants.FLAGS.COUNTERS)
 		this.updateSource({infiltrationPoints: this.infiltrationPoints})
 		return newCounter.id;
 	}
 	
 	getPointCounterByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.COUNTERS);
+		return Data.loadDataModel(id, constants.FLAGS.COUNTERS);
 	}
 	
 	getPointCounters() {
@@ -527,35 +384,14 @@ export class InfiltrationObstacle extends foundry.abstract.DataModel {
 
 	generatePointCounters(partySheet) {
 		if(this.goalType==="group"){
-			this.infiltrationPoints = [new Counter({name: "Player 1"})]
+			this.infiltrationPoints = [new CounterDataModel({name: "Player 1"})]
 		} else if(this.goalType==="individual") {
-			this.infiltrationPoints = [new Counter({name: "Player 1"}), new Counter({name: "Player 2"}), new Counter({name: "Player 3"}), new Counter({name: "Player 4"})]
+			this.infiltrationPoints = [new CounterDataModel({name: "Player 1"}), new Counter({name: "Player 2"}), new Counter({name: "Player 3"}), new Counter({name: "Player 4"})]
 		}
-	}
-
-	toHTML(){
-		let output = `<h3>${this.description}</h3>
-		<div>Points: ${this.points}</div>
-		<div>Goal: ${this.goal} (${this.goalType})</div>
-		<div>Objectives</div>
-		${this.infiltrationPoints.map(element=> {
-			Helper.log(true, 'subtypes Line 488')
-			return Data.loadDataModel(element,Helper.FLAGS.INFILTRATIONPOINTS).toHTML()
-		}).join("")}
-		${this.checks.map(element=> {
-			Helper.log(true, 'subtypes Line 492')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}
-		<div>Critical Success: ${this.outcome.criticalSuccess}</div>
-		<div>Success: ${this.outcome.success}</div>
-		<div>Failure: ${this.outcome.failure}</div>
-		<div>Critical Failure: ${this.outcome.criticalFailure}</div>
-		`
-		return output;
 	}
 }
 
-export class Complication extends foundry.abstract.DataModel {
+export class ComplicationDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -574,65 +410,42 @@ export class Complication extends foundry.abstract.DataModel {
 	}
 	
 	addCheck(newCheck) {
-		if(!newCheck instanceof Check) {
+		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
 		this.checks.push(newCheck.id)
-		Data.saveDataModel(newCheck, Helper.FLAGS.CHECKS)
+		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
 	}
 	
 	getCheckByID(id) {
-		return Data.loadDataModel(id, Helper.FLAGS.CHECKS);
+		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
 	}
 	
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
-
-	toHTML(){
-		let output = `<h3>Trigger: ${this.trigger}</h3>
-		<div>Description: ${this.descriiption}</div>
-		${this.checks.map(element=> {
-			Helper.log(true, 'subtypes Line 544')
-			return Data.loadDataModel(element,Helper.FLAGS.CHECKS).toHTML()
-		}).join("")}
-		<div>Critical Success: ${this.outcome.criticalSuccess}</div>
-		<div>Success: ${this.outcome.success}</div>
-		<div>Failure: ${this.outcome.failure}</div>
-		<div>Critical Failure: ${this.outcome.criticalFailure}</div>
-		`
-		return output;
-	}
 }
 
-export class Reputation extends foundry.abstract.DataModel {
+export class ReputationDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
 			name: new fields.StringField({required: true, blank: false, initial: "New Group"}),
 			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
-			reputation: new fields.StringField({required: true, blank: false, initial: Helper.REPUTATIONS.LEVELS.IGNORED.LABEL}),
+			reputation: new fields.StringField({required: true, blank: false, initial: constants.REPUTATIONS.LEVELS.IGNORED.LABEL}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "reputation"})
 		}
 	}
 
-	updateFromPoints() {
+	updateFromPoints() {}
 
-	}
-
-	toHTML(){
-		let output = `<h3>Group: ${this.name}</h3>
-		<div>Points: ${this.points} (${this.reputation})</div>
-		`
-		return output;
-	}
 }
 
-export class Check extends foundry.abstract.DataModel {
+export class CheckDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -647,28 +460,16 @@ export class Check extends foundry.abstract.DataModel {
 	}
 
 	calculateDC() {
-		this.updateSource({dc: Helper.DCS?.[this.partyLevel] + Helper.ADJUSTMENTS?.[this.adjustment], calculated: true});
+		this.updateSource({dc: constants.DCS?.[this.partyLevel] + constants.ADJUSTMENTS?.[this.adjustment], calculated: true});
 		return this;
 	}
 	
 	getEnricher() {
 		return "@Check[type:"+this.checkType+"|dc:"+this.dc+"]";
 	}
-
-	toHTML(){
-		let output = ``
-		if(this.calculated){
-			//output = `<div>${this.getEnricher()} (${this.adjustment} Level ${this.partyLevel} DC)</div>`
-			output = `<div>DC ${this.dc} ${this.checkType} Check (${this.adjustment} Level ${this.partyLevel} DC)</div>`
-		} else {
-			//output =`<div>${this.getEnricher()}</div>`
-			output =`<div>DC ${this.dc} ${this.checkType} Check</div>`
-		}
-		return output;
-	}
 }
 
-export class Counter extends foundry.abstract.DataModel {
+export class CounterDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -678,14 +479,9 @@ export class Counter extends foundry.abstract.DataModel {
 			type: new fields.StringField({required: true, blank: false, initial: "counter"})
 		}
 	}
-
-	toHTML(){
-		let output = `<div>${this.name}: ${this.points}</div>`
-		return output;
-	}
 }
 
-export class Threshold extends foundry.abstract.DataModel {
+export class ThresholdDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -694,10 +490,5 @@ export class Threshold extends foundry.abstract.DataModel {
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "threshold"})
 		}
-	}
-
-	toHTML(){
-		let output = `<div>${this.thresholdValue}: ${this.description}</div>`
-		return output;
 	}
 }

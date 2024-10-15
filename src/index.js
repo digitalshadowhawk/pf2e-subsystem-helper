@@ -2,7 +2,6 @@
 //import BasicApplication from './lib/BasicApplication.js';
 //import SubsystemTab from './lib/SubsystemTab.js';
 import SubsystemTab from './lib/SubsystemTab.svelte';
-import { Helper } from './pf2e-subsystem-helper.js';
 import { constants } from './constants.js';
 
 
@@ -52,10 +51,9 @@ Hooks.on('init', function() {
 });
 
 Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
-    if (!game.user.isGM || !(game.settings.get(Helper.ID, "Reputation")||game.settings.get(Helper.ID, "Influence")||game.settings.get(Helper.ID, "VictoryPoints")||game.settings.get(Helper.ID, "Chases")||game.settings.get(Helper.ID, "Infiltration")||game.settings.get(Helper.ID, "Research"))) {return;}
+    if (!game.user.isGM || !(game.settings.get(constants.ID, "Reputation")||game.settings.get(constants.ID, "Influence")||game.settings.get(constants.ID, "VictoryPoints")||game.settings.get(constants.ID, "Chases")||game.settings.get(constants.ID, "Infiltration")||game.settings.get(constants.ID, "Research"))) {return;}
     html.find('.sub-nav:not(.sub-sub-nav)').append('<a data-tab="subsystems" class="">Subsystems</a>')
     
-    partySheet?.__subsystem_tab?.$destroy();
     const targetEl = html[0].querySelector('.container');
     if(targetEl) {
         partySheet.__subsystem_tab = new SubsystemTab({
@@ -65,4 +63,9 @@ Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
     }
 
     //html.find('.container').append(new SubsystemTab(partySheet, html, data))
+});
+
+
+Hooks.on('closePartySheetPF2e', function(partySheet, html, data) {
+	partySheet?.__subsystem_tab?.$destroy();
 });

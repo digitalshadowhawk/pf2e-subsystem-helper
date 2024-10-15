@@ -1,5 +1,6 @@
 import * as subsystem from './subsystem-data-models.js';
 import * as subtype from './subsystem-data-model-subtypes.js';
+import { constants } from './constants.js';
 
 
 export class Helper {
@@ -27,18 +28,40 @@ export class Helper {
 export class Data {
 	
 	static get allSubsystems() {
-		return game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS);
+		return game.actors?.party?.getFlag(constants.ID, constants.FLAGS.SUBSYSTEMS);
 	}
 
-	static saveDataModel(dataModel, flag = Helper.FLAGS.SUBSYSTEMS) {
-		return game.actors?.party?.setFlag(Helper.ID, flag, {[dataModel.id]: dataModel});
+	static saveDataModel(dataModel, flag = constants.FLAGS.SUBSYSTEMS) {
+		return game.actors?.party?.setFlag(constants.ID, flag, {[dataModel.id]: dataModel});
 	}
 
-	static loadDataModel(id, flag = Helper.FLAGS.SUBSYSTEMS) {
-		const model = game.actors?.party?.getFlag(Helper.ID, flag)?.[id]
+	static loadDataModel(id, flag = constants.FLAGS.SUBSYSTEMS) {
+		const model = game.actors?.party?.getFlag(constants.ID, flag)?.[id]
 		let instantiatedModel = {}
 		if(!model){
 			Helper.log(true, "Object is not a valid Data Model")
+			if(flag === constants.FLAGS.SUBSYSTEMS) {
+				let model = {}
+				if(id==="research"){
+					instantiatedModel = new subsystem.ResearchDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				} else if (id==="influence"){
+					instantiatedModel = new subsystem.InfluenceDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				} else if (id==="chases"){
+					instantiatedModel = new subsystem.ChasesDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				} else if (id==="victorypoints"){
+					instantiatedModel = new subsystem.VictoryPointsDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				} else if (id==="infiltrations"){
+					instantiatedModel = new subsystem.InfiltrationDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				} else if (id==="reputations"){
+					instantiatedModel = new subsystem.ReputationDataModel(model)
+					this.saveDataModel(instantiatedModel)
+				}
+			}
 			return {};
 		}
 		if(model.type==="research"){
@@ -54,29 +77,29 @@ export class Data {
 		} else if (model.type==="reputations"){
 			instantiatedModel = new subsystem.ReputationDataModel(model)
 		}else if (model.type==="library"){
-			instantiatedModel = new subtype.Library(model)
+			instantiatedModel = new subtype.LibraryDataModel(model)
 		} else if (model.type==="librarysource"){
-			instantiatedModel = new subtype.LibrarySource(model)
+			instantiatedModel = new subtype.LibrarySourceDataModel(model)
 		} else if (model.type==="influencenpc"){
-			instantiatedModel = new subtype.InfluenceNPC(model)
+			instantiatedModel = new subtype.InfluenceNPCDataModel(model)
 		} else if (model.type==="chase"){
-			instantiatedModel = new subtype.Chase(model)
+			instantiatedModel = new subtype.ChaseDataModel(model)
 		} else if (model.type==="chaseobstacle"){
-			instantiatedModel = new subtype.ChaseObstacle(model)
+			instantiatedModel = new subtype.ChaseObstacleDataModel(model)
 		} else if (model.type==="infiltration"){
-			instantiatedModel = new subtype.Infiltration(model)
+			instantiatedModel = new subtype.InfiltrationDataModel(model)
 		} else if (model.type==="infiltrationobstacle"){
-			instantiatedModel = new subtype.InfiltrationObstacle(model)
+			instantiatedModel = new subtype.InfiltrationObstacleDataModel(model)
 		} else if (model.type==="complication"){
-			instantiatedModel = new subtype.Complication(model)
+			instantiatedModel = new subtype.ComplicationDataModel(model)
 		} else if (model.type==="reputation"){
-			instantiatedModel = new subtype.Reputation(model)
+			instantiatedModel = new subtype.ReputationDataModel(model)
 		} else if (model.type==="check"){
-			instantiatedModel = new subtype.Check(model)
+			instantiatedModel = new subtype.CheckDataModel(model)
 		} else if (model.type==="threshold"){
-			instantiatedModel = new subtype.Threshold(model)
+			instantiatedModel = new subtype.ThresholdDataModel(model)
 		} else if (model.type==="counter"){
-			instantiatedModel = new subtype.Counter(model)
+			instantiatedModel = new subtype.CounterDataModel(model)
 		} else {
 			Helper.log(true, "Data Model not recognized.")
 		}
@@ -90,27 +113,27 @@ export class Data {
 			[`-=${id}`]: null
 		}
 		
-		return game.actors?.party?.setFlag(Helper.ID, flag, keyDeletion);
+		return game.actors?.party?.setFlag(constants.ID, flag, keyDeletion);
 	}
 	
 	static deleteFlagType(flag) {
-		return game.actors?.party?.unsetFlag(Helper.ID, flag);
+		return game.actors?.party?.unsetFlag(constants.ID, flag);
 	}
 	
 	static deleteAllFlags() {		
-		for (const property in Helper.FLAGS){
-			Helper.log(true, game.actors?.party?.unsetFlag(Helper.ID, Helper.FLAGS[property]))
+		for (const property in constants.FLAGS){
+			Helper.log(true, game.actors?.party?.unsetFlag(constants.ID, constants.FLAGS[property]))
 		}
 	}
 	
 	static showAllFlags() {
-		for (const property in Helper.FLAGS){
-			Helper.log(true, game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS[property]))
+		for (const property in constants.FLAGS){
+			Helper.log(true, game.actors?.party?.getFlag(constants.ID, constants.FLAGS[property]))
 		}
 	}
 
 	static getAllSubsystems() {
-		var output = game.actors?.party?.getFlag(Helper.ID, Helper.FLAGS.SUBSYSTEMS)
+		var output = game.actors?.party?.getFlag(constants.ID, constants.FLAGS.SUBSYSTEMS)
 		return output
 	}
 
@@ -125,26 +148,26 @@ export class Data {
 		
 		//Victory Point Subsystem Dummies
 		const victoryPointDummy = new subsystem.VictoryPointsDataModel()
-		const counter1 = new subtype.Counter()
+		const counter1 = new subtype.CounterDataModel()
 		victoryPointDummy.addCounter(counter1)
 
 		this.saveDataModel(victoryPointDummy)
 
 		//Chase Subsystem Dummies
 		const chaseDummy = new subsystem.ChasesDataModel()
-		const chase1 = new subtype.Chase({name: "Underground Obstacles" , objective: "Win."})
-		const chaseObstacle1 = new subtype.ChaseObstacle({name: "Crumbling Corridor", level: 1, goal:1})
-		const chaseObstacle1Check1 = new subtype.Check({checkType: "Acrobatics", dc: 13})
-		const chaseObstacle1Check2 = new subtype.Check({checkType: "Crafting", dc: 15})
-		const chaseObstacle2 = new subtype.ChaseObstacle({name: "Fungus Grotto", level: 1, goal:1})
-		const chaseObstacle2Check1 = new subtype.Check({checkType: "Fortitude", dc: 15})
-		const chaseObstacle2Check2 = new subtype.Check({checkType: "Survival", dc: 13})
-		const chaseObstacle3 = new subtype.ChaseObstacle({name: "Pit Trap", level: 1, goal:2})
-		const chaseObstacle3Check1 = new subtype.Check({checkType: "Athletics", dc: 13})
-		const chaseObstacle3Check2 = new subtype.Check({checkType: "Perception", dc: 15})
-		const chaseObstacle4 = new subtype.ChaseObstacle({name: "Wandering Gelatinous Cube", level: 1, goal:2})
-		const chaseObstacle4Check1 = new subtype.Check({checkType: "Occultism", dc: 18})
-		const chaseObstacle4Check2 = new subtype.Check({checkType: "Stealth", dc: 15})
+		const chase1 = new subtype.ChaseDataModel({name: "Underground Obstacles" , objective: "Win."})
+		const chaseObstacle1 = new subtype.ChaseObstacleDataModel({name: "Crumbling Corridor", level: 1, goal:1})
+		const chaseObstacle1Check1 = new subtype.CheckDataModel({checkType: "Acrobatics", dc: 13})
+		const chaseObstacle1Check2 = new subtype.CheckDataModel({checkType: "Crafting", dc: 15})
+		const chaseObstacle2 = new subtype.ChaseObstacleDataModel({name: "Fungus Grotto", level: 1, goal:1})
+		const chaseObstacle2Check1 = new subtype.CheckDataModel({checkType: "Fortitude", dc: 15})
+		const chaseObstacle2Check2 = new subtype.CheckDataModel({checkType: "Survival", dc: 13})
+		const chaseObstacle3 = new subtype.ChaseObstacleDataModel({name: "Pit Trap", level: 1, goal:2})
+		const chaseObstacle3Check1 = new subtype.CheckDataModel({checkType: "Athletics", dc: 13})
+		const chaseObstacle3Check2 = new subtype.CheckDataModel({checkType: "Perception", dc: 15})
+		const chaseObstacle4 = new subtype.ChaseObstacleDataModel({name: "Wandering Gelatinous Cube", level: 1, goal:2})
+		const chaseObstacle4Check1 = new subtype.CheckDataModel({checkType: "Occultism", dc: 18})
+		const chaseObstacle4Check2 = new subtype.CheckDataModel({checkType: "Stealth", dc: 15})
 
 		chaseObstacle1.addCheck(chaseObstacle1Check1)
 		chaseObstacle1.addCheck(chaseObstacle1Check2)
@@ -164,19 +187,19 @@ export class Data {
 
 		//Influence Subsystem Dummies
 		const influenceDummy = new subsystem.InfluenceDataModel()
-		const npc1 = new subtype.InfluenceNPC({name: "Danphy Mollwether", perception: 9, will: 12, resistances: "The landlord thinks in practical terms, with little patience for the “good-for-nothings” of the troupe. Appeals directed at sympathy alone increase the check's DC by 2.", weaknesses: "Mr. Mollwether used to visit the theater often as a small child, and performing one of his favorite old songs or plays brings tears to his eyes and reduces the Performance DC by 2."})
-		const npcThreshold1 = new subtype.Threshold({thresholdValue: 4, description: "Mr. Mollwether gives the troupe 1 week to get him his back rent, with interest, before evicting them."})
-		const npcThreshold2 = new subtype.Threshold({thresholdValue: 6, description: "Mr. Mollwether gives the troupe 1 month to get him his back rent before evicting them."})
-		const npcThreshold3 = new subtype.Threshold({thresholdValue: 8, description: "Mr. Mollwether allows the troupe to stay, reduces their rent, and forgives half their debt."})
-		const npcDiscovery1 = new subtype.Check({checkType: "Mercantile Lore", dc: 13})
-		const npcDiscovery2 = new subtype.Check({checkType: "Perception", dc: 18})
-		const npcDiscovery3 = new subtype.Check({checkType: "Society", dc: 16})
-		const npcCheck1 = new subtype.Check({checkType: "Accounting Lore", dc: 16})
-		const npcCheck2 = new subtype.Check({checkType: "Crafting", dc: 16})
-		const npcCheck3 = new subtype.Check({checkType: "Intimidation", dc: 20})
-		const npcCheck4 = new subtype.Check({checkType: "Performance", dc: 20})
-		const npcCheck5 = new subtype.Check({checkType: "Diplomacy", dc: 22})
-		const npcCheck6 = new subtype.Check({checkType: "Deception", dc: 24})
+		const npc1 = new subtype.InfluenceNPCDataModel({name: "Danphy Mollwether", perception: 9, will: 12, resistances: "The landlord thinks in practical terms, with little patience for the “good-for-nothings” of the troupe. Appeals directed at sympathy alone increase the check's DC by 2.", weaknesses: "Mr. Mollwether used to visit the theater often as a small child, and performing one of his favorite old songs or plays brings tears to his eyes and reduces the Performance DC by 2."})
+		const npcThreshold1 = new subtype.ThresholdDataModel({thresholdValue: 4, description: "Mr. Mollwether gives the troupe 1 week to get him his back rent, with interest, before evicting them."})
+		const npcThreshold2 = new subtype.ThresholdDataModel({thresholdValue: 6, description: "Mr. Mollwether gives the troupe 1 month to get him his back rent before evicting them."})
+		const npcThreshold3 = new subtype.ThresholdDataModel({thresholdValue: 8, description: "Mr. Mollwether allows the troupe to stay, reduces their rent, and forgives half their debt."})
+		const npcDiscovery1 = new subtype.CheckDataModel({checkType: "Mercantile Lore", dc: 13})
+		const npcDiscovery2 = new subtype.CheckDataModel({checkType: "Perception", dc: 18})
+		const npcDiscovery3 = new subtype.CheckDataModel({checkType: "Society", dc: 16})
+		const npcCheck1 = new subtype.CheckDataModel({checkType: "Accounting Lore", dc: 16})
+		const npcCheck2 = new subtype.CheckDataModel({checkType: "Crafting", dc: 16})
+		const npcCheck3 = new subtype.CheckDataModel({checkType: "Intimidation", dc: 20})
+		const npcCheck4 = new subtype.CheckDataModel({checkType: "Performance", dc: 20})
+		const npcCheck5 = new subtype.CheckDataModel({checkType: "Diplomacy", dc: 22})
+		const npcCheck6 = new subtype.CheckDataModel({checkType: "Deception", dc: 24})
 
 		npc1.addThreshold(npcThreshold1)
 		npc1.addThreshold(npcThreshold2)
@@ -196,23 +219,23 @@ export class Data {
 
 		//Research Subsystem Dummies
 		const researchDummy = new subsystem.ResearchDataModel()
-		const library1 = new subtype.Library({libraryName: "The Hags' Secret", level: 7, points: 0})
-		const librarySource1 = new subtype.LibrarySource({description: "Sprite Swarm", maxRP: 5, earnedRP: 0})
-		const librarySource1check1 = new subtype.Check({checkType: "Diplomacy", dc: 23})
-		const librarySource1check2 = new subtype.Check({checkType: "Society", dc: 23})
-		const librarySource1check3 = new subtype.Check({checkType: "Athletics", dc: 28})
-		const librarySource2 = new subtype.LibrarySource({description:"Field of Tomeflowers", maxRP: 10, earnedRP: 0})
-		const librarySource2check1 = new subtype.Check({checkType: "Academia Lore", dc: 18})
-		const librarySource2check2 = new subtype.Check({checkType: "Library Lore", dc: 18})
-		const librarySource2check3 = new subtype.Check({checkType: "Occultism", dc: 23})
-		const librarySource3 = new subtype.LibrarySource({description: "Loremother Tree", maxRP: 15, earnedRP: 0})
-		const librarySource3check1 = new subtype.Check({checkType: "Performance", dc: 21})
-		const librarySource3check2 = new subtype.Check({checkType: "Nature", dc: 23})
-		const libraryThreshold1 = new subtype.Threshold({thresholdValue: 5, description: "The PCs learn of apocryphal fey legends that say the coven members were once cruel fey queens now twisted by inner corruption. They learn basic details about hags and the hag mother's Call."})
-		const libraryThreshold2 = new subtype.Threshold({thresholdValue: 10, description: "The PCs learn that the coven gathers on a nearby mountaintop every full moon. Attaining this knowledge comes at a cost: hag malice solidifies into two will-o'-wisps, which attack the PCs."})
-		const libraryThreshold3 = new subtype.Threshold({thresholdValue: 15, description: "The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens."})
-		const libraryThreshold4 = new subtype.Threshold({thresholdValue: 20, description: "The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge."})
-		const libraryThreshold5 = new subtype.Threshold({thresholdValue: 30, description: " A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade."})
+		const library1 = new subtype.LibraryDataModel({libraryName: "The Hags' Secret", level: 7, points: 0})
+		const librarySource1 = new subtype.LibrarySourceDataModel({description: "Sprite Swarm", maxRP: 5, earnedRP: 0})
+		const librarySource1check1 = new subtype.CheckDataModel({checkType: "Diplomacy", dc: 23})
+		const librarySource1check2 = new subtype.CheckDataModel({checkType: "Society", dc: 23})
+		const librarySource1check3 = new subtype.CheckDataModel({checkType: "Athletics", dc: 28})
+		const librarySource2 = new subtype.LibrarySourceDataModel({description:"Field of Tomeflowers", maxRP: 10, earnedRP: 0})
+		const librarySource2check1 = new subtype.CheckDataModel({checkType: "Academia Lore", dc: 18})
+		const librarySource2check2 = new subtype.CheckDataModel({checkType: "Library Lore", dc: 18})
+		const librarySource2check3 = new subtype.CheckDataModel({checkType: "Occultism", dc: 23})
+		const librarySource3 = new subtype.LibrarySourceDataModel({description: "Loremother Tree", maxRP: 15, earnedRP: 0})
+		const librarySource3check1 = new subtype.CheckDataModel({checkType: "Performance", dc: 21})
+		const librarySource3check2 = new subtype.CheckDataModel({checkType: "Nature", dc: 23})
+		const libraryThreshold1 = new subtype.ThresholdDataModel({thresholdValue: 5, description: "The PCs learn of apocryphal fey legends that say the coven members were once cruel fey queens now twisted by inner corruption. They learn basic details about hags and the hag mother's Call."})
+		const libraryThreshold2 = new subtype.ThresholdDataModel({thresholdValue: 10, description: "The PCs learn that the coven gathers on a nearby mountaintop every full moon. Attaining this knowledge comes at a cost: hag malice solidifies into two will-o'-wisps, which attack the PCs."})
+		const libraryThreshold3 = new subtype.ThresholdDataModel({thresholdValue: 15, description: "The PCs learn that a specific magical incantation is needed to reach the hag's mountaintop. Though they don't quite discover the incantation, they discover among magical writings a page containing the uncommon spell read omens."})
+		const libraryThreshold4 = new subtype.ThresholdDataModel({thresholdValue: 20, description: "The Loremother Tree awakens long enough to tell the PCs the incantation, but warns them that the hags possess powerful magic that has struck down many heroes. The tree then returns to slumber. Replace the Loremother Tree's Performance Research check with a DC 28 Diplomacy check to convince the tree to share further knowledge."})
+		const libraryThreshold5 = new subtype.ThresholdDataModel({thresholdValue: 30, description: " A dryad emerges from the trunk of the Loremother Tree and tells the PCs about the hags' spell—a unique polymorph ability that turns people into toads. She also gives each PC a small flower charm for protection that grants each PC a +3 status bonus to their saving throws against the hags' Toad Form ability. Unfortunately, this draws the hags' attention, who send two living wildfires to burn the glade down. If the PCs don't defeat the fire elementals, the creatures destroy any remaining information in the glade."})
 		
 		librarySource1.addCheck(librarySource1check1)
 		librarySource1.addCheck(librarySource1check2)
@@ -236,25 +259,25 @@ export class Data {
 
 		//Infiltration Subsystem Dummies
 		const infiltrationDummy = new subsystem.InfiltrationDataModel()
-		const infiltration1 = new subtype.Infiltration({name: "Sample Infiltration"})
-		const infiltrationObstacle1 = new subtype.InfiltrationObstacle({goal: 2, goalType: "individual"})
-		const infiltrationObstacle1Check1 = new subtype.Check({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
-		const infiltrationObstacle1Check2 = new subtype.Check({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
-		const infiltrationObstacle1Check3 = new subtype.Check({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
-		const infiltrationObstacle2 = new subtype.InfiltrationObstacle({goal: 1, goalType: "group"})
-		const infiltrationObstacle2Check1 = new subtype.Check({checkType: "Athletics", level: 1, adjustment: "HARD"}).calculateDC()
-		const infiltrationObstacle2Check2 = new subtype.Check({checkType: "Thievery", level: 1, adjustment: "VERYHARD"}).calculateDC()
-		const infiltrationObstacle3 = new subtype.InfiltrationObstacle({goal: 3, goalType: "group"})
-		const infiltrationObstacle3Check1 = new subtype.Check({checkType: "Thievery", level: 1, adjustment: "HARD"}).calculateDC()
-		const awarenessThreshold1 = new subtype.Threshold({thresholdValue: 5, description: "Suspicions are raised. Increase the DCs for obstacles by 1. The first time the PCs reach this tier, a complication occurs."})
-		const awarenessThreshold2 = new subtype.Threshold({thresholdValue: 10, description: "The first time the PCs reach this tier, a complication occurs."})
-		const awarenessThreshold3 = new subtype.Threshold({thresholdValue: 15, description: "Increase the DCs for obstacles by a total of 2, and the first time the PCs reach this tier, a complication occurs."})
-		const awarenessThreshold4 = new subtype.Threshold({thresholdValue: 20, description: "The infiltration fails."})
-		const complication1 = new subtype.Complication({trigger: "The PCs reach 5 Awareness Points for the first time.", description: "Someone thinks they recognize you, and you must either convince them otherwise before slipping away or find a way to dodge the person entirely.", outcome: {success: "You convince or otherwise dodge the person.", failure: "You are recognized, and the party accrues 1 AP.", criticalFailure: "As failure, but the party accrues 2 AP."}})
-		const complication1Check1 = new subtype.Check({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
-		const complication1Check2 = new subtype.Check({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
-		const complication1Check3 = new subtype.Check({checkType: "Performance", level: 1, adjustment: "HARD"}).calculateDC()
-		const complication1Check4 = new subtype.Check({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		const infiltration1 = new subtype.InfiltrationDataModel({name: "Sample Infiltration"})
+		const infiltrationObstacle1 = new subtype.InfiltrationObstacleDataModel({goal: 2, goalType: "individual"})
+		const infiltrationObstacle1Check1 = new subtype.CheckDataModel({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
+		const infiltrationObstacle1Check2 = new subtype.CheckDataModel({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
+		const infiltrationObstacle1Check3 = new subtype.CheckDataModel({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		const infiltrationObstacle2 = new subtype.InfiltrationObstacleDataModel({goal: 1, goalType: "group"})
+		const infiltrationObstacle2Check1 = new subtype.CheckDataModel({checkType: "Athletics", level: 1, adjustment: "HARD"}).calculateDC()
+		const infiltrationObstacle2Check2 = new subtype.CheckDataModel({checkType: "Thievery", level: 1, adjustment: "VERYHARD"}).calculateDC()
+		const infiltrationObstacle3 = new subtype.InfiltrationObstacleDataModel({goal: 3, goalType: "group"})
+		const infiltrationObstacle3Check1 = new subtype.CheckDataModel({checkType: "Thievery", level: 1, adjustment: "HARD"}).calculateDC()
+		const awarenessThreshold1 = new subtype.ThresholdDataModel({thresholdValue: 5, description: "Suspicions are raised. Increase the DCs for obstacles by 1. The first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold2 = new subtype.ThresholdDataModel({thresholdValue: 10, description: "The first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold3 = new subtype.ThresholdDataModel({thresholdValue: 15, description: "Increase the DCs for obstacles by a total of 2, and the first time the PCs reach this tier, a complication occurs."})
+		const awarenessThreshold4 = new subtype.ThresholdDataModel({thresholdValue: 20, description: "The infiltration fails."})
+		const complication1 = new subtype.ComplicationDataModel({trigger: "The PCs reach 5 Awareness Points for the first time.", description: "Someone thinks they recognize you, and you must either convince them otherwise before slipping away or find a way to dodge the person entirely.", outcome: {success: "You convince or otherwise dodge the person.", failure: "You are recognized, and the party accrues 1 AP.", criticalFailure: "As failure, but the party accrues 2 AP."}})
+		const complication1Check1 = new subtype.CheckDataModel({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
+		const complication1Check2 = new subtype.CheckDataModel({checkType: "Diplomacy", level: 1, adjustment: "HARD"}).calculateDC()
+		const complication1Check3 = new subtype.CheckDataModel({checkType: "Performance", level: 1, adjustment: "HARD"}).calculateDC()
+		const complication1Check4 = new subtype.CheckDataModel({checkType: "Stealth", level: 1, adjustment: "VERYHARD"}).calculateDC()
 		
 		complication1.addCheck(complication1Check1)
 		complication1.addCheck(complication1Check2)
@@ -282,7 +305,7 @@ export class Data {
 	}
 }
 
-Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
+/*Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
     Helper.log(true, game.settings.get(Helper.ID, "Reputation")?.config)
 	if (!game.user.isGM || !(game.settings.get(Helper.ID, "Reputation")||game.settings.get(Helper.ID, "Influence")||game.settings.get(Helper.ID, "VictoryPoints")||game.settings.get(Helper.ID, "Chases")||game.settings.get(Helper.ID, "Infiltration")||game.settings.get(Helper.ID, "Research"))) {return;}
 	
@@ -334,28 +357,28 @@ Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
 	html.on('click', '.create-VictoryPoints-subsystem-button', (event) => {
 		Helper.log(true, 'Victory Points Button Clicked!');
 	});
-});
+});*/
 
 function getFolders(partySheet) {
 	
 	const enabledFolders = []
 	
-	if (game.settings.get(Helper.ID, "Reputation")) {
+	if (game.settings.get(constants.ID, "Reputation")) {
 		enabledFolders.push('reputation')
 	}
-	if (game.settings.get(Helper.ID, "Influence")) {
+	if (game.settings.get(constants.ID, "Influence")) {
 		enabledFolders.push('influence')
 	}
-	if (game.settings.get(Helper.ID, "Infiltration")) {
+	if (game.settings.get(constants.ID, "Infiltration")) {
 		enabledFolders.push('infiltrations')
 	}
-	if (game.settings.get(Helper.ID, "Research")) {
+	if (game.settings.get(constants.ID, "Research")) {
 		enabledFolders.push('research')
 	}
-	if (game.settings.get(Helper.ID, "Chases")) {
+	if (game.settings.get(constants.ID, "Chases")) {
 		enabledFolders.push('chases')
 	}
-	if (game.settings.get(Helper.ID, "VictoryPoints")) {
+	if (game.settings.get(constants.ID, "VictoryPoints")) {
 		enabledFolders.push('victorypoints');
 	}
 
@@ -380,52 +403,10 @@ function getFolders(partySheet) {
 	}).join("")
 }
 
-export class SubsystemForm extends HandlebarsApplicationMixin(ApplicationV2) {
-	static DEFAULT_OPTIONS = {
-		id: "subsystem-form",
-		form: {
-			closeOnSubmit: false
-		},
-		position: {
-			width: 640,
-			height: "auto"
-		},
-		tag: "form"
-	}
-
-	get title() {
-		return `Subsystems`;
-	}
-
-	static PARTS = {
-		header: {
-			template: "./modules/pf2e-subsystem-helper/templates/pf2e-subsystem-helper.hbs"
-		}
-	}
-
-	_prepareContext(options) {
-		return {
-			researchSubsystem: Data.loadDataModel('research').concatenate(),
-			influenceSubsystem: Data.loadDataModel('influence'),
-			reputationSubsystem: Data.loadDataModel('reputation'),
-			chasesSubsystem: Data.loadDataModel('chases'),
-			infiltrationSubsystem: Data.loadDataModel('infiltration'),
-			victorypointsSubsystem: Data.loadDataModel('victorypoints')
-		}
-	}
-
-	async #onSubmit(event, form, formData) {
-		await Data.saveDataModel(formData)
-
-		this.render();
-	}
-}
-
 
 globalThis.pf2esubsystemhelper = {
 	Helper,
 	Data,
 	subsystem,
-	subtype,
-	SubsystemForm
+	subtype
 }
