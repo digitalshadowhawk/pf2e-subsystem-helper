@@ -1,6 +1,6 @@
-import * as subtype from './subsystem-data-model-subtypes.mjs';
-import { Helper } from "./pf2e-subsystem-helper.mjs";
-import { Data } from "./pf2e-subsystem-helper.mjs";
+import * as subtype from './subsystem-data-model-subtypes.js';
+import { Helper } from "./pf2e-subsystem-helper.js";
+import { Data } from "./pf2e-subsystem-helper.js";
 
 export class ResearchDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {

@@ -25,15 +25,12 @@
       }
     ]
   },
-  "scripts": [
-	"src/lib/lib.mjs"
-  ],
+  "scripts": [],
   "esmodules": [
-    "index.js",
-  	"src/pf2e-subsystem-helper.mjs"
+    "index.js"
   ],
   "styles": [
-    "styles/pf2e-subsystem-helper.css"
+    "style.css"
   ],
   "flags": {
     "hotReload": {

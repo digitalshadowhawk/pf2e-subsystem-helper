@@ -1,6 +1,8 @@
 <script>
    import { ApplicationShell }   from '#runtime/svelte/component/core';
 
+   let testText = "Hello World"
+
    export let elementRoot;
 </script>
 
@@ -11,7 +13,7 @@
 <!-- ApplicationShell exports `elementRoot` which is the outer application shell element -->
 <ApplicationShell bind:elementRoot>
    <main>
-      <h1>Basic application</h1>
+      <h1>{testText}</h1>
    </main>
 </ApplicationShell>
 

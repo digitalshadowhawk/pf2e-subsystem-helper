@@ -1,6 +1,6 @@
 
-import { Helper } from "./pf2e-subsystem-helper.mjs";
-import { Data } from "./pf2e-subsystem-helper.mjs";
+import { Helper } from "./pf2e-subsystem-helper.js";
+import { Data } from "./pf2e-subsystem-helper.js";
 
 export class Library extends foundry.abstract.DataModel {
 	static defineSchema() {
