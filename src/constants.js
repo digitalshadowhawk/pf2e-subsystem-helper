@@ -14,7 +14,8 @@ const constants = {
 		INFILTRATIONOBSTACLES: 'infiltrationobstacles',
 		INFILTRATIONPOINTS: 'infiltrationpoints',
 		COMPLICATIONS: 'complications',
-		COUNTERS: 'counters'
+		COUNTERS: 'counters',
+		CONTAINERSTATE: 'containerstate'
 	},
 
 	DCS: {

@@ -61,8 +61,9 @@ export class Data {
 					instantiatedModel = new subsystem.ReputationDataModel(model)
 					this.saveDataModel(instantiatedModel)
 				}
+				return instantiatedModel
 			}
-			return {};
+			return null;
 		}
 		if(model.type==="research"){
 			instantiatedModel = new subsystem.ResearchDataModel(model)
@@ -105,6 +106,14 @@ export class Data {
 		}
 		
 		return instantiatedModel;
+	}
+
+	static setFlag(id, flag, value) {
+		return game.actors?.party?.setFlag(constants.ID, flag[id], value)
+	}
+
+	static getFlag(id, flag) {
+		return game.actors?.party?.setFlag(constants.ID, flag[id])
 	}
 	
 	// delete a specific subsystem by ID
@@ -358,6 +367,8 @@ export class Data {
 		Helper.log(true, 'Victory Points Button Clicked!');
 	});
 });*/
+
+
 
 function getFolders(partySheet) {
 	

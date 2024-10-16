@@ -14,10 +14,9 @@
         display = "none"
     }
 
-    let showNPCs = false
-
     function toggleNPCs() {
-        showNPCs = !showNPCs
+        influenceSubsystem.visible = !influenceSubsystem.visible
+        Data.saveDataModel(influenceSubsystem)
     }
 
     function addNPC() {
@@ -27,13 +26,13 @@
 </script>
 
 
-<div class="folder" style="display:{display}">
+<div class="folder" style="display:{display}; width:100%;">
     <button class="folder-header flexrow" on:click={toggleNPCs}>{influenceSubsystem.subsystemName}</button>
-    {#if showNPCs}
+    {#if influenceSubsystem.visible}
         {#each influenceSubsystem.npcs as npc}
-        <div class="npc"><InfluenceNPC id={npc} /></div>
+        <div class="npc"><InfluenceNPC id={npc} parentid={influenceSubsystem.id} parentFlag={constants.FLAGS.SUBSYSTEMS} /></div>
         {/each}
-        <button on:click={addNPC}>Add New NPC</button>
+        <button class="sub-button" on:click={addNPC}>Add New NPC</button>
     {/if}
 </div>
 
@@ -49,6 +48,9 @@
         text-shadow: 0px 0px 3px var(--color-shadow-dark);
     }
     .npc {
+        margin-left: 1%;
+    }
+    .sub-button {
         margin-left: 1%;
     }
 </style>

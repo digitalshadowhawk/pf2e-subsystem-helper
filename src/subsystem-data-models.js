@@ -10,7 +10,8 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Research Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "research"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'research'}),
-			libraries: new fields.ArrayField(new fields.StringField())
+			libraries: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -26,7 +27,7 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getLibraryByID(id) {
-		return new subtype.Library(Data.loadDataModel(id, constants.FLAGS.LIBRARIES));
+		return new subtype.LibraryDataModel(Data.loadDataModel(id, constants.FLAGS.LIBRARIES));
 	}
 	
 	getLibraries() {
@@ -35,18 +36,6 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 
 	getMechanicName() {
 		return "Library";
-	}
-
-	toHTML(){
-		return this.libraries.map(element => {
-			let model = this.getLibraryByID(element)
-			Helper.log(true, 'subsystems Line 43')
-			let entry = `<research-library class="directory-item flexcol collapsed" style="display: flex;">
-				${model.toHTML()}
-			</research-library>`
-
-			return entry;
-		});
 	}
 }
 
@@ -57,7 +46,8 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Victory Points Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "victorypoints"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'victorypoints'}),
-			counters: new fields.ArrayField(new fields.StringField())
+			counters: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -73,7 +63,7 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getCounterByID(id) {
-		return new subtype.Counter(Data.loadDataModel(id, constants.FLAGS.COUNTERS));
+		return new subtype.CounterDataModel(Data.loadDataModel(id, constants.FLAGS.COUNTERS));
 	}
 	
 	getCounter() {
@@ -92,7 +82,8 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Influence Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "influence"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'influence'}),
-			npcs: new fields.ArrayField(new fields.StringField())
+			npcs: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -108,7 +99,7 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getNPCByID(id) {
-		return new subtype.InfluenceNPC(Data.loadDataModel(id, constants.FLAGS.NPCS));
+		return new subtype.InfluenceNPCDataModel(Data.loadDataModel(id, constants.FLAGS.NPCS));
 	}
 	
 	getNPCs() {
@@ -127,7 +118,8 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Chases Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "chases"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'chases'}),
-			chases: new fields.ArrayField(new fields.StringField())
+			chases: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -143,7 +135,7 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getChaseByID(id) {
-		return new subtype.Chase(Data.loadDataModel(id, constants.FLAGS.CHASES));
+		return new subtype.ChaseDataModel(Data.loadDataModel(id, constants.FLAGS.CHASES));
 	}
 	
 	getChases() {
@@ -162,7 +154,8 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Infiltration Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "infiltrations"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'infiltration'}),
-			infiltrations: new fields.ArrayField(new fields.StringField())
+			infiltrations: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -178,7 +171,7 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getInfiltrationByID(id) {
-		return new subtype.Infiltration(Data.loadDataModel(id, constants.FLAGS.INFILTRATIONS));
+		return new subtype.InfiltrationDataModel(Data.loadDataModel(id, constants.FLAGS.INFILTRATIONS));
 	}
 	
 	getInfiltrations() {
@@ -197,7 +190,8 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Reputation Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "reputations"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'reputations'}),
-			reputations: new fields.ArrayField(new fields.StringField())
+			reputations: new fields.ArrayField(new fields.StringField()),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -213,7 +207,7 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getReputationByID(id) {
-		return new subtype.Reputation(Data.loadDataModel(id, constants.FLAGS.REPUTATIONS));
+		return new subtype.ReputationDataModel(Data.loadDataModel(id, constants.FLAGS.REPUTATIONS));
 	}
 	
 	getReputations() {

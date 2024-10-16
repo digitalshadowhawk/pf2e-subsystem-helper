@@ -14,10 +14,10 @@
         display = "none"
     }
 
-    let showCounters = false
 
     function toggleCounters() {
-        showCounters = !showCounters
+        victoryPointsSubsystem.visible = !victoryPointsSubsystem.visible
+        Data.saveDataModel(victoryPointsSubsystem)
     }
 
     function addCounter() {
@@ -27,13 +27,13 @@
 </script>
 
 
-<div class="folder" style="display:{display}">
+<div class="folder" style="display:{display}; width: 100%">
     <button class="folder-header flexrow" on:click={toggleCounters}>{victoryPointsSubsystem.subsystemName}</button>
-    {#if showCounters}
+    {#if victoryPointsSubsystem.visible}
         {#each victoryPointsSubsystem.counters as counter}
-            <div class="counter"><Counter id={counter} /></div>
+            <div class="counter"><Counter id={counter} parentid={victoryPointsSubsystem.id} parentFlag={constants.FLAGS.SUBSYSTEMS}/></div>
         {/each}
-        <button on:click={addCounter}>Add New Counter</button>
+        <button class="sub-button" on:click={addCounter}>Add New Counter</button>
     {/if}
 </div>
 
@@ -49,6 +49,9 @@
         text-shadow: 0px 0px 3px var(--color-shadow-dark);
     }
     .counter {
+        margin-left: 1%;
+    }
+    .sub-button {
         margin-left: 1%;
     }
 </style>

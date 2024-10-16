@@ -13,7 +13,8 @@ export class LibraryDataModel extends foundry.abstract.DataModel {
 			thresholds: new fields.ArrayField(new fields.StringField()),
 			sources: new fields.ArrayField(new fields.StringField()),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "library"})
+			type: new fields.StringField({required: true, blank: false, initial: "library"}),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -99,10 +100,11 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 			thresholds: new fields.ArrayField(new fields.StringField()),
 			discoveries: new fields.ArrayField(new fields.StringField()),
 			checks: new fields.ArrayField(new fields.StringField()),
-			resistances: new fields.StringField({required: false, blank: true, initial: ""}),
-			weaknesses: new fields.StringField({required: false, blank: true, initial: ""}),
+			resistances: new fields.StringField({required: false, blank: true, initial: "No resistances"}),
+			weaknesses: new fields.StringField({required: false, blank: true, initial: "No weaknesses"}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "influencenpc"})
+			type: new fields.StringField({required: true, blank: false, initial: "influencenpc"}),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	

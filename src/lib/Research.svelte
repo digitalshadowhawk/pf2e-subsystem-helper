@@ -14,10 +14,9 @@
         display = "none"
     }
 
-    let showLibraries = false
-
     function toggleLibraries() {
-        showLibraries = !showLibraries
+        researchSubsystem.visible = !researchSubsystem.visible
+        Data.saveDataModel(researchSubsystem)
     }
 
     function addLibrary() {
@@ -27,13 +26,13 @@
 </script>
 
 
-<div class="folder" style="display:{display}">
+<div class="folder" style="display:{display}; width: 100%;">
     <button class="folder-header flexrow" on:click={toggleLibraries}>{researchSubsystem.subsystemName}</button>
-    {#if showLibraries}
+    {#if researchSubsystem.visible}
         {#each researchSubsystem.libraries as library}
-        <div class="library"><Library id={library} /></div>
+        <div class="library"><Library id={library} parentid={researchSubsystem.id} parentFlag={constants.FLAGS.SUB} /></div>
         {/each}
-        <button on:click={addLibrary}>Add New Library</button>
+        <button class="sub-button" on:click={addLibrary}>Add New Library</button>
     {/if}
 </div>
 
@@ -48,7 +47,7 @@
         background: rgba(120, 100, 82, 0.5);
         text-shadow: 0px 0px 3px var(--color-shadow-dark);
     }
-    .library {
+    .library, .sub-button {
         margin-left: 1%;
     }
 </style>

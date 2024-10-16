@@ -8,10 +8,12 @@
 
 <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
 
-<div class="subsystems">
-<Research />
-<Influence />
-<VictoryPoints />
+<div class="subsystems tab" data-tab="subsystems" data-region="subsystems">
+<div class="content">
+    <Research />
+    <Influence />
+    <VictoryPoints />
+</div>
 </div>
 
 
@@ -19,7 +21,6 @@
 .subsystems{
     display: block;
     position: relative;
-    flex: 1;
     overflow-y: scroll;
     overflow-x: hidden;
     height: auto;
