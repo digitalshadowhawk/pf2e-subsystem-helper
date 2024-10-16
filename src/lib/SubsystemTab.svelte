@@ -2,6 +2,7 @@
     import { ApplicationShell }   from '#runtime/svelte/component/core';
     import Research from './Research.svelte'
     import Influence from './Influence.svelte';
+    import Chases from './Chases.svelte';
     import VictoryPoints from './VictoryPoints.svelte';
 
 </script>
@@ -12,6 +13,7 @@
 <div class="content">
     <Research />
     <Influence />
+    <Chases />
     <VictoryPoints />
 </div>
 </div>

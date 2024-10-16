@@ -174,7 +174,8 @@ export class ChaseDataModel extends foundry.abstract.DataModel {
 			obstacles: new fields.ArrayField(new fields.StringField()),
 			objective: new fields.StringField({required: true, blank: false, initial: "Survive"}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "chase"})
+			type: new fields.StringField({required: true, blank: false, initial: "chase"}),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	

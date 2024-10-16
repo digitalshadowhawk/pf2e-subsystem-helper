@@ -1,0 +1,79 @@
+<script>
+    import { Data, Helper } from '../pf2e-subsystem-helper.js';
+    import { constants } from '../constants.js';
+    import { ChaseObstacleDataModel } from '../subsystem-data-model-subtypes.js';
+    import TextWrapper from './TextWrapper.svelte';
+    import ChaseObstacle from './ChaseObstacle.svelte';
+
+    export let id;
+    export let parentid;
+    export let parentFlag;
+    let data = Data.loadDataModel(id, constants.FLAGS.CHASES)
+
+    function addObstacle() {
+        data.addObstacle(new ChaseObstacleDataModel({}))
+        Data.saveDataModel(data, constants.FLAGS.CHASES)
+    }
+
+    function toggleChase() {
+        data.visible = !data.visible
+        Data.saveDataModel(data, constants.FLAGS.CHASES)
+    }
+    
+    function deleteSelf() {
+        parent = Data.loadDataModel(parentid, parentFlag)
+        parent.obstacles.splice(parent.obstacles.indexOf(data.id),1)
+        Data.saveDataModel(parent, parentFlag)
+        Data.deleteFlag(data.id, constants.FLAGS.CHASES)
+    }
+
+    function save(){
+        Data.saveDataModel(data, constants.FLAGS.CHASES)
+    }
+
+</script>
+<button class="folder-header flexrow" on:click={toggleChase}>{data.name}</button>
+{#if data.visible}
+<div class="npc-data folder">
+    <div style="display: grid; grid-template-columns: 25% auto 10%;">
+        <div><TextWrapper parentid={data.id} parentFlag={constants.FLAGS.CHASES} content={data.name} field="name" /></div>
+        <div>Objective: <TextWrapper parentid={data.id} parentFlag={constants.FLAGS.CHASES} content={data.objective} field="objective" /></div>
+        <div style="text-align:right;"><button style="width: auto;" on:click={deleteSelf}>Delete</button></div>
+    </div>
+    <hr>
+    <div class="leftandright">
+        <h4 class="center">Obstacles:</h4>
+        <button style="width: auto;" on:click={addObstacle}>Add Obstacle</button>
+    </div>
+    {#each data.obstacles as obstacle}
+        <hr>
+        <div class="check"><ChaseObstacle id={obstacle} parentid={data.id} parentFlag={constants.FLAGS.CHASES} /></div>
+    {/each}
+</div>
+{/if}
+
+<style>
+    .leftandright{
+        display: flex;
+        justify-content: space-between;
+    }
+    .folder {
+        color: rgb(120, 100, 82);
+    }
+    .folder-header {
+        color: #FFFFFF;
+        padding: 6px;
+        line-height: 24px;
+        background: rgba(120, 100, 82, 0.5);
+        text-shadow: 0px 0px 3px var(--color-shadow-dark);
+    }
+
+    .center {
+        align-content: center;
+        margin: 0 0 0;
+    }
+    .npc-data {
+        border: 1px solid #000;
+        padding: 1%;
+    }
+</style>
