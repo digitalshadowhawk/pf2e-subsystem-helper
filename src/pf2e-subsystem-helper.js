@@ -2,6 +2,52 @@ import * as subsystem from './subsystem-data-models.js';
 import * as subtype from './subsystem-data-model-subtypes.js';
 import { constants } from './constants.js';
 
+export let patchFunc = (prop, func, type = "WRAPPER") => {
+    let nonLibWrapper = () => {
+        const oldFunc = eval(prop);
+        eval(`${prop} = function (event) {
+            return func.call(this, ${type != "OVERRIDE" ? "oldFunc.bind(this)," : ""} ...arguments);
+        }`);
+    }
+    if (game.modules.get("lib-wrapper")?.active) {
+        try {
+            libWrapper.register("pf2e-subsystem-helper", prop, func, type);
+        } catch (e) {
+            nonLibWrapper();
+        }
+    } else {
+        nonLibWrapper();
+    }
+}
+
+export class PF2eSubsystemHelper {
+	static async init() {
+        try {
+            Object.defineProperty(User.prototype, "isTheGM", {
+                get: function isTheGM() {
+                    return this == (game.users.find(u => u.hasRole("GAMEMASTER") && u.active) || game.users.find(u => u.hasRole("ASSISTANT") && u.active));
+                }
+            });
+        } catch { }
+
+		patchFunc("ActorSheet.prototype._renderInner", async function (wrapped, ...args) {
+            let inner = await wrapped(...args);
+
+            if (this.constructor.name == "PartySheetPF2e") {
+
+                let subsystemTab = $("<div>").attr("data-tab", "subsystems").attr("style", "display: block; overflow-y: scroll; overflow-x: hidden;").addClass("tab subsystemTab");//.append(template);
+
+
+                $('.sub-nav a[data-tab="inventory"]', inner).after($("<a>").attr("data-tab", "subsystems").text("Subsystems"));
+                $('section.container div[data-tab="inventory"]', inner).after(subsystemTab);
+            }
+
+            return inner;
+        });
+	}
+
+	
+}
 
 export class Helper {
 	
@@ -419,5 +465,6 @@ globalThis.pf2esubsystemhelper = {
 	Helper,
 	Data,
 	subsystem,
-	subtype
+	subtype,
+	PF2eSubsystemHelper
 }

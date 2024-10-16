@@ -1,3 +1,6 @@
+# 0.0.4
+- hooked the subsytem tab into the party sheet on init, fixing the tab switching issue (hopefully for good this time)
+
 # 0.0.3
 - added Chases subsystem
 - hopefully fixed party sheet tab switching on refresh issue
