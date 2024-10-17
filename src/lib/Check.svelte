@@ -1,7 +1,6 @@
 <script>
     import { Data } from '../pf2e-subsystem-helper.js';
     import { constants } from '../constants.js';
-    import { TJSContentEdit }     from '#standard/component';
 
     export let id;
     export let parentid
@@ -26,7 +25,7 @@
     }
 
     function postToChat() {
-        ChatMessage.create(new ChatMessage({content: content}))
+        ChatMessage.create({content: content})
     }
 
 </script>
