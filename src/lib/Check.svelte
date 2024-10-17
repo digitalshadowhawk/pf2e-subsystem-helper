@@ -24,10 +24,15 @@
         Data.saveDataModel(data, constants.FLAGS.CHECKS)
         content =data.getEnricher()
     }
+
+    function postToChat() {
+        ChatMessage.create(new ChatMessage({content: content}))
+    }
+
 </script>
 <div class="leftandright">
 <div class="center">DC <input type="number" style="width: 30px;" min="0" bind:value={data.dc} on:focusout={save} /> <input style="width: 120px;" min="0" bind:value={data.checkType} on:focusout={save} /> check</div>
-<div style="width:200px;"><TJSContentEdit bind:content /></div>
+<div><button class="folder-header flexrow" on:click={postToChat}>Post Check</button></div>
 <button style="width: auto;" on:click={deleteSelf}>Delete</button>
 </div>
 

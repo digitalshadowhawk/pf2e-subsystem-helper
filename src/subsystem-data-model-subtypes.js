@@ -468,7 +468,7 @@ export class CheckDataModel extends foundry.abstract.DataModel {
 	}
 	
 	getEnricher() {
-		return "@Check[type:"+this.checkType+"|dc:"+this.dc+"]";
+		return `@Check[${this.checkType}|dc:${this.dc}]`;
 	}
 }
 
