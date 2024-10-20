@@ -30,7 +30,7 @@
     <button class="folder-header flexrow" on:click={toggleLibraries}>{researchSubsystem.subsystemName}</button>
     {#if researchSubsystem.visible}
         {#each researchSubsystem.libraries as library}
-        <div class="library"><Library id={library} parentid={researchSubsystem.id} parentFlag={constants.FLAGS.SUB} /></div>
+        <div class="library"><Library id={library} parentid={researchSubsystem.id} parentFlag={constants.FLAGS.SUBSYSTEMS} /></div>
         {/each}
         <button class="sub-button" on:click={addLibrary}>Add New Library</button>
     {/if}

@@ -50,6 +50,8 @@
     }
     .counter {
         margin-left: 1%;
+        border: 1px solid #000;
+        padding: 1%;
     }
     .sub-button {
         margin-left: 1%;

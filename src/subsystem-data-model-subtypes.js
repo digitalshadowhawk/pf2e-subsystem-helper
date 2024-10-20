@@ -14,7 +14,9 @@ export class LibraryDataModel extends foundry.abstract.DataModel {
 			sources: new fields.ArrayField(new fields.StringField()),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "library"}),
-			visible: new fields.BooleanField({required: true, blank: false, initial: false})
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			thresholdsVisible: new fields.BooleanField({required: true, blank: false, initial: true}),
+			sourcesVisible: new fields.BooleanField({required: true, blank: false, initial: true})
 		}
 	}
 	
@@ -37,6 +39,13 @@ export class LibraryDataModel extends foundry.abstract.DataModel {
 		return this.thresholds.map( id => this.getThresholdByID(id) );
 	}
 	
+	deleteThreshold(oldThresholdID){
+		this.thresholds.splice(this.thresholds.indexOf(oldThresholdID), 1)
+		Data.deleteFlag(oldThresholdID, constants.FLAGS.THRESHOLDS)
+		this.updateSource({thresholds: this.thresholds})
+		Data.saveDataModel(this, constants.FLAGS.LIBRARIES)
+	}
+	
 	addSource(newSource) {
 		if(!newSource instanceof LibrarySourceDataModel) {
 			Helper.log(true, 'Cannot add new Library Source - the object is not a Library Source')
@@ -51,7 +60,18 @@ export class LibraryDataModel extends foundry.abstract.DataModel {
 	getSourceByID(id) {
 		return Data.loadDataModel(id, constants.FLAGS.SOURCES);
 	}
-	
+
+	deleteSource(oldSourceID){
+		let temp = Data.loadDataModel(oldSourceID, constants.FLAGS.SOURCES)
+		temp.checks.forEach(check => {
+			temp.deleteCheck(check)
+		});
+		this.sources.splice(this.sources.indexOf(oldSourceID), 1)
+		Data.deleteFlag(oldSourceID, constants.FLAGS.SOURCES)
+		this.updateSource({sources: this.sources})
+		Data.saveDataModel(this, constants.FLAGS.LIBRARIES)
+	}
+
 	getSources() {
 		return this.sources.map( id => this.getSourceByID(id) );
 	}
@@ -66,7 +86,8 @@ export class LibrarySourceDataModel extends foundry.abstract.DataModel {
 			earnedRP: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			checks: new fields.ArrayField(new fields.StringField()),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "librarysource"})
+			type: new fields.StringField({required: true, blank: false, initial: "librarysource"}),
+			checksVisible: new fields.BooleanField({required: true, blank: false, initial: true})
 		}
 	}
 	
@@ -79,6 +100,14 @@ export class LibrarySourceDataModel extends foundry.abstract.DataModel {
 		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
 		this.updateSource({checks: this.checks})
 		return newCheck.id;
+	}
+	
+
+	deleteCheck(oldCheckID){
+		this.checks.splice(this.checks.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({checks: this.checks})
+		Data.saveDataModel(this, constants.FLAGS.SOURCES)
 	}
 	
 	getCheckByID(id) {
@@ -102,9 +131,13 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 			checks: new fields.ArrayField(new fields.StringField()),
 			resistances: new fields.StringField({required: false, blank: true, initial: "No resistances"}),
 			weaknesses: new fields.StringField({required: false, blank: true, initial: "No weaknesses"}),
+			penalties: new fields.StringField({required: false, blank: true, initial: "No penalties"}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "influencenpc"}),
-			visible: new fields.BooleanField({required: true, blank: false, initial: false})
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			thresholdsVisible: new fields.BooleanField({required: true, blank: false, initial: true}),
+			discoveriesVisible: new fields.BooleanField({required: true, blank: false, initial: true}),
+			checksVisible: new fields.BooleanField({required: true, blank: false, initial: true})
 		}
 	}
 	
@@ -127,6 +160,13 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 		return this.thresholds.map( id => this.getThresholdByID(id) );
 	}
 	
+	deleteThreshold(oldThresholdID){
+		this.thresholds.splice(this.thresholds.indexOf(oldThresholdID), 1)
+		Data.deleteFlag(oldThresholdID, constants.FLAGS.THRESHOLDS)
+		this.updateSource({thresholds: this.thresholds})
+		Data.saveDataModel(this, constants.FLAGS.NPCS)
+	}
+	
 	addCheck(newCheck) {
 		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
@@ -145,7 +185,14 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
-	
+
+	deleteCheck(oldCheckID){
+		this.checks.splice(this.checks.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({checks: this.checks})
+		Data.saveDataModel(this, constants.FLAGS.NPCS)
+	}
+
 	addDiscoveryCheck(newDiscovery) {
 		if(!newDiscovery instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Discovery Check - the object is not a Check')
@@ -164,6 +211,14 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 	getDicoveryChecks() {
 		return this.discoveries.map( id => this.getCheckByID(id) );
 	}
+	
+
+	deleteDiscoveryCheck(oldCheckID){
+		this.discoveries.splice(this.discoveries.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({discoveries: this.discoveries})
+		Data.saveDataModel(this, constants.FLAGS.NPCS)
+	}
 }
 
 export class ChaseDataModel extends foundry.abstract.DataModel {
@@ -175,7 +230,8 @@ export class ChaseDataModel extends foundry.abstract.DataModel {
 			objective: new fields.StringField({required: true, blank: false, initial: "Survive"}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
 			type: new fields.StringField({required: true, blank: false, initial: "chase"}),
-			visible: new fields.BooleanField({required: true, blank: false, initial: false})
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			obstaclesVisible: new fields.BooleanField({required: true, blank: false, initial: true})
 		}
 	}
 	
@@ -188,6 +244,17 @@ export class ChaseDataModel extends foundry.abstract.DataModel {
 		Data.saveDataModel(newObstacle, constants.FLAGS.CHASEOBSTACLES)
 		this.updateSource({obstacles: this.obstacles})
 		return newObstacle.id;
+	}
+
+	deleteObstacle(oldObstacleID){
+		let temp = Data.loadDataModel(oldObstacleID, constants.FLAGS.CHASEOBSTACLES)
+		temp.checks.forEach(check => {
+			temp.deleteCheck(check)
+		});
+		this.obstacles.splice(this.obstacles.indexOf(oldObstacleID), 1)
+		Data.deleteFlag(oldObstacleID, constants.FLAGS.CHASEOBSTACLES)
+		this.updateSource({obstacles: this.obstacles})
+		Data.saveDataModel(this, constants.FLAGS.CHASES)
 	}
 	
 	getObstacleByID(id) {
@@ -209,7 +276,8 @@ export class ChaseObstacleDataModel extends foundry.abstract.DataModel {
 			goal: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 1}),
 			checks: new fields.ArrayField(new fields.StringField()),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "chaseobstacle"})
+			type: new fields.StringField({required: true, blank: false, initial: "chaseobstacle"}),
+			checksVisible: new fields.BooleanField({required: true, blank: false, initial: true})
 		}
 	}
 	
@@ -226,6 +294,13 @@ export class ChaseObstacleDataModel extends foundry.abstract.DataModel {
 	
 	getCheckByID(id) {
 		return Data.loadDataModel(id, constants.FLAGS.CHECKS);
+	}
+
+	deleteCheck(oldCheckID){
+		this.checks.splice(this.checks.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({checks: this.checks})
+		Data.saveDataModel(this, constants.FLAGS.CHASEOBSTACLES)
 	}
 	
 	getChecks() {
@@ -246,7 +321,13 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 			opportunities: new fields.ArrayField(new fields.StringField()),
 			edgePoints: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "infiltration"})
+			type: new fields.StringField({required: true, blank: false, initial: "infiltration"}),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			objectivesVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			obstaclesVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			thresholdsVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			complicationsVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			opportunitiesVisible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -255,10 +336,27 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		this.updateSource({objectives: this.objectives})
 	}
 	
+	deleteObjective(objective) {
+		this.objectives.splice(this.objectives.indexOf(objective),1)
+	}
+	
 	getObjectives() {
 		return this.objectives;
 	}
+
+	addOpportunity(newOpportunity) {
+		this.opportunities.push(newOpportunity)
+		this.updateSource({opportunities: this.opportunities})
+	}
 	
+	deleteOpportunity(opportunity) {
+		this.opportunities.splice(this.opportunities.indexOf(opportunity),1)
+	}
+	
+	getOpportunities() {
+		return this.opportunities;
+	}
+
 	addObstacle(newObstacle) {
 		if(!newObstacle instanceof InfiltrationObstacleDataModel) {
 			Helper.log(true, 'Cannot add new Infiltration Obstacle - the object is not an Infiltration Obstacle')
@@ -270,6 +368,20 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		return newObstacle.id;
 	}
 	
+	deleteObstacle(oldObstacleID){
+		let temp = Data.loadDataModel(oldObstacleID, constants.FLAGS.INFILTRATIONOBSTACLES)
+		temp.checks.forEach(check => {
+			temp.deleteCheck(check)
+		});
+		temp.counters.forEach(counter => {
+			temp.deleteCounter(counter)
+		});
+		this.obstacles.splice(this.obstacles.indexOf(oldObstacleID), 1)
+		Data.deleteFlag(oldObstacleID, constants.FLAGS.INFILTRATIONOBSTACLES)
+		this.updateSource({obstacles: this.obstacles})
+		Data.saveDataModel(this, constants.FLAGS.INFILTRATIONS)
+	}
+
 	getObstacleByID(id) {
 		return Data.loadDataModel(id, constants.FLAGS.INFILTRATIONOBSTACLES);
 	}
@@ -296,6 +408,13 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	getAwarenessThresholds() {
 		return this.awarenessThresholds.map( id => this.getAwarenessThresholdByID(id) );
 	}
+
+	deleteAwarenessThreshold(oldThresholdID){
+		this.awarenessThresholds.splice(this.awarenessThresholds.indexOf(oldThresholdID), 1)
+		Data.deleteFlag(oldThresholdID, constants.FLAGS.THRESHOLDS)
+		this.updateSource({awarenessThresholds: this.awarenessThresholds})
+		Data.saveDataModel(this, constants.FLAGS.INFILTRATIONS)
+	}
 	
 	addComplication(newComplication) {
 		if(!newComplication instanceof ComplicationDataModel) {
@@ -316,13 +435,15 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		return this.complications.map( id => this.getComplicationByID(id) );
 	}
 	
-	addOpportunity(newOpportunity) {
-		this.opportunities.push(newOpportunity)
-		this.updateSource({opportunities: this.opportunities})
-	}
-	
-	getOpportunities() {
-		return this.opportunities;
+	deleteComplications(oldComplicationD){
+		let temp = Data.loadDataModel(oldComplicationD, constants.FLAGS.COMPLICATIONS)
+		temp.checks.forEach(check => {
+			temp.deleteCheck(check)
+		});
+		this.complications.splice(this.complications.indexOf(oldComplicationD), 1)
+		Data.deleteFlag(oldComplicationD, constants.FLAGS.COMPLICATIONS)
+		this.updateSource({complications: this.complications})
+		Data.saveDataModel(this, constants.FLAGS.INFILTRATIONS)
 	}
 }
 
@@ -330,10 +451,8 @@ export class InfiltrationObstacleDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
-			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			goal: new fields.NumberField({required: true, nullable: false, integer: true, positive: true, initial: 2}),
-			goalType: new fields.StringField({required: true, blank: false, initial: "group"}),
-			infiltrationPoints: new fields.ArrayField(new fields.StringField()),
+			counters: new fields.ArrayField(new fields.StringField()),
 			checks: new fields.ArrayField(new fields.StringField()),
 			description: new fields.StringField({required: true, blank: false, initial: "New Description"}),
 			outcome: new fields.SchemaField({
@@ -343,19 +462,23 @@ export class InfiltrationObstacleDataModel extends foundry.abstract.DataModel {
 				criticalFailure: new fields.StringField({required: true, blank: false, initial: "The PCs accrue 2 Awareness Points."})
 			}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "infiltrationobstacle"})
+			type: new fields.StringField({required: true, blank: false, initial: "infiltrationobstacle"}),
+			isIndividual: new fields.BooleanField({required: true, blank: false, initial: false}),
+			countersVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			checksVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			displayReference: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
-	
-	addCheck(newCheck) {
+
+	addCheck(newCheck){
 		if(!newCheck instanceof CheckDataModel) {
 			Helper.log(true, 'Cannot add new Check - the object is not a Check')
 			return;
 		}
-		this.checks.push(newCheck.id)
 		Data.saveDataModel(newCheck, constants.FLAGS.CHECKS)
+		this.checks.push(newCheck.id)
 		this.updateSource({checks: this.checks})
-		return newCheck.id;
+		return this
 	}
 	
 	getCheckByID(id) {
@@ -366,15 +489,26 @@ export class InfiltrationObstacleDataModel extends foundry.abstract.DataModel {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
 	
-	addPointCounter(newCounter) {
-		if(!newCounter instanceof CounterDataModel) {
-			Helper.log(true, 'Cannot add new Check - the object is not a Check')
-			return;
-		}
-		this.infiltrationPoints.push(newCounter.id)
+
+	deleteCheck(oldCheckID){
+		this.checks.splice(this.checks.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({checks: this.checks})
+		Data.saveDataModel(this, constants.FLAGS.INFILTRATIONOBSTACLES)
+	}
+
+	addPointCounter(newCounter){
 		Data.saveDataModel(newCounter, constants.FLAGS.COUNTERS)
-		this.updateSource({infiltrationPoints: this.infiltrationPoints})
+		this.counters.push(newCounter.id)
+		this.updateSource({counters: this.counters})
 		return newCounter.id;
+	}
+	
+	deletePointCounter(oldCounter) {
+		this.counters.splice(this.counters.indexOf(oldCounter),1)
+		Data.deleteFlag(oldCounter, constants.FLAGS.COUNTERS)
+		this.updateSource({counters: this.counters})
+		Data.saveDataModel(this, constants.FLAGS.INFILTRATIONOBSTACLES)
 	}
 	
 	getPointCounterByID(id) {
@@ -383,14 +517,6 @@ export class InfiltrationObstacleDataModel extends foundry.abstract.DataModel {
 	
 	getPointCounters() {
 		return this.checks.map( id => this.getPointCountersByID(id) );
-	}
-
-	generatePointCounters(partySheet) {
-		if(this.goalType==="group"){
-			this.infiltrationPoints = [new CounterDataModel({name: "Player 1"})]
-		} else if(this.goalType==="individual") {
-			this.infiltrationPoints = [new CounterDataModel({name: "Player 1"}), new Counter({name: "Player 2"}), new Counter({name: "Player 3"}), new Counter({name: "Player 4"})]
-		}
 	}
 }
 
@@ -408,7 +534,8 @@ export class ComplicationDataModel extends foundry.abstract.DataModel {
 				criticalFailure: new fields.StringField({required: true, blank: false, initial: "Critical Failure"})
 			}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "complication"})
+			type: new fields.StringField({required: true, blank: false, initial: "complication"}),
+			checksVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
 		}
 	}
 	
@@ -430,6 +557,13 @@ export class ComplicationDataModel extends foundry.abstract.DataModel {
 	getChecks() {
 		return this.checks.map( id => this.getCheckByID(id) );
 	}
+	
+	deleteCheck(oldCheckID){
+		this.checks.splice(this.checks.indexOf(oldCheckID), 1)
+		Data.deleteFlag(oldCheckID, constants.FLAGS.CHECKS)
+		this.updateSource({checks: this.checks})
+		Data.saveDataModel(this, constants.FLAGS.COMPLICATIONS)
+	}
 }
 
 export class ReputationDataModel extends foundry.abstract.DataModel {
@@ -440,11 +574,57 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 			points: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			reputation: new fields.StringField({required: true, blank: false, initial: constants.REPUTATIONS.LEVELS.IGNORED.LABEL}),
 			id: new fields.StringField({required: true, blank: false, initial: Helper.generateID}),
-			type: new fields.StringField({required: true, blank: false, initial: "reputation"})
+			type: new fields.StringField({required: true, blank: false, initial: "reputation"}),
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			effectsVisible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			Revered: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Admired: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Liked: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Ignored: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Disliked: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Hated: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			}),
+			Hunted: new fields.SchemaField({
+				value: new fields.StringField({required: false, blank: true, initial: ""}),
+				overrides: new fields.BooleanField({required: true, blank: false, initial: false})
+			})
 		}
 	}
 
-	updateFromPoints() {}
+	updateFromPoints() {
+		this.reputation = this.getSlug("LABEL")
+	}
+
+	getSlug(slug) {
+		for (const property in constants.REPUTATIONS.LEVELS){
+			if(this.points >= constants.REPUTATIONS.LEVELS[property].LOWER && this.points <= constants.REPUTATIONS.LEVELS[property].UPPER){
+				return constants.REPUTATIONS.LEVELS[property][slug]
+			}
+			if(this.points > 50) {
+				return constants.REPUTATIONS.LEVELS.REVERED[slug]
+			}
+			if(this.points < -50) {
+				return constants.REPUTATIONS.LEVELS.HUNTED[slug]
+			}
+		}
+	}
 
 }
 

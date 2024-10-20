@@ -22,19 +22,20 @@
     
     function deleteSelf() {
         parent = Data.loadDataModel(parentid, parentFlag)
-        parent.obstacles.splice(parent.obstacles.indexOf(data.id),1)
+        parent.deleteChase(id)
         Data.saveDataModel(parent, parentFlag)
-        Data.deleteFlag(data.id, constants.FLAGS.CHASES)
     }
 
-    function save(){
+    function toggleObstacles() {
+        data.obstaclesVisible = !data.obstaclesVisible
         Data.saveDataModel(data, constants.FLAGS.CHASES)
     }
 
 </script>
+{#if data != undefined}
 <button class="folder-header flexrow" on:click={toggleChase}>{data.name}</button>
 {#if data.visible}
-<div class="npc-data folder">
+<div class="chase-data folder">
     <div style="display: grid; grid-template-columns: 25% auto 10%;">
         <div><TextWrapper parentid={data.id} parentFlag={constants.FLAGS.CHASES} content={data.name} field="name" /></div>
         <div>Objective: <TextWrapper parentid={data.id} parentFlag={constants.FLAGS.CHASES} content={data.objective} field="objective" /></div>
@@ -42,14 +43,19 @@
     </div>
     <hr>
     <div class="leftandright">
-        <h4 class="center">Obstacles:</h4>
-        <button style="width: auto;" on:click={addObstacle}>Add Obstacle</button>
+        <button class="folder-header flexrow" on:click={toggleObstacles}>Obstacles:</button>
+        {#if data.obstaclesVisible}
+        <button style="width: 120px;" on:click={addObstacle}>Add Obstacle</button>
+        {/if}
     </div>
+    {#if data.obstaclesVisible}
     {#each data.obstacles as obstacle}
         <hr>
         <div class="check"><ChaseObstacle id={obstacle} parentid={data.id} parentFlag={constants.FLAGS.CHASES} /></div>
     {/each}
+    {/if}
 </div>
+{/if}
 {/if}
 
 <style>
@@ -67,12 +73,7 @@
         background: rgba(120, 100, 82, 0.5);
         text-shadow: 0px 0px 3px var(--color-shadow-dark);
     }
-
-    .center {
-        align-content: center;
-        margin: 0 0 0;
-    }
-    .npc-data {
+    .chase-data {
         border: 1px solid #000;
         padding: 1%;
     }

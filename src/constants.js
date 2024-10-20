@@ -40,7 +40,7 @@ const constants = {
 				UPPER: 50,
 				RAISED: "Major favor",
 				LOWERED: "Moderate or major disservice",
-				EFFECT: "The group reveres the PCs as heroes and celebrities. Every member has heard of the PCs, is helpful toward them, and would take major risks to assist them. Only major favors accrue Reputation Points, and only moderate or major disservices can reduce them."
+				EFFECT: "The group reveres the PCs as heroes and celebrities. Every member has heard of the PCs, is @UUID[Compendium.pf2e.conditionitems.Item.v44P3WUcU1j0115l]{Helpful} toward them, and would take major risks to assist them. Only major favors accrue Reputation Points, and only moderate or major disservices can reduce them."
 			},
 			ADMIRED: {
 				LABEL: "Admired",
@@ -48,7 +48,7 @@ const constants = {
 				UPPER: 29,
 				RAISED: "Major favor",
 				LOWERED: "Any disservice",
-				EFFECT: "The PCs have earned this group's admiration. The majority of the group knows about the PCs and have an extremely favorable opinion toward them. Many members of the group are helpful toward the PCs, and those who aren't are friendly. Only major favors accrue Reputation Points."
+				EFFECT: "The PCs have earned this group's admiration. The majority of the group knows about the PCs and have an extremely favorable opinion toward them. Many members of the group are @UUID[Compendium.pf2e.conditionitems.Item.v44P3WUcU1j0115l]{Helpful} toward the PCs, and those who aren't are @UUID[Compendium.pf2e.conditionitems.Item.v66R7FdOf11l94im]{Friendly}. Only major favors accrue Reputation Points."
 			},
 			LIKED: {
 				LABEL: "Liked",
@@ -56,7 +56,7 @@ const constants = {
 				UPPER: 14,
 				RAISED: "Moderate or major favor",
 				LOWERED: "Any disservice",
-				EFFECT: "The PCs have gained this group's favor. Many members of the group know about the PCs, and those who do are usually friendly to them. At this reputation, only moderate and major favors accrue Reputation Points; it takes more to impress the group further."
+				EFFECT: `The PCs have gained this group's favor. Many members of the group know about the PCs, and those who do are usually @UUID[Compendium.pf2e.conditionitems.Item.v66R7FdOf11l94im]{Friendly} to them. At this reputation, only moderate and major favors accrue Reputation Points; it takes more to impress the group further.`
 			},
 			IGNORED: {
 				LABEL: "Ignored",
@@ -72,7 +72,7 @@ const constants = {
 				UPPER: -5,
 				RAISED: "Any favor",
 				LOWERED: "Moderate or major disservice",
-				EFFECT: "The PCs have a poor reputation among members of this group. Many members of the group know about the PCs, and are usually unfriendly to them. At this reputation, only moderate and major disservices reduce Reputation Points."
+				EFFECT: "The PCs have a poor reputation among members of this group. Many members of the group know about the PCs, and are usually @UUID[Compendium.pf2e.conditionitems.Item.I1ffBVISxLr2gC4u]{Unfriendly} to them. At this reputation, only moderate and major disservices reduce Reputation Points."
 			},
 			HATED: {
 				LABEL: "Hated",
@@ -80,15 +80,15 @@ const constants = {
 				UPPER: -15,
 				RAISED: "Any favor",
 				LOWERED: "Major disservice",
-				EFFECT: "The PCs have earned this group's ire. The vast majority of the group knows about the PCs and have an extremely unfavorable opinion toward them. Many members of the group are hostile toward the PCs, and those who aren't are unfriendly. When presented an easy opportunity to hurt the PCs, the group will jump at the chance. Only major disservices can still reduce Reputation Points."
+				EFFECT: "The PCs have earned this group's ire. The vast majority of the group knows about the PCs and have an extremely unfavorable opinion toward them. Many members of the group are @UUID[Compendium.pf2e.conditionitems.Item.ud7gTLwPeklzYSXG]{Hostile} toward the PCs, and those who aren't are @UUID[Compendium.pf2e.conditionitems.Item.I1ffBVISxLr2gC4u]{Unfriendly}. When presented an easy opportunity to hurt the PCs, the group will jump at the chance. Only major disservices can still reduce Reputation Points."
 			},
 			HUNTED: {
 				LABEL: "Hunted",
-				LOWER: -30,
+				LOWER: -50,
 				UPPER: -30,
 				RAISED: "Moderate or major favor",
 				LOWERED: "Major disservice",
-				EFFECT: "The group actively hunts the PCs as scapegoats or nemeses, even at significant cost to itself. Every member has heard of the PCs, is hostile toward them, and would take major risks to thwart or destroy them. Only major disservices can still reduce Reputation Points, and only moderate or major favors can increase them."
+				EFFECT: "The group actively hunts the PCs as scapegoats or nemeses, even at significant cost to itself. Every member has heard of the PCs, is @UUID[Compendium.pf2e.conditionitems.Item.ud7gTLwPeklzYSXG]{Hostile} toward them, and would take major risks to thwart or destroy them. Only major disservices can still reduce Reputation Points, and only moderate or major favors can increase them."
 			}
 		},
 		SERVICES: {

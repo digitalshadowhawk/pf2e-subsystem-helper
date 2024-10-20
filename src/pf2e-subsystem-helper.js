@@ -82,10 +82,10 @@ export class Data {
 	}
 
 	static loadDataModel(id, flag = constants.FLAGS.SUBSYSTEMS) {
-		const model = game.actors?.party?.getFlag(constants.ID, flag)?.[id]
+		const model = game.actors.party.getFlag(constants.ID, flag)?.[id]
 		let instantiatedModel = {}
 		if(!model){
-			Helper.log(true, "Object is not a valid Data Model")
+			Helper.log(true, "Object is not a valid Data Model", id, flag)
 			if(flag === constants.FLAGS.SUBSYSTEMS) {
 				let model = {}
 				if(id==="research"){
@@ -101,10 +101,10 @@ export class Data {
 					instantiatedModel = new subsystem.VictoryPointsDataModel(model)
 					this.saveDataModel(instantiatedModel)
 				} else if (id==="infiltrations"){
-					instantiatedModel = new subsystem.InfiltrationDataModel(model)
+					instantiatedModel = new subsystem.InfiltrationsDataModel(model)
 					this.saveDataModel(instantiatedModel)
 				} else if (id==="reputations"){
-					instantiatedModel = new subsystem.ReputationDataModel(model)
+					instantiatedModel = new subsystem.ReputationsDataModel(model)
 					this.saveDataModel(instantiatedModel)
 				}
 				return instantiatedModel
@@ -120,9 +120,9 @@ export class Data {
 		} else if (model.type==="victorypoints"){
 			instantiatedModel = new subsystem.VictoryPointsDataModel(model)
 		} else if (model.type==="infiltrations"){
-			instantiatedModel = new subsystem.InfiltrationDataModel(model)
+			instantiatedModel = new subsystem.InfiltrationsDataModel(model)
 		} else if (model.type==="reputations"){
-			instantiatedModel = new subsystem.ReputationDataModel(model)
+			instantiatedModel = new subsystem.ReputationsDataModel(model)
 		}else if (model.type==="library"){
 			instantiatedModel = new subtype.LibraryDataModel(model)
 		} else if (model.type==="librarysource"){
@@ -159,7 +159,7 @@ export class Data {
 	}
 
 	static getFlag(id, flag) {
-		return game.actors?.party?.setFlag(constants.ID, flag[id])
+		return game.actors?.party?.getFlag(constants.ID, flag[id])
 	}
 	
 	// delete a specific subsystem by ID
@@ -183,7 +183,7 @@ export class Data {
 	
 	static showAllFlags() {
 		for (const property in constants.FLAGS){
-			Helper.log(true, game.actors?.party?.getFlag(constants.ID, constants.FLAGS[property]))
+			Helper.log(true, constants.FLAGS[property], game.actors?.party?.getFlag(constants.ID, constants.FLAGS[property]))
 		}
 	}
 
@@ -313,7 +313,7 @@ export class Data {
 		this.saveDataModel(researchDummy);
 
 		//Infiltration Subsystem Dummies
-		const infiltrationDummy = new subsystem.InfiltrationDataModel()
+		const infiltrationDummy = new subsystem.InfiltrationsDataModel()
 		const infiltration1 = new subtype.InfiltrationDataModel({name: "Sample Infiltration"})
 		const infiltrationObstacle1 = new subtype.InfiltrationObstacleDataModel({goal: 2, goalType: "individual"})
 		const infiltrationObstacle1Check1 = new subtype.CheckDataModel({checkType: "Deception", level: 1, adjustment: "STANDARD"}).calculateDC()
@@ -359,107 +359,6 @@ export class Data {
 		this.saveDataModel(infiltrationDummy)
 	}
 }
-
-/*Hooks.on('renderPartySheetPF2e', function(partySheet, html, data) {
-    Helper.log(true, game.settings.get(Helper.ID, "Reputation")?.config)
-	if (!game.user.isGM || !(game.settings.get(Helper.ID, "Reputation")||game.settings.get(Helper.ID, "Influence")||game.settings.get(Helper.ID, "VictoryPoints")||game.settings.get(Helper.ID, "Chases")||game.settings.get(Helper.ID, "Infiltration")||game.settings.get(Helper.ID, "Research"))) {return;}
-	
-	let context ={
-		researchSubsystem: Data.loadDataModel('research').concatenate(),
-		influenceSubsystem: Data.loadDataModel('influence'),
-		reputationSubsystem: Data.loadDataModel('reputation'),
-		chasesSubsystem: Data.loadDataModel('chases'),
-		infiltrationSubsystem: Data.loadDataModel('infiltration'),
-		victorypointsSubsystem: Data.loadDataModel('victorypoints')
-	}
-
-	//Helper.log(true, this)
-	//const inject = Handlebars.compile(`./modules/pf2e-subsystem-helper/templates/pf2e-subsystem-helper.hbs`, {context, allowProtoMethodsByDefault: true, allowProtoPropertiesByDefault: true})
-
-	html.find('.sub-nav:not(.sub-sub-nav)').append('<a data-tab="subsystems" class="">Subsystems</a>')
-    html.find('.container').append('<div class="tab" data-tab="subsystems" data-region="subsystems"> </div>')
-	html.find('.container').find('.subsystems').find('.directory-item').on("click", async function(event) {
-        event.preventDefault();
-        let target = $(event.currentTarget);
-        if (target.hasClass('collapsed')) {
-              target.removeClass('collapsed')
-        } else {
-              target.addClass('collapsed')
-        }
-    })
-
-	Helper.log("this before instantiating subsystemTab")
-	Helper.log(this)
-
-	this.subsystemTab ??= new (this.pf2esubsystemhelper.App.SubsystemForm({window: {frame: false, applicationPart: 'composite'}}))
-	this.subsystemTab.render({force: true});
-	
-	html.on('click', '.create-Reputation-subsystem-button', (event) => {
-		Helper.log(true, 'Reputation Button Clicked!');
-	});
-	html.on('click', '.create-Influence-subsystem-button', (event) => {
-		Helper.log(true, 'Influence Button Clicked!');
-	});
-	html.on('click', '.create-Infiltration-subsystem-button', (event) => {
-		Helper.log(true, 'Infiltration Button Clicked!');
-	});
-	html.on('click', '.create-Research-subsystem-button', (event) => {
-		Helper.log(true, 'Research Button Clicked!');
-	});
-	html.on('click', '.create-Chases-subsystem-button', (event) => {
-		Helper.log(true, 'Chases Button Clicked!');
-	});
-	html.on('click', '.create-VictoryPoints-subsystem-button', (event) => {
-		Helper.log(true, 'Victory Points Button Clicked!');
-	});
-});*/
-
-
-
-function getFolders(partySheet) {
-	
-	const enabledFolders = []
-	
-	if (game.settings.get(constants.ID, "Reputation")) {
-		enabledFolders.push('reputation')
-	}
-	if (game.settings.get(constants.ID, "Influence")) {
-		enabledFolders.push('influence')
-	}
-	if (game.settings.get(constants.ID, "Infiltration")) {
-		enabledFolders.push('infiltrations')
-	}
-	if (game.settings.get(constants.ID, "Research")) {
-		enabledFolders.push('research')
-	}
-	if (game.settings.get(constants.ID, "Chases")) {
-		enabledFolders.push('chases')
-	}
-	if (game.settings.get(constants.ID, "VictoryPoints")) {
-		enabledFolders.push('victorypoints');
-	}
-
-	return enabledFolders.map(obj=>{
-		Helper.log(true, obj)
-		let model = Data.loadDataModel(obj)
-		Helper.log(true, model)
-		let folder = `<li class="directory-item folder flexcol collapsed" style="display: flex;">
-		<header class="folder-header flexrow">
-            <h3 class="noborder"><i class="fas fa-folder-open fa-fw"></i>${model.subsystemName}</h3>
-			<button class="create-button create-subsystem-button create-${model.type}-subsystem-button flex0" data-tooltip="Create New ${element.getMechanicName()}">
-				<i class="fa-solid subsystem-add fa-gears"></i>
-				<i class="fa-solid subsystem-add fa-plus"></i>
-			</button>
-       	</header>
-   		<ol class="subdirectory">
-			${model.toHTML()}
-		</ol>
-   		</li>`
-
-		return folder;
-	}).join("")
-}
-
 
 globalThis.pf2esubsystemhelper = {
 	Helper,

@@ -1,22 +1,26 @@
 <script>
-    import { Data } from '../pf2e-subsystem-helper.js';
+    import { Data, Helper } from '../pf2e-subsystem-helper.js';
     import { constants } from '../constants.js';
 
     export let id;
     export let parentid
     export let parentFlag
     let data = Data.loadDataModel(id, constants.FLAGS.CHECKS)
-    let content = data.getEnricher()
     
-    function deleteSelf() {
+    let content
+    if(data !=undefined){
+        content = data.getEnricher()
+    }
+
+    function deleteSelf() {        
         parent = Data.loadDataModel(parentid, parentFlag)
-        if(parent.checks.indexOf(data.id) != -1){
-            parent.checks.splice(parent.checks.indexOf(data.id),1)
-        } else if(parent.discoveries.indexOf(data.id) != -1){
-            parent.discoveries.splice(parent.discoveries.indexOf(data.id),1)
-        }
+        try {
+            parent?.deleteCheck(id)
+        } catch (error){}
+        try {
+            parent?.deleteDiscoveryCheck(id)
+        } catch (error){}
         Data.saveDataModel(parent, parentFlag)
-        Data.deleteFlag(data.id, constants.FLAGS.CHECKS)
     }
 
     function save(){
@@ -29,11 +33,13 @@
     }
 
 </script>
+{#if data != undefined}
 <div class="leftandright">
 <div class="center">DC <input type="number" style="width: 30px;" min="0" bind:value={data.dc} on:focusout={save} /> <input style="width: 120px;" min="0" bind:value={data.checkType} on:focusout={save} /> check</div>
 <div><button class="folder-header flexrow" on:click={postToChat}>Post Check</button></div>
 <button style="width: auto;" on:click={deleteSelf}>Delete</button>
 </div>
+{/if}
 
 <style>
     .leftandright{

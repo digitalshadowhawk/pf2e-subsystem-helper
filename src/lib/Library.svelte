@@ -9,13 +9,11 @@
     export let id;
     export let parentid;
     export let parentFlag;
+    let content
 
     let data = Data.loadDataModel(id, constants.FLAGS.LIBRARIES)
-    let content = data.libraryName;
-    let enrichedContent;
-
-    function reloadData() {
-        data = Data.loadDataModel(id, constants.FLAGS.LIBRARIES)
+    if(data !=undefined){
+        content = data.libraryName;
     }
 
     function addThreshold() {
@@ -33,11 +31,20 @@
         Data.saveDataModel(data, constants.FLAGS.LIBRARIES)
     }
 
+    function toggleSources() {
+        data.sourcesVisible = !data.sourcesVisible
+        Data.saveDataModel(data, constants.FLAGS.LIBRARIES)
+    }
+
+    function toggleThresholds() {
+        data.thresholdsVisible = !data.thresholdsVisible
+        Data.saveDataModel(data, constants.FLAGS.LIBRARIES)
+    }
+
     function deleteSelf() {
-        parent = Data.loadDataModel(parentid)
-        parent.libraries.splice(parent.libraries.indexOf(data.id),1)
+        parent = Data.loadDataModel(parentid, parentFlag)
+        parent.deleteLibrary(id)
         Data.saveDataModel(parent, parentFlag)
-        Data.deleteFlag(data.id, constants.FLAGS.LIBRARIES)
     }
 
     function save(){
@@ -45,7 +52,7 @@
     }
 
 </script>
-
+{#if data != undefined}
 <div class="folder">
     <button class="folder-header flexrow" on:click={toggleLibrary}>{data.libraryName}</button>
     {#if data.visible}
@@ -61,25 +68,33 @@
             <hr>
             <main>
                 <div class="leftandright">
-                    <h3 class="center">Thresholds:</h3>
-                    <button style="width: auto;" on:click={addThreshold}>Add Threshold</button>
+                    <button class="folder-header flexrow" on:click={toggleThresholds}>Thresholds:</button>
+                    {#if data.thresholdsVisible}
+                    <button style="width: 120px;" on:click={addThreshold}>Add Threshold</button>
+                    {/if}
                 </div>
+                {#if data.thresholdsVisible}
                 {#each data.thresholds as threshold}
                     <div class="threshold"><Threshold id={threshold} parentid={data.id} parentFlag = {constants.FLAGS.LIBRARIES} /></div>
                 {/each}
+                {/if}
                 <hr>
                 <div class="leftandright">
-                    <h3 class="center">Sources:</h3>
-                    <button style="width: auto;" on:click={addSource}>Add Source</button>
+                    <button class="folder-header flexrow" on:click={toggleSources}>Sources:</button>
+                    {#if data.sourcesVisible}
+                    <button style="width: 120px;" on:click={addSource}>Add Source</button>
+                    {/if}
                 </div>
+                {#if data.sourcesVisible}
                 {#each data.sources as source}
                     <div class="source"><Source id={source} parentid={data.id} parentFlag= {constants.FLAGS.LIBRARIES} /></div>
                 {/each}
+                {/if}
             </main> 
         </div>
     {/if}
 </div>
-
+{/if}
 <style>
     .leftandright{
         display: flex;

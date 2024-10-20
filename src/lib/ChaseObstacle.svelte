@@ -9,9 +9,12 @@
     export let parentid;
     export let parentFlag;
 
-    let data = Data.loadDataModel(id, constants.FLAGS.CHASEOBSTACLES)
-    let content = data.name;
+    let content
 
+    let data = Data.loadDataModel(id, constants.FLAGS.CHASEOBSTACLES)
+    if(data != undefined){
+        content = data.name;
+    }
     function reloadData() {
         data = Data.loadDataModel(id, constants.FLAGS.CHASEOBSTACLES)
     }
@@ -22,10 +25,14 @@
     }
 
     function deleteSelf() {
-        parent = Data.loadDataModel(parentid)
-        parent.obstacles.splice(parent.obstacles.indexOf(data.id),1)
+        parent = Data.loadDataModel(parentid, parentFlag)
+        parent.deleteObstacle(id)
         Data.saveDataModel(parent, parentFlag)
-        Data.deleteFlag(data.id, constants.FLAGS.CHASEOBSTACLES)
+    }
+
+    function toggleChecks() {
+        data.checksVisible = !data.checksVisible
+        Data.saveDataModel(data, constants.FLAGS.CHASEOBSTACLES)
     }
 
     function save(){
@@ -34,6 +41,7 @@
 
 </script>
 
+{#if data != undefined}
 <div>
     <header>
         <div class="center"><TJSContentEdit bind:content on:editor:save={() => { data.name = content; save()}} /></div>
@@ -49,20 +57,32 @@
     <hr>
     <main>
         <div class="leftandright">
-            <h3 class="center">Checks:</h3>
-            <button style="width: auto;" on:click={addCheck}>Add Check</button>
+            <button class="folder-header flexrow" on:click={toggleChecks}>Checks:</button>
+            {#if data.checksVisible}
+            <button style="width: 120px;" on:click={addCheck}>Add Check</button>
+            {/if}
         </div>
+        {#if data.checksVisible}
         {#each data.checks as check}
             <hr>
             <div class="check"><Check id={check} parentid={data.id} parentFlag = {constants.FLAGS.CHASEOBSTACLES} /></div>
         {/each}
+        {/if}
     </main> 
 </div>
+{/if}
 
 <style>
     .leftandright{
         display: flex;
         justify-content: space-between;
+    }
+    .folder-header {
+        color: #FFFFFF;
+        padding: 6px;
+        line-height: 24px;
+        background: rgba(120, 100, 82, 0.5);
+        text-shadow: 0px 0px 3px var(--color-shadow-dark);
     }
 
     .center {

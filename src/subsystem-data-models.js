@@ -26,6 +26,20 @@ export class ResearchDataModel extends foundry.abstract.DataModel {
 		return newLibrary.id;
 	}
 	
+	deleteLibrary(oldLibraryID){
+		let temp = Data.loadDataModel(oldLibraryID, constants.FLAGS.LIBRARIES)
+		temp.thresholds.forEach(threshold => {
+			temp.deleteThreshold(threshold)
+		});
+		temp.sources.forEach(source => {
+			temp.deleteSource(source)
+		});
+		this.libraries.splice(this.libraries.indexOf(oldLibraryID), 1)
+		Data.deleteFlag(oldLibraryID, constants.FLAGS.LIBRARIES)
+		this.updateSource({libraries: this.libraries})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
+	}
+	
 	getLibraryByID(id) {
 		return new subtype.LibraryDataModel(Data.loadDataModel(id, constants.FLAGS.LIBRARIES));
 	}
@@ -60,6 +74,13 @@ export class VictoryPointsDataModel extends foundry.abstract.DataModel {
 		Data.saveDataModel(newCounter, constants.FLAGS.COUNTERS)
 		this.updateSource({counters: this.counters})
 		return newCounter.id;
+	}
+	
+	deleteCounter(oldCounterID){
+		this.counters.splice(this.counters.indexOf(oldCounterID), 1)
+		Data.deleteFlag(oldCounterID, constants.FLAGS.COUNTERS)
+		this.updateSource({counters: this.counters})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
 	}
 	
 	getCounterByID(id) {
@@ -98,6 +119,23 @@ export class InfluenceDataModel extends foundry.abstract.DataModel {
 		return newNPC.id;
 	}
 	
+	deleteNPC(oldNPCID){
+		let temp = Data.loadDataModel(oldNPCID, constants.FLAGS.NPCS)
+		temp.thresholds.forEach(threshold => {
+			temp.deleteThreshold(threshold)
+		});
+		temp.discoveries.forEach(discovery => {
+			temp.deleteDiscoveryCheck(discovery)
+		});
+		temp.checks.forEach(check => {
+			temp.deleteCheck(check)
+		});
+		this.npcs.splice(this.npcs.indexOf(oldNPCID), 1)
+		Data.deleteFlag(oldNPCID, constants.FLAGS.NPCS)
+		this.updateSource({npcs: this.npcs})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
+	}
+	
 	getNPCByID(id) {
 		return new subtype.InfluenceNPCDataModel(Data.loadDataModel(id, constants.FLAGS.NPCS));
 	}
@@ -134,6 +172,17 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 		return newChase.id;
 	}
 	
+	deleteChase(oldChaseID){
+		let temp = Data.loadDataModel(oldChaseID, constants.FLAGS.CHASES)
+		temp.obstacles.forEach(obstacle => {
+			temp.deleteObstacle(obstacle)
+		});
+		this.chases.splice(this.chases.indexOf(oldChaseID), 1)
+		Data.deleteFlag(oldChaseID, constants.FLAGS.CHASES)
+		this.updateSource({chases: this.chases})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
+	}
+
 	getChaseByID(id) {
 		return new subtype.ChaseDataModel(Data.loadDataModel(id, constants.FLAGS.CHASES));
 	}
@@ -147,13 +196,13 @@ export class ChasesDataModel extends foundry.abstract.DataModel {
 	}
 }
 
-export class InfiltrationDataModel extends foundry.abstract.DataModel {
+export class InfiltrationsDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
 			subsystemName: new fields.StringField({required: true, blank: false, initial: "Infiltration Subsystem"}),
 			type: new fields.StringField({required: true, blank: false, initial: "infiltrations"}),
-			id: new fields.StringField({required: true, blank: false, initial: 'infiltration'}),
+			id: new fields.StringField({required: true, blank: false, initial: 'infiltrations'}),
 			infiltrations: new fields.ArrayField(new fields.StringField()),
 			visible: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
@@ -170,6 +219,23 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		return newInfiltration.id;
 	}
 	
+	deleteInfiltration(oldInfiltrationID){
+		let temp = Data.loadDataModel(oldInfiltrationID, constants.FLAGS.INFILTRATIONS)
+		temp.obstacles.forEach(obstacle => {
+			temp.deleteObstacle(obstacle)
+		});
+		temp.awarenessThresholds.forEach(threshold => {
+			temp.deleteAwarenessThreshold(threshold)
+		});
+		temp.complications.forEach(complication => {
+			temp.deleteComplication(complication)
+		});
+		this.infiltrations.splice(this.infiltrations.indexOf(oldInfiltrationID), 1)
+		Data.deleteFlag(oldInfiltrationID, constants.FLAGS.INFILTRATIONS)
+		this.updateSource({infiltrations: this.infiltrations})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
+	}
+	
 	getInfiltrationByID(id) {
 		return new subtype.InfiltrationDataModel(Data.loadDataModel(id, constants.FLAGS.INFILTRATIONS));
 	}
@@ -183,7 +249,7 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 	}
 }
 
-export class ReputationDataModel extends foundry.abstract.DataModel {
+export class ReputationsDataModel extends foundry.abstract.DataModel {
 	static defineSchema() {
 		const fields = foundry.data.fields;
 		return {
@@ -191,7 +257,8 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 			type: new fields.StringField({required: true, blank: false, initial: "reputations"}),
 			id: new fields.StringField({required: true, blank: false, initial: 'reputations'}),
 			reputations: new fields.ArrayField(new fields.StringField()),
-			visible: new fields.BooleanField({required: true, blank: false, initial: false})
+			visible: new fields.BooleanField({required: true, blank: false, initial: false}),
+			displayReference: new fields.BooleanField({required: true, blank: false, initial: false})
 		}
 	}
 	
@@ -204,6 +271,13 @@ export class ReputationDataModel extends foundry.abstract.DataModel {
 		Data.saveDataModel(newReputation, constants.FLAGS.REPUTATIONS)
 		this.updateSource({reputations: this.reputations})
 		return newReputation.id;
+	}	
+	
+	deleteReputation(oldReputationID){
+		this.reputations.splice(this.reputations.indexOf(oldReputationID), 1)
+		Data.deleteFlag(oldReputationID, constants.FLAGS.REPUTATIONS)
+		this.updateSource({reputations: this.reputations})
+		Data.saveDataModel(this, constants.FLAGS.SUBSYSTEMS)
 	}
 	
 	getReputationByID(id) {
