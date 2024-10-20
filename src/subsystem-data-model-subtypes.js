@@ -374,7 +374,7 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 			temp.deleteCheck(check)
 		});
 		temp.counters.forEach(counter => {
-			temp.deleteCounter(counter)
+			temp.deletePointCounter(counter)
 		});
 		this.obstacles.splice(this.obstacles.indexOf(oldObstacleID), 1)
 		Data.deleteFlag(oldObstacleID, constants.FLAGS.INFILTRATIONOBSTACLES)
@@ -435,7 +435,7 @@ export class InfiltrationDataModel extends foundry.abstract.DataModel {
 		return this.complications.map( id => this.getComplicationByID(id) );
 	}
 	
-	deleteComplications(oldComplicationD){
+	deleteComplication(oldComplicationD){
 		let temp = Data.loadDataModel(oldComplicationD, constants.FLAGS.COMPLICATIONS)
 		temp.checks.forEach(check => {
 			temp.deleteCheck(check)
