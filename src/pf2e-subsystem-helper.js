@@ -3,20 +3,22 @@ import * as subtype from './subsystem-data-model-subtypes.js';
 import { constants } from './constants.js';
 
 export let patchFunc = (prop, func, type = "WRAPPER") => {
-    let nonLibWrapper = () => {
-        const oldFunc = eval(prop);
+    /*let nonLibWrapper = () => {
+        /*const oldFunc = eval(prop);
         eval(`${prop} = function (event) {
             return func.call(this, ${type != "OVERRIDE" ? "oldFunc.bind(this)," : ""} ...arguments);
         }`);
-    }
+
+
+    }*/
     if (game.modules.get("lib-wrapper")?.active) {
         try {
             libWrapper.register("pf2e-subsystem-helper", prop, func, type);
         } catch (e) {
-            nonLibWrapper();
+            Helper.log(true, "Could not successfully register module.")
         }
     } else {
-        nonLibWrapper();
+        Helper.log(true,"LibWrapper not enabled.")
     }
 }
 

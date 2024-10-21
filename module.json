@@ -23,9 +23,15 @@
         "type": "system",
         "compatibility": {}
       }
+    ],
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "compatibility": {}
+      }
     ]
   },
-  "scripts": [],
   "esmodules": [
     "index.js"
   ],
@@ -34,8 +40,12 @@
   ],
   "flags": {
     "hotReload": {
-      "extensions": ["json"],
-      "paths": ["languages"]
+      "extensions": [
+        "json"
+      ],
+      "paths": [
+        "languages"
+      ]
     }
   },
   "languages": [
@@ -63,4 +73,5 @@
   "protected": false,
   "coreTranslation": false,
   "library": false
+}
 }
