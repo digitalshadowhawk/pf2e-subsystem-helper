@@ -1,6 +1,7 @@
 import * as subsystem from './subsystem-data-models.js';
 import * as subtype from './subsystem-data-model-subtypes.js';
 import { constants } from './constants.js';
+import { libWrapper } from './lib/shim.js';
 
 export let patchFunc = (prop, func, type = "WRAPPER") => {
     /*let nonLibWrapper = () => {

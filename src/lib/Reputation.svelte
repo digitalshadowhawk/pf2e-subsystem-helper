@@ -41,7 +41,7 @@
 </script>
 {#if data != undefined}
 <div class="folder">
-    <button class="folder-header flexrow" on:click={toggleReputation}>{data.name}</button>
+    <button class="folder-header flexrow" on:click={toggleReputation}>{data.name} - {data.reputation} ({data.points})</button>
     {#if data.visible}
         <div class="library-data">
             <header>
@@ -66,13 +66,13 @@
                     <button style="margin-top: 5px;" on:click={toggleEffects}>Custom Effects</button>
                     {#if data.effectsVisible}
                         <div>
-                            <div style="margin-top: 5px;">Revered: <br><input style="width: 85%;" bind:value={data.Revered.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Revered.overrides} /></div>
-                            <div style="margin-top: 5px;">Admired: <br><input style="width: 85%;" bind:value={data.Admired.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Admired.overrides} /></div>
-                            <div style="margin-top: 5px;">Liked: <br><input style="width: 85%;" bind:value={data.Liked.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Liked.overrides} /></div>
-                            <div style="margin-top: 5px;">Ignored: <br><input style="width: 85%;" bind:value={data.Ignored.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Ignored.overrides} /></div>
-                            <div style="margin-top: 5px;">Disliked: <br><input style="width: 85%;" bind:value={data.Disliked.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Disliked.overrides} /></div>
-                            <div style="margin-top: 5px;">Hated: <br><input style="width: 85%;" bind:value={data.Hated.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Hated.overrides} /></div>
-                            <div style="margin-top: 5px;">Hunted: <br><input style="width: 85%;" bind:value={data.Hunted.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Hunted.overrides} /></div>
+                            <div style="margin-top: 5px;">Revered: <br><textarea style="width: 85%;" bind:value={data.Revered.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Revered.overrides} /></div>
+                            <div style="margin-top: 5px;">Admired: <br><textarea style="width: 85%;" bind:value={data.Admired.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Admired.overrides} /></div>
+                            <div style="margin-top: 5px;">Liked: <br><textarea style="width: 85%;" bind:value={data.Liked.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Liked.overrides} /></div>
+                            <div style="margin-top: 5px;">Ignored: <br><textarea style="width: 85%;" bind:value={data.Ignored.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Ignored.overrides} /></div>
+                            <div style="margin-top: 5px;">Disliked: <br><textarea style="width: 85%;" bind:value={data.Disliked.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Disliked.overrides} /></div>
+                            <div style="margin-top: 5px;">Hated: <br><textarea style="width: 85%;" bind:value={data.Hated.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Hated.overrides} /></div>
+                            <div style="margin-top: 5px;">Hunted: <br><textarea style="width: 85%;" bind:value={data.Hunted.value} on:focusout={save} /> Override: <input type="checkbox" bind:checked={data.Hunted.overrides} /></div>
                         </div>
                     {/if}
                 </div>

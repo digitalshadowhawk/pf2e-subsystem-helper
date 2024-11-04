@@ -1,3 +1,14 @@
+# 0.0.9
+- removed hard dependency on libWrapper (implemented shim fallback)
+- added missing influence field for NPCs in the influence subsystem
+- added reputation level and points to the reputation group headers
+
+# 0.0.8
+- accidentally added an extra bracket in module.json, removed that
+
+# 0.0.7
+- added libwrapper dependency, as the non-libwrapper fallback wasn't working properly
+
 # 0.0.6
 - made submenus like check or source groups collapsable
 - added Reputation and Infiltration subsystems

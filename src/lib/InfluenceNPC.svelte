@@ -68,8 +68,13 @@
 {#if data.visible}
 <div class="npc-data folder">
     <div class="leftandright">
-        <div style="width: 80%;" class="leftandright"><div class="center" style="width: 25%;"><TJSContentEdit bind:content on:editor:save={() => { data.name = content; save()}} /></div>
-        <div class="center">Perception: +<input type="number" style="width: 30px;" min="0" bind:value={data.perception} on:focusout={save} />, Will: +<input type="number" style="width: 30px;" min="0" bind:value={data.will} on:focusout={save} /></div>
+        <div style="width: 80%;" class="leftandright">
+            <div class="center" style="width: 25%;">
+                <TJSContentEdit bind:content on:editor:save={() => { data.name = content; save()}} />
+            </div>
+            <div class="center">Influence Points: <input type="number" style="width: 30px;" min="0" bind:value={data.influence} on:focusout={save} /></div>
+            <div class="center">Perception: +<input type="number" style="width: 30px;" min="0" bind:value={data.perception} on:focusout={save} />, Will: +<input type="number" style="width: 30px;" min="0" bind:value={data.will} on:focusout={save} />
+        </div>
     </div>
         <button style="width: auto;" on:click={deleteSelf}>Delete</button>
     </div>

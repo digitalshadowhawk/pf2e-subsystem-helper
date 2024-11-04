@@ -124,6 +124,7 @@ export class InfluenceNPCDataModel extends foundry.abstract.DataModel {
 		const fields = foundry.data.fields;
 		return {
 			name: new fields.StringField({required: true, blank: false, initial: "New NPC"}),
+			influence: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			perception: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			will: new fields.NumberField({required: true, nullable: false, integer: true, positive: false, initial: 0}),
 			thresholds: new fields.ArrayField(new fields.StringField()),
