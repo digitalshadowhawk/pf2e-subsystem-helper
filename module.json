@@ -23,9 +23,6 @@
         "type": "system",
         "compatibility": {}
       }
-    ],
-    "requires": [
-      {}
     ]
   },
   "esmodules": [
