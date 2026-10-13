@@ -4,7 +4,7 @@ New Features
 - added "New Page" button in subsystems window
 - added edit button directly to subsystem window and to journal pages
 - added setting to allow GMs to decide whether to open the builder or default journal editor when clicking the edit button
-- addedd the ability to set influence checks, weaknesses, and resistances as "undiscovered|discovered|always known" with secret block formatting and a toggle button
+- added the ability to set influence checks, weaknesses, and resistances as "undiscovered|discovered|always known" with secret block formatting and a toggle button
 
 Improvements
 - Influence weaknesses and resistances can now apply to specific checks and lores
