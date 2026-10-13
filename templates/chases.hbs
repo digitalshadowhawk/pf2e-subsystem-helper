@@ -4,6 +4,11 @@
     <select name="chases.journal">
         {{selectOptions journalChoices selected=chasesJournal blank="— Select a chase journal —"}}
     </select>
+    {{#if chasesJournal}}
+    <button type="button" class="new-page" data-action="newPage" data-subsystem="chases">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -29,11 +34,14 @@
                         data-action="chasePost" data-tooltip
                         aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Chases.Post'}}" {{#unless
                         chase.current}}disabled{{/unless}}></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
 
             <div class="checks chase-panel">
+                {{#if chase.notes}}<div class="topic-notes">{{{chase.notes}}}</div>{{/if}}
                 {{#if (and @root.isGM chase.lengthHint)}}
                 <p class="chase-hint"><i class="fa-solid fa-triangle-exclamation"></i> {{chase.lengthHint}}</p>
                 {{/if}}

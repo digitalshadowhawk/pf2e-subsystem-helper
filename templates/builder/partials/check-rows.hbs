@@ -1,0 +1,29 @@
+{{#each checks as |check ci|}}
+<div class="builder-row check-row" data-row="check">
+    <select name="{{../path}}.{{ci}}.skill">
+        {{selectOptions @root.skillChoices selected=check.skill}}
+    </select>
+    <input type="text" class="lore-name" name="{{../path}}.{{ci}}.lore" value="{{check.lore}}"
+        data-lore placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LoreName'}}"
+        {{#unless (eq check.skill "lore")}}hidden{{/unless}}>
+    <input type="number" class="dc" name="{{../path}}.{{ci}}.dc" value="{{check.dc}}" min="0" step="1" placeholder="DC">
+    <input type="text" class="check-label" name="{{../path}}.{{ci}}.label" value="{{check.label}}"
+        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.CheckLabel'}}">
+    <input type="hidden" name="{{../path}}.{{ci}}.extra" value="{{check.extra}}">
+    <input type="hidden" name="{{../path}}.{{ci}}.suffix" value="{{check.suffix}}">
+    <span class="row-controls">
+        <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+            data-path="{{../path}}" data-index="{{ci}}" data-delta="-1" data-tooltip
+            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+        <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+            data-path="{{../path}}" data-index="{{ci}}" data-delta="1" data-tooltip
+            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+        <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+            data-path="{{../path}}" data-index="{{ci}}" data-tooltip
+            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveCheck'}}"></button>
+    </span>
+</div>
+{{/each}}
+<button type="button" class="add-row" data-action="addRow" data-path="{{path}}">
+    <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddCheck"}}
+</button>

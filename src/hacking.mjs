@@ -6,7 +6,7 @@ const PREFIX = `${LANG}.Hacking`;
 const HAS_CHECK = /@Check\[/i;
 const ACCESS_LINE = /\(?\s*(physical|remote)\s*[;,]\s*(\d+)\s+success(?:es)?\s*\)?/i;
 const FAILURES = /\(\s*(\d+)\s+failures?\s*(?:[;,]\s*([^)]*))?\)/i;
-const REDUCTION = /(?:DC\s*)?[–—−-]\s*(\d+)\s*$/i;
+const REDUCTION = /(?:DC\s*)?[\u2013\u2014\u2212-]\s*(\d+)\s*$/i;
 const MIN_DC = /min(?:imum)?\s+DC\s+(\d+)/i;
 
 const isHeading = (el) => /^H[1-6]$/.test(el.tagName);
@@ -31,7 +31,7 @@ function fromFirstCheck(html) {
     return (at > 0 ? html.slice(at) : html).trim();
 }
 
-const stripReduction = (html) => html.replace(/[;,]?\s*(?:DC\s*)?[–—−-]\s*\d+\s*((?:<\/[a-z]+>\s*)*)$/i, "$1").trim();
+const stripReduction = (html) => html.replace(/[;,]?\s*(?:DC\s*)?[\u2013\u2014\u2212-]\s*\d+\s*((?:<\/[a-z]+>\s*)*)$/i, "$1").trim();
 
 function splitBoldLabels(html, labels) {
     const template = document.createElement("template");
@@ -100,10 +100,11 @@ export function parseComputer(html, fallbackName) {
     const addVulnerability = (html, text, name) => {
         ap ??= newAccessPoint();
         const reduction = Number(text.match(REDUCTION)?.[1]) || 1;
-        const before = textOf(html.split(/<a[^>]*class="[^"]*inline-check|@Check\[/i)[0]).replace(/[:;,—–-]\s*$/, "");
+        const before = textOf(stripReduction(html.split(/<a[^>]*class="[^"]*inline-check|@Check\[/i)[0])).replace(/[:;,\u2013\u2014-]\s*$/, "");
         ap.vulnerabilities.push({
             key: `${ap.key}-v${ap.vulnerabilities.length}`,
             name: name || before || game.i18n.format(`${PREFIX}.VulnerabilityN`, { n: ap.vulnerabilities.length + 1 }),
+            unnamed: !(name || before),
             checks: stripReduction(fromFirstCheck(html)),
             reduction
         });
@@ -118,6 +119,7 @@ export function parseComputer(html, fallbackName) {
         countermeasure = {
             key: `${ap.key}-c${ap.countermeasures.length}`,
             name: name || game.i18n.format(`${PREFIX}.CountermeasureN`, { n: ap.countermeasures.length + 1 }),
+            unnamed: !name,
             failures: Number(match?.[1]) || 1,
             persistent: /persistent/i.test(match?.[2] ?? "") || /\bpersistent\b/i.test(label),
             effect: parts[""].replace(FAILURES, "").replace(/^\s*[;:,]\s*/, "").replace(/[\s;,]+$/, "").trim(),
@@ -168,7 +170,7 @@ export function parseComputer(html, fallbackName) {
 
             if (ACCESS_LINE.test(lead.text)) {
                 if (!ap || ap.hasLine) newAccessPoint(label);
-                else if (ap.unnamed) ap.name = label;
+                else if (ap.unnamed) Object.assign(ap, { name: label, unnamed: false });
                 readAccessLine(lead.html, lead.text);
                 continue;
             }

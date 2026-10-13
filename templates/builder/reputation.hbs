@@ -1,0 +1,52 @@
+<div class="builder-body standard-form">
+    {{> "modules/pf2e-subsystem-helper/templates/builder/partials/header.hbs"}}
+
+    {{! ---------- Tier thresholds ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Thresholds"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.ReputationThresholdsHint"}}</p>
+        {{#each model.thresholds as |t ti|}}
+        <div class="builder-row threshold-row" data-row="threshold">
+            <select class="tier" name="thresholds.{{ti}}.tier">
+                {{selectOptions @root.tierChoices selected=t.tier}}
+            </select>
+            <textarea name="thresholds.{{ti}}.html" rows="2"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ThresholdPlaceholder'}}">{{t.html}}</textarea>
+            <span class="row-controls">
+                <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                    data-path="thresholds" data-index="{{ti}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+            </span>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="thresholds">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddThreshold"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Locations ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Locations"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.LocationsHint"}}</p>
+        {{#each model.locations as |l li|}}
+        <div class="builder-row location-row" data-row="location">
+            <input type="text" class="location-text" name="locations.{{li}}.html" value="{{l.html}}"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LocationPlaceholder'}}">
+            <span class="row-controls">
+                <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                    data-path="locations" data-index="{{li}}" data-delta="-1" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                    data-path="locations" data-index="{{li}}" data-delta="1" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                    data-path="locations" data-index="{{li}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+            </span>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="locations">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddLocation"}}
+        </button>
+    </fieldset>
+</div>

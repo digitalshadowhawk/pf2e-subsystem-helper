@@ -28,6 +28,8 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
 
     static PARSE_OPTIONS = {};
 
+    static BUILDABLE = false;
+
     /** @override */
     static VIEW_PARTS = {
         ...JournalEntryPageProseMirrorSheet.VIEW_PARTS,
@@ -49,8 +51,17 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
             secrets: page.isOwner
         });
         const parsed = this._parse(html, page.name);
-        Object.assign(context, { subsystem: this.constructor.SUBSYSTEM }, this._prepareView(parsed, this.#state()));
+        Object.assign(context, { subsystem: this.constructor.SUBSYSTEM, canBuild: this.constructor.BUILDABLE && page.isOwner }, this._prepareView(parsed, this.#state()));
         return context;
+    }
+
+    /** @override */
+    async _onRender(context, options) {
+        await super._onRender(context, options);
+        this.element.querySelector("[data-builder-edit]")?.addEventListener("click", async () => {
+            const { PageBuilder } = await import("./page-builder.mjs");
+            new PageBuilder({ subsystem: this.constructor.SUBSYSTEM, page: this.document }).render({ force: true });
+        });
     }
 
     /**
@@ -99,6 +110,12 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
         const counts = { weakness: 0, resistance: 0 };
         let pendingLabel = null;
         let currentLabel = null;
+        const secretOf = new WeakMap();   // line → {id, revealed} when it sits in a secret block
+
+        const leadInOf = (el) => {
+            const bold = el.querySelector?.("strong, b")?.textContent.trim() ?? "";
+            return bold && el.textContent.trim().startsWith(bold) ? bold : "";
+        };
 
         const flushPending = () => {
             if (pendingLabel) notes.push(pendingLabel.el.outerHTML);
@@ -115,9 +132,32 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
             const el = queue.shift();
             if (el === firstHeading) continue;
 
+            if (el.tagName === "SECRET-BLOCK") {
+                queue.unshift(...[...el.children].filter((child) => child.tagName !== "BUTTON"));
+                continue;
+            }
+
+            if (el.tagName === "SECTION" && el.classList.contains("secret")) {
+                const lines = [...el.children].filter((line) => line.tagName !== "BUTTON"
+                    && (line.textContent.trim() || line.querySelector("a.inline-check")));
+                const inModifiers = !!kindOfModifier(sectionLabel());
+                const holdsContent = (line) => line.querySelector("a.inline-check") || kindOfModifier(leadInOf(line));
+                const unwrap = lines.some(holdsContent)
+                    || (inModifiers && lines.length > 0 && lines.every((line) => !/^H[1-6]$/.test(line.tagName)));
+                if (unwrap) {
+                    const secret = { id: el.id, revealed: el.classList.contains("revealed") };
+                    for (const line of lines) secretOf.set(line, secret);
+                    queue.unshift(...lines);
+                    continue;
+                }
+                if (lines.length) notes.push(el.outerHTML);
+                continue;
+            }
             if (el.tagName === "UL" || el.tagName === "OL") {
                 if (el.querySelector("a.inline-check") || kindOfModifier(sectionLabel()) || isLocationSection()) {
-                    queue.unshift(...[...el.children].map((li) => li.querySelector(":scope > p") ?? li));
+                    const items = [...el.children].map((li) => li.querySelector(":scope > p") ?? li);
+                    if (secretOf.has(el)) for (const item of items) secretOf.set(item, secretOf.get(el));
+                    queue.unshift(...items);
                     continue;
                 }
             }
@@ -152,7 +192,9 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
                         checkLabel += node.textContent;
                     }
                     checkLabel = checkLabel.trim().replace(/^[-–—:,]\s*/, "");
-                    checks.set(`${anchor.outerHTML}|${checkLabel}`, { html: anchor.outerHTML, label: checkLabel });
+                    checks.set(`${anchor.outerHTML}|${checkLabel}`, {
+                        html: anchor.outerHTML, label: checkLabel, secret: secretOf.get(el) ?? null
+                    });
                 });
                 continue;
             }
@@ -175,7 +217,10 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
                         plain = text.slice(boldText.length).trim();
                     }
                     const amount = Number(plain.match(/\bby\s+(\d+)/i)?.[1] ?? 2);
-                    modifiers.push({ key: `${kind}-${counts[kind]++}`, kind, html: body.innerHTML.trim(), amount, skills: modifierSkills(plain) });
+                    modifiers.push({
+                        key: `${kind}-${counts[kind]++}`, kind, html: body.innerHTML.trim(), amount,
+                        skills: modifierSkills(plain), secret: secretOf.get(el) ?? null
+                    });
                     continue;
                 }
 
@@ -184,6 +229,12 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
                     locations.push({ key: `location-${locations.length}`, html: el.innerHTML });
                     continue;
                 }
+            }
+
+            if (secretOf.has(el)) {
+                const { revealed } = secretOf.get(el);
+                notes.push(`<section class="secret${revealed ? " revealed" : ""}">${el.outerHTML}</section>`);
+                continue;
             }
 
             flushPending();
@@ -216,6 +267,7 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
 
 export class ResearchPageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "research";
+    static BUILDABLE = true;
     static PARSE_OPTIONS = { pattern: PATTERNS.research };
 
     /** @override */
@@ -256,6 +308,7 @@ export class ResearchPageSheet extends SubsystemPageSheet {
 
 export class VictoryPageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "victory";
+    static BUILDABLE = true;
     static PARSE_OPTIONS = { pattern: PATTERNS.victory };
 
     /** @override */
@@ -292,6 +345,7 @@ export class VictoryPageSheet extends SubsystemPageSheet {
 
 export class InfluencePageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "influence";
+    static BUILDABLE = true;
     static PARSE_OPTIONS = { pattern: PATTERNS.influence };
 
     /** @override */
@@ -342,6 +396,7 @@ export class InfluencePageSheet extends SubsystemPageSheet {
 
 export class ReputationPageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "reputation";
+    static BUILDABLE = true;
     static PARSE_OPTIONS = { pattern: PATTERNS.reputation, toThreshold: tierThreshold, collectLocations: true };
 
     /** @override */
@@ -399,6 +454,7 @@ export class ReputationPageSheet extends SubsystemPageSheet {
 
 export class ChasePageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "chases";
+    static BUILDABLE = true;
 
     /** @override */
     _parse(html, fallbackName) {
@@ -483,6 +539,7 @@ const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 
 
 export class InfiltrationPageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "infiltration";
+    static BUILDABLE = true;
 
     /** @override */
     _parse(html, fallbackName) {
@@ -639,6 +696,7 @@ export class InfiltrationPageSheet extends SubsystemPageSheet {
 
 export class HackingPageSheet extends SubsystemPageSheet {
     static SUBSYSTEM = "hacking";
+    static BUILDABLE = true;
 
     /** @override */
     _parse(html, fallbackName) {

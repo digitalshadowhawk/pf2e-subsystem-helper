@@ -640,3 +640,6 @@
 
 .subsystem-view.tracked .hack-outcome:not(.reached) { opacity: 0.75; }
 .subsystem-view.tracked .hack-outcome.reached strong { color: var(--view-green); }
+
+.subsystem-view li.undiscovered { opacity: 0.55; }
+.subsystem-view li.undiscovered::after { content: "\f070"; margin-left: var(--spacer-6); font-family: var(--font-awesome); font-weight: 900; font-size: var(--font-size-11); }

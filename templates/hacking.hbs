@@ -4,6 +4,10 @@
     <select name="hacking.journal">
         {{selectOptions journalChoices selected=hackingJournal blank="— Select a hacking journal —"}}
     </select>
+    {{#if hackingJournal}}<button type="button" class="new-page" data-action="newPage" data-subsystem="hacking">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -23,7 +27,10 @@
                 {{#if @root.isGM}}
                 <div class="controls split-button">
                     <button type="button" class="ui-control icon {{hack.discoveredIcon}}"
-                        data-action="toggleTopicDiscovered" data-tooltip aria-label="{{hack.discoveredTooltip}}"></button>
+                        data-action="toggleTopicDiscovered" data-tooltip
+                        aria-label="{{hack.discoveredTooltip}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
@@ -38,10 +45,12 @@
                         <strong>{{alert.label}}</strong>
                         {{#if alert.effect}}<span>{{{alert.effect}}}</span>{{/if}}
                     </div>
-                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right" data-action="hackPost"
-                        data-key="{{alert.key}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Post'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                        data-action="hackPost" data-key="{{alert.key}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Post'}}"></button>
                     <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="hackDismiss"
-                        data-key="{{alert.key}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Dismiss'}}"></button>
+                        data-key="{{alert.key}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Dismiss'}}"></button>
                 </div>
                 {{/each}}
 
@@ -58,7 +67,8 @@
                 {{#each hack.accessPoints as |ap|}}
                 <div class="infil-card hack-ap {{ap.type}}{{#if ap.hacked}} hacked{{/if}}" data-ap="{{ap.key}}">
                     <header>
-                        {{#if ap.hacked}}<i class="fa-solid fa-unlock cleared-icon"></i>{{else}}<i class="fa-solid fa-lock"></i>{{/if}}
+                        {{#if ap.hacked}}<i class="fa-solid fa-unlock cleared-icon"></i>{{else}}<i
+                            class="fa-solid fa-lock"></i>{{/if}}
                         <strong>{{ap.name}}</strong>
                         <span class="type-badge">{{ap.typeLabel}}</span>
                         <span class="ip">{{ap.requiredLabel}}</span>
@@ -66,7 +76,8 @@
 
                     <div class="hack-counters">
                         <div class="pips">
-                            {{#each ap.successPips as |pip|}}<span class="pip {{pip.state}}{{#if pip.bonus}} bonus-slot{{/if}}"></span>{{/each}}
+                            {{#each ap.successPips as |pip|}}<span
+                                class="pip {{pip.state}}{{#if pip.bonus}} bonus-slot{{/if}}"></span>{{/each}}
                         </div>
                         <span class="hack-failures{{#if ap.failures}} has-failures{{/if}}">
                             <i class="fa-solid fa-triangle-exclamation"></i> {{ap.failureLabel}}
@@ -74,13 +85,17 @@
                         {{#if @root.isGM}}
                         <span class="hack-adjust">
                             <button type="button" class="ui-control icon fa-solid fa-minus" data-action="hackAdjust"
-                                data-field="successes" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.RemoveSuccess'}}"></button>
+                                data-field="successes" data-delta="-1" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.RemoveSuccess'}}"></button>
                             <button type="button" class="ui-control icon fa-solid fa-plus" data-action="hackAdjust"
-                                data-field="successes" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.AddSuccess'}}"></button>
+                                data-field="successes" data-delta="1" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.AddSuccess'}}"></button>
                             <button type="button" class="ui-control icon fa-solid fa-minus" data-action="hackAdjust"
-                                data-field="failures" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.RemoveFailure'}}"></button>
+                                data-field="failures" data-delta="-1" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.RemoveFailure'}}"></button>
                             <button type="button" class="ui-control icon fa-solid fa-plus" data-action="hackAdjust"
-                                data-field="failures" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.AddFailure'}}"></button>
+                                data-field="failures" data-delta="1" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.AddFailure'}}"></button>
                         </span>
                         {{/if}}
                     </div>
@@ -97,10 +112,16 @@
 
                     {{#unless ap.hacked}}
                     <div class="infil-awards">
-                        <button type="button" class="crit-success" data-action="hackResult" data-result="critSuccess">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critSuccess"}}</button>
-                        <button type="button" class="success" data-action="hackResult" data-result="success">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.success"}}</button>
-                        <button type="button" class="failure" data-action="hackResult" data-result="failure">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.failure"}}</button>
-                        <button type="button" class="crit-fail" data-action="hackResult" data-result="critFailure">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critFailure"}}</button>
+                        <button type="button" class="crit-success" data-action="hackResult"
+                            data-result="critSuccess">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critSuccess"}}</button>
+                        <button type="button" class="success" data-action="hackResult" data-result="success">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Hacking.Award.success"}}</button>
+                        <button type="button" class="failure" data-action="hackResult" data-result="failure">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Hacking.Award.failure"}}</button>
+                        <button type="button" class="crit-fail" data-action="hackResult"
+                            data-result="critFailure">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critFailure"}}</button>
                     </div>
                     {{/unless}}
 
@@ -109,8 +130,10 @@
                         <h4>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Vulnerabilities"}}</h4>
                         {{#each ap.vulnerabilities as |v|}}
                         <div class="hack-vulnerability{{#if v.exploited}} exploited{{/if}}">
-                            <button type="button" class="ui-control icon fa-regular {{#if v.exploited}}fa-square-check{{else}}fa-square{{/if}}"
-                                data-action="hackVulnerability" data-key="{{v.key}}" aria-pressed="{{v.exploited}}" data-tooltip
+                            <button type="button"
+                                class="ui-control icon fa-regular {{#if v.exploited}}fa-square-check{{else}}fa-square{{/if}}"
+                                data-action="hackVulnerability" data-key="{{v.key}}" aria-pressed="{{v.exploited}}"
+                                data-tooltip
                                 aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Exploited'}}"></button>
                             <span class="name">{{v.name}}</span>
                             <span class="checks-inline">{{{v.checks}}}</span>
@@ -129,15 +152,19 @@
                             <header>
                                 <i class="fa-solid fa-shield-halved"></i>
                                 <strong>{{cm.name}}</strong>
-                                {{#if cm.persistent}}<span class="type-badge">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Persistent"}}</span>{{/if}}
+                                {{#if cm.persistent}}<span class="type-badge">{{localize
+                                    "PF2E-SUBSYSTEM-HELPER.Hacking.Persistent"}}</span>{{/if}}
                                 {{#if @root.isGM}}<span class="threshold">{{cm.thresholdLabel}}</span>{{/if}}
                                 <span class="state">{{cm.stateLabel}}</span>
                                 {{#if @root.isGM}}
-                                <button type="button" class="ui-control icon fa-solid {{#if cm.noticed}}fa-eye{{else}}fa-eye-slash{{/if}}"
+                                <button type="button"
+                                    class="ui-control icon fa-solid {{#if cm.noticed}}fa-eye{{else}}fa-eye-slash{{/if}}"
                                     data-action="hackCountermeasure" data-op="notice" data-key="{{cm.key}}" data-tooltip
                                     aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.MarkNoticed'}}"></button>
-                                <button type="button" class="ui-control icon fa-solid {{#if cm.disabled}}fa-power-off{{else}}fa-plug{{/if}}"
-                                    data-action="hackCountermeasure" data-op="disable" data-key="{{cm.key}}" data-tooltip
+                                <button type="button"
+                                    class="ui-control icon fa-solid {{#if cm.disabled}}fa-power-off{{else}}fa-plug{{/if}}"
+                                    data-action="hackCountermeasure" data-op="disable" data-key="{{cm.key}}"
+                                    data-tooltip
                                     aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.MarkDisabled'}}"></button>
                                 <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
                                     data-action="hackPost" data-key="{{cm.key}}" data-tooltip
@@ -146,14 +173,22 @@
                             </header>
                             {{#if cm.effect}}<div class="card-description">{{{cm.effect}}}</div>{{/if}}
                             {{#if @root.isGM}}
-                            {{#if cm.notice}}<p class="hack-checks"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Notice"}}</strong> {{{cm.notice}}}</p>{{/if}}
+                            {{#if cm.notice}}<p class="hack-checks"><strong>{{localize
+                                    "PF2E-SUBSYSTEM-HELPER.Hacking.Notice"}}</strong> {{{cm.notice}}}</p>{{/if}}
                             {{#if cm.disable}}
-                            <p class="hack-checks"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Disable"}}</strong> {{{cm.disable}}}</p>
+                            <p class="hack-checks"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Disable"}}</strong>
+                                {{{cm.disable}}}</p>
                             {{#unless cm.disabled}}
                             <div class="infil-awards">
-                                <button type="button" class="success" data-action="hackCountermeasure" data-op="disable" data-key="{{cm.key}}">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.disabled"}}</button>
-                                <button type="button" class="failure" data-action="hackCountermeasure" data-op="failure" data-key="{{cm.key}}">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.failure"}}</button>
-                                <button type="button" class="crit-fail" data-action="hackCountermeasure" data-op="critFailure" data-key="{{cm.key}}">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critFailure"}}</button>
+                                <button type="button" class="success" data-action="hackCountermeasure" data-op="disable"
+                                    data-key="{{cm.key}}">{{localize
+                                    "PF2E-SUBSYSTEM-HELPER.Hacking.Award.disabled"}}</button>
+                                <button type="button" class="failure" data-action="hackCountermeasure" data-op="failure"
+                                    data-key="{{cm.key}}">{{localize
+                                    "PF2E-SUBSYSTEM-HELPER.Hacking.Award.failure"}}</button>
+                                <button type="button" class="crit-fail" data-action="hackCountermeasure"
+                                    data-op="critFailure" data-key="{{cm.key}}">{{localize
+                                    "PF2E-SUBSYSTEM-HELPER.Hacking.Award.critFailure"}}</button>
                             </div>
                             {{/unless}}
                             {{/if}}
@@ -176,7 +211,8 @@
                         <span class="text">{{{o.html}}}</span>
                         <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
                             data-action="hackPost" data-key="{{o.key}}" data-tooltip
-                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Post'}}" {{#unless o.reached}}disabled{{/unless}}></button>
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Hacking.Post'}}" {{#unless
+                            o.reached}}disabled{{/unless}}></button>
                     </div>
                     {{/each}}
                 </div>

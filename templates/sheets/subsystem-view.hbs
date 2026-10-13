@@ -1,6 +1,11 @@
 <div>
     <article class="subsystem-view {{subsystem}}-view{{#if progress}} tracked{{/if}}{{#if chase.tracked}} tracked{{/if}}{{#if infiltration.tracked}} tracked{{/if}}{{#if hacking.tracked}} tracked{{/if}}{{#if tierKey}} tier-{{tierKey}}{{/if}}">
         <header class="view-header">
+            {{#if canBuild}}
+            <button type="button" class="builder-edit" data-builder-edit>
+                <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm"}}
+            </button>
+            {{/if}}
             <h1>{{name}}</h1>
             {{#if infiltration.summary}}
             <div class="infil-summary">
@@ -269,7 +274,7 @@
                 </header>
                 <ul>
                     {{#each g.checks as |c|}}
-                    <li>
+                    <li class="{{#if c.secret}}{{#if c.secret.revealed}}discovered{{else}}undiscovered{{/if}}{{/if}}">
                         {{{c.html}}}
                         {{#if c.adjustment}}<span class="dc-adjustment">DC {{c.adjustment}}</span>{{/if}}
                         {{#if c.label}}<span class="check-label">{{c.label}}</span>{{/if}}
@@ -286,7 +291,7 @@
             <h2>Weaknesses &amp; Resistances</h2>
             <ul>
                 {{#each modifiers as |m|}}
-                <li class="modifier {{m.kind}}{{#if m.active}} active{{/if}}">
+                <li class="modifier {{m.kind}}{{#if m.active}} active{{/if}}{{#if m.secret}}{{#if m.secret.revealed}} discovered{{else}} undiscovered{{/if}}{{/if}}">
                     <span class="kind">{{m.kindLabel}}</span>
                     <span class="text">{{{m.html}}}</span>
                     <span class="amount">{{#if m.skillsLabel}}{{m.skillsLabel}} {{/if}}DC {{m.signedLabel}}</span>

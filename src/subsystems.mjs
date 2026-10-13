@@ -1,11 +1,12 @@
 import { MODULE_ID, LANG, SUBSYSTEMS } from "./constants.mjs";
 import { SubsystemData } from "./data.mjs";
 import { PATTERNS, REPUTATION, CHASE_TYPES, isReached, parseTopic, partyMembers, reputationTier, tierReached, tierThreshold, chaseDefaults, chaseRequired, chaseStatus, detectedPartySize, parseChase, hasComputers } from "./utils.mjs";
-import { parseDetails, parseReputationLocations } from "./parsers.mjs";
+import { parseReputationLocations } from "./parsers.mjs";
 import { applyModifiersToGroups, skillsLabel } from "./modifiers.mjs";
 import { SubsystemPageSheet, ResearchPageSheet, InfluencePageSheet, ReputationPageSheet, ChasePageSheet, InfiltrationPageSheet, VictoryPageSheet, HackingPageSheet, SHEET_CLASSES } from "./subsystem-sheets.mjs";
 import { applyAP, applyResult, buildInfiltrationView, clearForAll, infiltrationChatContent, infiltrationDefaults, movePC, parseInfiltration } from "./infiltration.mjs";
 import { adjustAccessPoint, applyCountermeasure, applyHackResult, buildHackingView, endHackingRound, hackingChatContent, hackingDefaults, parseComputer, toggleVulnerability } from "./hacking.mjs";
+import { PageBuilder } from "./page-builder.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -72,6 +73,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             toggleChecks: Subsystems.#onToggleChecks,
             toggleTopicDiscovered: Subsystems.#onToggleTopicDiscovered,
             resultsToChat: Subsystems.#onResultsToChat,
+            newPage: Subsystems.#onNewPage,
+            editPage: Subsystems.#onEditPage,
+            toggleSecret: Subsystems.#onToggleSecret,
             // Influence
             toggleModifier: Subsystems.#onToggleModifier,
             // Reputation
@@ -163,6 +167,16 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             }
         });
 
+        game.settings.register(MODULE_ID, "editInJournal", {
+            name: `${LANG}.Settings.EditInJournal.Name`,
+            hint: `${LANG}.Settings.EditInJournal.Hint`,
+            scope: "user",
+            config: true,
+            type: Boolean,
+            default: false,
+            onChange: () => subsystems.manager?.render()
+        });
+
         Hooks.on("renderChatMessageHTML", (message, element) => {
             const flags = message.flags[MODULE_ID];
             const subsystem = flags?.results ?? (flags?.researchThresholds ? "research" : null);
@@ -209,6 +223,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         this.data = game.settings.get(MODULE_ID, "subsystems");
+        context.editTooltip = _loc(game.settings.get(MODULE_ID, "editInJournal")
+            ? `${LANG}.EditPage.Journal` : `${LANG}.EditPage.Form`);
 
         this.journals = Object.fromEntries(SUBSYSTEMS.map((id) => {
             const uuid = this.data[id].journal;
@@ -282,6 +298,12 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         this.element.classList.toggle("player-view", !game.user.isGM);
     }
 
+    async #pageDetails(page, options) {
+        if (!game.user.isGM) return { groups: [], modifiers: [], notes: "" };
+        const html = await enrich(page.text.content ?? "", { relativeTo: page, secrets: true });
+        return SubsystemPageSheet.parse(html, page.name, options);
+    }
+
     #visibleTopics(subsystem) {
         const topics = this.topics[subsystem];
         if (game.user.isGM) return topics;
@@ -303,9 +325,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             const state = this.data.research.topics[topic.pageId] ?? { discovered: false, points: 0, categories: {} };
             const max = topic.thresholds.at(-1) ?? 0;
 
-            const details = isGM ? await parseDetails(page, PATTERNS.research) : { checks: [] };
+            const details = await this.#pageDetails(page, { pattern: PATTERNS.research });
             const stored = state.categories ?? {};
-            const checks = details.checks.map((g) => {
+            const checks = details.groups.map((g) => {
                 const sliderMax = g.max ?? max;
                 return { ...g, points: stored[g.key] ?? 0, sliderMax, markers: sliderMarkers(sliderMax) };
             });
@@ -329,7 +351,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 categoriesEditable: isGM && state.discovered,
                 expanded: this.#expanded.has(topic.pageId),
                 markers: sliderMarkers(max, topic.thresholds),
-                hasResults: state.discovered && topic.thresholds.some((t) => t <= total)
+                hasResults: state.discovered && topic.thresholds.some((t) => t <= total),
+                notes: details.notes
             };
         }));
     }
@@ -346,12 +369,13 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             const defaultMax = topic.thresholds.at(-1) ?? 0;
             const max = state.max ?? defaultMax;
 
-            const parsed = isGM ? await parseDetails(page, PATTERNS.influence) : { checks: [], modifiers: [] };
+            const parsed = await this.#pageDetails(page, { pattern: PATTERNS.influence });
             const active = new Set(state.active ?? []);
             const modifiers = parsed.modifiers.map((m) => {
                 const signed = m.kind === "weakness" ? -m.amount : m.amount;
                 return {
                     ...m,
+                    text: m.html,
                     active: active.has(m.key),
                     value: signed,
                     signedLabel: signedLabel(signed),
@@ -359,7 +383,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                     kindLabel: _loc(`${prefix}.Modifier.${m.kind === "weakness" ? "Weakness" : "Resistance"}`)
                 };
             });
-            const checks = applyModifiersToGroups(parsed.checks, modifiers);
+            const checks = applyModifiersToGroups(parsed.groups, modifiers);
 
             return {
                 ...topic,
@@ -376,7 +400,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 hasDetails: checks.length > 0 || modifiers.length > 0,
                 expanded: this.#expanded.has(topic.pageId),
                 markers: sliderMarkers(max, topic.thresholds),
-                hasResults: state.discovered && topic.thresholds.some((t) => t <= state.points)
+                hasResults: state.discovered && topic.thresholds.some((t) => t <= state.points),
+                notes: parsed.notes,
+                hasDetails: checks.length > 0 || modifiers.length > 0 || !!parsed.notes
             };
         }));
     }
@@ -393,6 +419,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
 
             const completed = new Set(state.completed ?? []);
             const locations = (await parseReputationLocations(page)).map((l) => ({ ...l, completed: completed.has(l.key) }));
+            const { notes } = await this.#pageDetails(page, {
+                pattern: PATTERNS.reputation, toThreshold: tierThreshold, collectLocations: true
+            });
             const bonus = locations.filter((l) => l.completed).length;
             const total = Math.clamp(state.points + bonus, REPUTATION.min, REPUTATION.max);
             const shown = game.user.isGM ? locations : locations.filter((l) => l.completed);
@@ -423,7 +452,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                     threshold: topic.thresholds.includes(n),
                     pos: (n - REPUTATION.min) / span
                 })),
-                hasResults: state.discovered && topic.results.some((r) => tierReached(r.token, total))
+                hasResults: state.discovered && topic.results.some((r) => tierReached(r.token, total)),
+                notes,
+                hasDetails: shown.length > 0 || !!notes
             };
         }));
     }
@@ -493,7 +524,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                     levelLabel: obstacle.level ? game.i18n.format(`${prefix}.Level`, { level: obstacle.level }) : "",
                     markers: sliderMarkers(required).map(({ pos }) => ({ pos }))
                 },
-                expanded: this.#expanded.has(chase.pageId)
+                expanded: this.#expanded.has(chase.pageId),
+                notes: isGM ? view.intro : ""
             };
         }));
     }
@@ -517,7 +549,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 pageLink: page.toAnchor({ name: view.name }).outerHTML,
                 canUndo: (this.#infilHistory.get(infil.pageId)?.length ?? 0) > 0,
                 expanded: this.#expanded.has(infil.pageId),
-                ...buildInfiltrationView(view, state, { party, selectedId })
+                ...buildInfiltrationView(view, state, { party, selectedId }),
+                notes: isGM ? [view.intro, view.notes].filter(Boolean).join("\n") : ""
             };
         }));
     }
@@ -532,7 +565,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             const page = journal.pages.get(topic.pageId);
             const state = this.data.victory.topics[topic.pageId] ?? { discovered: false, points: 0 };
             const max = topic.thresholds.at(-1) ?? 0;
-            const { checks } = isGM ? await parseDetails(page, PATTERNS.victory) : { checks: [] };
+            const { groups: checks, notes } = await this.#pageDetails(page, { pattern: PATTERNS.victory });
 
             return {
                 ...topic,
@@ -546,7 +579,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 checks,
                 expanded: this.#expanded.has(topic.pageId),
                 markers: sliderMarkers(max, topic.thresholds),
-                hasResults: topic.thresholds.some((t) => t <= state.points)
+                hasResults: topic.thresholds.some((t) => t <= state.points),
+                notes
             };
         }));
     }
@@ -579,8 +613,8 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /**
      * @param {string} subsystem
      * @param {string} topicId
-     * @param {(entry: object) => void} fn   Mutates the entry in place
-     * @param {object} [defaults]            Merged under the stored entry before fn runs
+     * @param {(entry: object) => void} fn
+     * @param {object} [defaults]
      */
     async #updateTopic(subsystem, topicId, fn, defaults = {}) {
         const data = this.data.toObject();
@@ -623,9 +657,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /*  Shared actions                              */
     /* -------------------------------------------- */
 
-    /**
-     * @this {Subsystems}
-     */
+    /** @this {Subsystems} */
     static #onToggleChecks(event, target) {
         const li = target.closest("[data-topic]");
         const id = li.dataset.topic;
@@ -634,7 +666,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         li.classList.toggle("expanded", this.#expanded.has(id));
     }
 
-    /** @this {Subsystems} */
+    /** 
+     * @this {Subsystems}
+     */
     static async #onToggleTopicDiscovered(event, target) {
         if (!game.user.isGM) return;
         const { subsystem, topic } = target.closest("[data-topic]").dataset;
@@ -643,9 +677,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         });
     }
 
-    /**
-     * @this {Subsystems}
-     */
+    /** @this {Subsystems} */
     static async #onResultsToChat(event, target) {
         if (!game.user.isGM) return;
         const { subsystem, topic: topicId } = target.closest("[data-topic]").dataset;
@@ -673,13 +705,50 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         await ChatMessage.implementation.create({ speaker: { user: game.user.id }, content, flags });
     }
 
+    /** 
+     * @this {Subsystems}
+     */
+    static #onNewPage(event, target) {
+        if (!game.user.isGM) return;
+        const subsystem = target.dataset.subsystem;
+        const journal = this.journals[subsystem];
+        if (!journal || !PageBuilder.supports(subsystem)) return;
+        new PageBuilder({ subsystem, journal }).render({ force: true });
+    }
+
+    /** @this {Subsystems} */
+    static #onEditPage(event, target) {
+        if (!game.user.isGM) return;
+        const { subsystem, topic } = target.closest("[data-topic]").dataset;
+        const page = this.journals[subsystem]?.pages.get(topic);
+        if (!page) return;
+
+        if (game.settings.get(MODULE_ID, "editInJournal") || !PageBuilder.supports(subsystem)) {
+            const mode = page.sheet.constructor.MODES?.EDIT ?? "edit";
+            return page.sheet.render({ force: true, mode });
+        }
+        new PageBuilder({ subsystem, page }).render({ force: true });
+    }
+
+    static async #onToggleSecret(event, target) {
+        if (!game.user.isGM) return;
+        const { subsystem, topic } = target.closest("[data-topic]").dataset;
+        const page = this.journals[subsystem]?.pages.get(topic);
+        const id = target.dataset.secret;
+        if (!page || !id) return;
+        const template = document.createElement("template");
+        template.innerHTML = page.text.content ?? "";
+        const section = template.content.querySelector(`section.secret[id="${CSS.escape(id)}"]`);
+        if (!section) return;
+        section.classList.toggle("revealed");
+        await page.update({ "text.content": template.innerHTML });
+    }
+
     /* -------------------------------------------- */
     /*  Influence actions                           */
     /* -------------------------------------------- */
 
-    /**
-     * @this {Subsystems}
-     */
+    /** @this {Subsystems} */
     static async #onToggleModifier(event, target) {
         if (!game.user.isGM) return;
         const key = target.dataset.key;
@@ -695,9 +764,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /*  Reputation actions                          */
     /* -------------------------------------------- */
 
-    /**
-     * @this {Subsystems}
-     */
+    /** @this {Subsystems} */
     static async #onToggleLocation(event, target) {
         if (!game.user.isGM) return;
         const key = target.dataset.key;
@@ -805,9 +872,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /*  Infiltration actions                        */
     /* -------------------------------------------- */
 
-    /**
-     * @this {Subsystems}
-     */
+    /** @this {Subsystems} */
     static #onInfilSelect(event, target) {
         this.#infilSelected.set(topicOf(target), target.dataset.actor);
         this.render();

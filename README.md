@@ -13,6 +13,18 @@ To access the subsystems application, there's a button for it under the Journal 
 
 <img width="205" height="246" alt="image" src="https://github.com/user-attachments/assets/e3b8cf64-37bc-4978-8246-637eb3bebb0e" />
 
+## Page Builder
+ 
+You don't have to write subsystem pages by hand. Every subsystem has a **Page Builder**, a form that writes the page in the format described under [Journal Formats](#journal-formats).
+ 
+- **New page:** in the Subsystems window, the **New Page** button under a tab's journal picker opens a blank form for that subsystem. Saving creates the page in the selected journal with the right page sheet already assigned.
+- **Edit a page:** use the edit button on any row in the Subsystems window, or **Edit with form** on the page sheet. The form opens with the page's current content filled in.
+- **What it covers:** check groups and their skills (including named Lores), DCs and labels; thresholds; Influence weaknesses and resistances, with a preview of which checks each one affects; Reputation tiers and locations; chase obstacles; infiltration objectives, obstacles, complications, opportunities and awareness; and hacking access points, vulnerabilities and countermeasures. Rich-text fields such as notes and descriptions use the normal editor.
+> **Note:** saving from the form rewrites the whole page in the standard format. Anything the module recognizes is kept, and any other text is kept as notes, but custom layout or formatting outside the notes may be normalized. If you prefer to hand-format a page, edit it in the journal instead.
+
+### Settings
+
+**Edit Pages in the Journal Editor:** When enabled, the edit button in the Subsystems window opens the page in the standard journal editor instead of the Page Builder. The page sheet's Edit with form button still opens the builder.
 
 ## Journal Formats
 
@@ -23,7 +35,8 @@ A few rules apply everywhere:
 - **The first heading on a page is its title.** If there's no heading, the page name is used.
 - **Bold lead-ins mark structure.** A bold phrase at the start of a paragraph (`**Success** You find...`) tells the module what that paragraph is. Lead-ins can end in a colon or not.
 - **Checks are inline checks.** Write them as `@Check[diplomacy|dc:20]`. Text right after a check becomes its label: `@Check[society|dc:18] Recall the family's history`.
-- **Anything the module doesn't recognize is kept as notes** and shown on the page sheet as written.
+- **Anything the module doesn't recognize is kept as notes.** Notes show on the page sheet as written, and in the Subsystems window when the GM expands a row.
+- **Secret blocks stay secret.** Foundry secret blocks are GM-only notes, unless they hold Influence checks or weaknesses/resistances (see [Influence](#influence)).
 
 ---
 
@@ -64,6 +77,7 @@ Background text...                            <-- notes
 **Influence Skills**
 @Check[diplomacy|dc:20] Talk business
 @Check[performance|dc:18] Impress her at the Rusty Dragon
+[secret] @Check[mercantile-lore|dc:26]       <-- in a secret block using the editor's formatting dropdown: undiscovered
 
 **Weaknesses**
 Flattery about her cooking lowers the DC of Diplomacy checks by 2.
@@ -78,6 +92,8 @@ Mentioning her father increases the DC of all checks by 3.
 - **Thresholds:** `**X Influence**`. The highest one is the default maximum; the GM can override it per NPC in the window.
 - **Weaknesses and resistances:** list them under a `**Weaknesses**` / `**Resistances**` label, or give each one its own lead-in (`**Weakness** ...`). The amount comes from "by X" in the text (default 2). Toggle them on in the window to lower (weakness) or raise (resistance) the check DCs.
 - **Which checks they affect:** if the text names skills as checks ("Diplomacy checks", "Deception or Intimidation checks", "Society and Lore checks", "her Diplomacy DC"), only those checks change. Otherwise every check changes. Checks under a **Discovery** label are never adjusted.
+- **Lores:** a named Lore (“Sailing Lore checks”) only changes that Lore. Plain “Lore” (“all Lore checks”) changes every Lore check.
+- **Discovery:** wrap a check, or a weakness or resistance, in a Foundry secret block to mark it **undiscovered**. Revealing the secret marks it **discovered**. Either way it stays in its group. The GM can switch it with the eye button on that line in the Subsystems window, with the Discovery dropdown in the Page Builder, or by revealing the secret in the journal editor. The state lives in the page text, so there's no hidden flag to lose.
 
 <img width="3075" height="1353" alt="image" src="https://github.com/user-attachments/assets/16f328bb-e7d3-4e84-aef1-59a1629ee964" />
 
@@ -100,6 +116,7 @@ Cleared the smuggler's tunnel
 
 - **Thresholds:** lead-ins named after the reputation tiers: `Revered` (30+), `Admired` (15+), `Liked` (5+), `Ignored` (-4 to 4), `Disliked` (-5 or less), `Hated` (-15 or less), `Hunted` (-30 or less). Use whichever tiers matter; the page sheet lists them top-down.
 - **Locations:** lines under a `**Locations**` label (or a heading with "Location" in it). The GM ticks them off in the window, and each one adds +1 on top of the slider value. The slider will account for these when you drag it, so if you uncheck a location, the total will decrease from where you last moved the slider.
+- **No checks:** in the rules, Reputation changes only through favors and disservices, so reputation pages don't use check groups. Any checks on the page are kept as notes.
 
 <img width="3103" height="678" alt="image" src="https://github.com/user-attachments/assets/37a1c036-3e8c-4fa3-9d1e-97927f6b2c43" />
 

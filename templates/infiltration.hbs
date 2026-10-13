@@ -4,6 +4,11 @@
     <select name="infiltration.journal">
         {{selectOptions journalChoices selected=infiltrationJournal blank="— Select an infiltration journal —"}}
     </select>
+    {{#if infiltrationJournal}}
+    <button type="button" class="new-page" data-action="newPage" data-subsystem="infiltration">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -27,11 +32,14 @@
                     <button type="button" class="ui-control icon {{infil.discoveredIcon}}"
                         data-action="toggleTopicDiscovered" data-tooltip
                         aria-label="{{infil.discoveredTooltip}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
 
             <div class="checks infil-panel">
+                {{#if infil.notes}}<div class="topic-notes">{{{infil.notes}}}</div>{{/if}}
                 {{! ---------- Threshold alerts (GM) ---------- }}
                 {{#if @root.isGM}}
                 {{#each infil.alerts as |alert|}}
@@ -333,6 +341,7 @@
         {{~/each~}}
     </ol>
     {{else}}
-    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain infiltrations.{{else}}No infiltrations underway.{{/if}}</p>
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain infiltrations.{{else}}No infiltrations
+        underway.{{/if}}</p>
     {{/if}}
 </section>

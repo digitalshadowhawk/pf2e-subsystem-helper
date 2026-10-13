@@ -209,6 +209,15 @@
 #subsystems-window a.inline-check.dc-lowered { outline: 1px solid var(--subsystems-green); }
 #subsystems-window a.inline-check.dc-raised  { outline: 1px solid var(--subsystems-red); }
 
+#subsystems-window .topic-notes { align-self: stretch; padding: var(--spacer-4) var(--spacer-8); border-left: 3px solid var(--color-light-5); font-size: var(--font-size-13); }
+#subsystems-window .topic-notes > :first-child { margin-top: 0; }
+#subsystems-window .topic-notes > :last-child  { margin-bottom: 0; }
+#subsystems-window .check.undiscovered > :not(.discover),
+#subsystems-window .modifier-row.undiscovered .modifier { opacity: 0.55; }
+#subsystems-window button.discover { --control-size: 1.5rem; }
+#subsystems-window .modifier-row { display: flex; align-items: center; gap: var(--spacer-4); }
+#subsystems-window .modifier-row .modifier { flex: 1; }
+
 /* ==========================================================================
     Shared badges and status
    ========================================================================== */
