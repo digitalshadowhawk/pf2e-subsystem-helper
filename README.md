@@ -9,6 +9,10 @@ A module dedicated to implementing various subsystems that aren't part of the pf
 - Victory Points
 - Hacking
 
+To access the subsystems application, there's a button for it under the Journal Notes category
+
+<img width="205" height="246" alt="image" src="https://github.com/user-attachments/assets/e3b8cf64-37bc-4978-8246-637eb3bebb0e" />
+
 
 ## Journal Formats
 
@@ -45,6 +49,8 @@ Background text...                            <-- notes
 - **Thresholds:** `**X Research Points**` (or `**X Research Point**`). The highest one is the topic's maximum.
 - **Check categories:** a fully bold line labels the checks under it. Add `(max X)` to the label to cap how many points that category can contribute; capped categories get their own sliders and add up to the topic total.
 
+<img width="3100" height="720" alt="image" src="https://github.com/user-attachments/assets/38f41fea-2779-4322-b477-17f041a3d041" />
+
 ---
 
 ### Influence
@@ -73,6 +79,8 @@ Mentioning her father increases the DC of all checks by 3.
 - **Weaknesses and resistances:** list them under a `**Weaknesses**` / `**Resistances**` label, or give each one its own lead-in (`**Weakness** ...`). The amount comes from "by X" in the text (default 2). Toggle them on in the window to lower (weakness) or raise (resistance) the check DCs.
 - **Which checks they affect:** if the text names skills as checks ("Diplomacy checks", "Deception or Intimidation checks", "Society and Lore checks", "her Diplomacy DC"), only those checks change. Otherwise every check changes. Checks under a **Discovery** label are never adjusted.
 
+<img width="3075" height="1353" alt="image" src="https://github.com/user-attachments/assets/16f328bb-e7d3-4e84-aef1-59a1629ee964" />
+
 ---
 
 ### Reputation
@@ -93,6 +101,8 @@ Cleared the smuggler's tunnel
 - **Thresholds:** lead-ins named after the reputation tiers: `Revered` (30+), `Admired` (15+), `Liked` (5+), `Ignored` (-4 to 4), `Disliked` (-5 or less), `Hated` (-15 or less), `Hunted` (-30 or less). Use whichever tiers matter; the page sheet lists them top-down.
 - **Locations:** lines under a `**Locations**` label (or a heading with "Location" in it). The GM ticks them off in the window, and each one adds +1 on top of the slider value. The slider will account for these when you drag it, so if you uncheck a location, the total will decrease from where you last moved the slider.
 
+<img width="3103" height="678" alt="image" src="https://github.com/user-attachments/assets/37a1c036-3e8c-4fa3-9d1e-97927f6b2c43" />
+
 ---
 
 ### Victory Points
@@ -112,6 +122,8 @@ Background text...
 
 - **Thresholds:** `**X Victory Points**` or `**X VP**`. The highest one is the track's maximum.
 - **Hidden tracks:** the GM can move the slider while a track is hidden from players, so it works for tracks players never see.
+
+<img width="3043" height="573" alt="image" src="https://github.com/user-attachments/assets/b672ec86-58f5-4b94-90b7-49f6757931e3" />
 
 ---
 
@@ -138,6 +150,8 @@ The ceiling is coming down...
 - **Checks:** any paragraph or bullet with an inline check.
 - **Options:** `**Options**` lead-in, for non-check ways past the obstacle, such as using the fly spell to bypass a crowd. Normal inline links work, so you can link any spell or ability you want.
 - The chase type (run away, chase down, beat the clock, competitive), the opponent's pace and the round limit are set in the subsystems window, not on the journal page.
+
+<img width="3097" height="1125" alt="image" src="https://github.com/user-attachments/assets/9d6d1c0b-3d5b-43f0-aa1d-3b987a76427e" />
 
 ---
 
@@ -183,6 +197,9 @@ Setup text...
 - **Opportunities:** H3s under a `## Opportunities` heading, with optional `**Requirements**` and checks.
 - **Awareness:** `**X AP**` (or `X Awareness Points`) lines under `## Awareness`. Text like "DCs increase by 1" or "by a total of 2" raises check DCs, and naming skills ("Computers and Deception DCs") limits the increase to them. The threshold that mentions failing, or the last one, ends the infiltration. Leave the section out to use the default 5/10/15/20 values.
 - Starting Edge Points and Awareness Points are set by the GM in the window.
+- Because each character can be at a different point in the infiltration, each party member can be selected to see what stage they're at and list the relevant obstacles for them.
+
+<img width="3010" height="1900" alt="image" src="https://github.com/user-attachments/assets/7ef4d4a1-023e-4344-a849-57a9ed235ff4" />
 
 ---
 
@@ -217,3 +234,5 @@ Description...
 - **Vulnerabilities:** `**Vulnerability** Name <checks>; -X`, one per line (or as a list under a `**Vulnerabilities**` label). When marked exploited, the access point's Hack DCs drop by X.
 - **Countermeasures:** `**Countermeasure (X Failures)**`, optionally named (`**Countermeasure: Trace (2 Failures; persistent)**`). It triggers when the access point reaches X failures. `persistent` ones trigger again each round until disabled. Follow it with `**Notice**` and `**Disable**` lines. The published inline form (`effect. **Notice** ...; **Disable** ...`) also works.
 - **Outcomes:** `**Critical Success**` and `**Success**` anywhere on the page. A critical success is twice the required successes on one access point, or hacking more than one.
+
+<img width="3061" height="1873" alt="image" src="https://github.com/user-attachments/assets/16a90683-16d6-49ad-b3bc-bcab8954380a" />
