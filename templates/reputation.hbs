@@ -1,0 +1,67 @@
+<section class="tab panel standard-form{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}"
+    data-tab="{{tab.id}}">
+    {{#if @root.isGM}}
+    <select name="reputation.journal">
+        {{selectOptions journalChoices selected=reputationJournal blank="— Select a reputation journal —"}}
+    </select>
+    <p class="hint">{{{instructions}}}</p>
+    {{/if}}
+    {{#if topics.length}}
+    <ol class="topics scrollable">
+        {{~#each topics as |topic|~}}
+        <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="reputation"
+            data-topic="{{topic.pageId}}">
+            <div class="form-group">
+                <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.locationsTooltip}}" {{#unless
+                    topic.hasDetails}}disabled{{/unless}}></button>
+                <label for="{{../rootId}}-reputation.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
+                <div class="form-fields">
+                    <div class="track">
+                        <range-picker name="reputation.topics.{{topic.pageId}}.points"
+                            id="{{../rootId}}-reputation.{{topic.pageId}}.points" value="{{topic.total}}"
+                            min="{{topic.min}}" max="{{topic.max}}" step="1" {{#unless (and @root.isGM topic.discovered)}}disabled{{/unless}}></range-picker>
+                        <datalist>
+                            {{#each topic.markers as |m|}}
+                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"
+                                {{/if}} style="--pos: {{m.pos}}"></option>
+                            {{/each}}
+                        </datalist>
+                    </div>
+                    <span class="tier {{topic.tierKey}}" data-tooltip
+                        aria-label="Base {{topic.points}} + {{topic.bonus}} from locations">{{topic.tierLabel}}</span>
+                </div>
+                {{#if @root.isGM}}
+                <div class="controls split-button">
+                    <button type="button" class="ui-control icon {{topic.discoveredIcon}}"
+                        data-action="toggleTopicDiscovered" data-tooltip
+                        aria-label="{{topic.discoveredTooltip}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
+                        topic.hasResults}}disabled{{/unless}}></button>
+                </div>
+                {{/if}}
+            </div>
+            {{#if topic.hasDetails}}
+            <div class="checks locations">
+                {{#each topic.locations as |loc|}}
+                <div class="location{{#if loc.completed}} completed{{/if}}">
+                    {{#if @root.isGM}}
+                    <button type="button"
+                        class="ui-control icon fa-regular {{#if loc.completed}}fa-square-check{{else}}fa-square{{/if}}"
+                        data-action="toggleLocation" data-key="{{loc.key}}" aria-pressed="{{loc.completed}}"></button>
+                    {{else}}
+                    <i class="fa-regular fa-square-check"></i>
+                    {{/if}}
+                    <span class="location-text">{{{loc.html}}}</span>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+        </li>
+        {{~/each~}}
+    </ol>
+    {{else}}
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain factions.{{else}}No factions discovered yet.{{/if}}</p>
+    {{/if}}
+</section>

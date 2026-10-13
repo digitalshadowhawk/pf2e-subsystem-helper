@@ -1,0 +1,642 @@
+/* ==========================================================================
+    Variables and colors
+   ========================================================================== */
+
+.subsystem-view {
+  --view-gold: #daa520;
+  --view-green: #437066;
+  --view-red: #8b2020;
+  --view-blue: #2e5f8a;
+  --view-muted: color-mix(in srgb, currentColor 35%, transparent);
+  --view-track: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+:is(.subsystem-view.tier-hunted,   .subsystem-view .tier-hunted)   { --tier-color: #5e0000; }
+:is(.subsystem-view.tier-hated,    .subsystem-view .tier-hated)    { --tier-color: #8b2020; }
+:is(.subsystem-view.tier-disliked, .subsystem-view .tier-disliked) { --tier-color: #a0522d; }
+:is(.subsystem-view.tier-ignored,  .subsystem-view .tier-ignored)  { --tier-color: #6b6b6b; }
+:is(.subsystem-view.tier-liked,    .subsystem-view .tier-liked)    { --tier-color: #437066; }
+:is(.subsystem-view.tier-admired,  .subsystem-view .tier-admired)  { --tier-color: #2e5f8a; }
+:is(.subsystem-view.tier-revered,  .subsystem-view .tier-revered)  { --tier-color: #b8860b; }
+
+/* ==========================================================================
+    Shared building blocks
+   ========================================================================== */
+
+.subsystem-view :is(.threshold, .obstacle-card) .badge,
+.subsystem-view .view-objective > header .badge {
+  display: grid;
+  place-items: center;
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--view-muted);
+  border-radius: 50%;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication) .cp {
+  margin-left: auto;
+  padding: 0.1rem var(--spacer-6);
+  border: 1px solid var(--view-muted);
+  border-radius: 4px;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.subsystem-view .type-badge {
+  padding: 0 var(--spacer-4);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: var(--font-size-11);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.subsystem-view .chase-status {
+  padding: 0.1rem var(--spacer-6);
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.subsystem-view .chase-status.good    { background: var(--view-green); color: white; }
+.subsystem-view .chase-status.bad     { background: var(--view-red);   color: white; }
+.subsystem-view .chase-status.warning { background: var(--view-gold);  color: #1a1a1a; }
+
+.subsystem-view .chase-meta {
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+}
+
+.subsystem-view .dc-badge {
+  padding: 0.1rem var(--spacer-6);
+  border-radius: 4px;
+  background: var(--view-red);
+  color: white;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication, .infil-opportunity) {
+  padding: var(--spacer-8) var(--spacer-12);
+  border: 1px solid var(--view-muted);
+  border-left-width: 4px;
+  border-radius: 6px;
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication, .infil-opportunity) > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view :is(.infil-obstacle, .infil-complication, .infil-opportunity) > header strong,
+.subsystem-view .obstacle-card .obstacle-name {
+  font-size: var(--font-size-16);
+  font-weight: bold;
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication, .infil-opportunity) .obstacle-description > :first-child {
+  margin-top: var(--spacer-6);
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication, .infil-opportunity) .obstacle-description > :last-child {
+  margin-bottom: 0;
+}
+
+.subsystem-view :is(.obstacle-card, .infil-obstacle, .infil-complication, .infil-opportunity) :is(.obstacle-checks, .obstacle-options) {
+  list-style: none;
+  margin: var(--spacer-6) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+.subsystem-view :is(.check-category, .view-modifiers, .view-locations) ul {
+  list-style: none;
+  margin: var(--spacer-4) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+.subsystem-view .outcome {
+  margin: var(--spacer-4) 0 0;
+}
+
+.subsystem-view a.inline-check.dc-lowered { outline: 1px solid var(--view-green); }
+.subsystem-view a.inline-check.dc-raised  { outline: 1px solid var(--view-red); }
+
+/* ==========================================================================
+    Header and progress bar
+   ========================================================================== */
+
+.subsystem-view .view-header h1 {
+  margin-bottom: var(--spacer-8);
+}
+
+.subsystem-view :is(.chase-summary, .infil-summary) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view .chase-summary { margin-bottom: var(--spacer-16); }
+.subsystem-view .infil-summary { margin-bottom: var(--spacer-8); }
+
+.subsystem-view .view-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  margin-bottom: var(--spacer-16);
+}
+
+.subsystem-view .view-progress .bar {
+  position: relative;
+  flex: 1;
+  height: 0.6rem;
+  border-radius: 0.3rem;
+  background: var(--view-track);
+}
+
+.subsystem-view .view-progress .fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: var(--view-green);
+}
+
+.subsystem-view.reputation-view .view-progress .fill { background: var(--tier-color, var(--view-green)); }
+.subsystem-view .view-progress.awareness .fill       { background: var(--view-red); }
+
+.subsystem-view .view-progress .zero {
+  position: absolute;
+  left: 50%;
+  top: -0.3rem;
+  width: 2px;
+  height: 1.2rem;
+  background: currentColor;
+  opacity: 0.6;
+  transform: translateX(-50%);
+}
+
+.subsystem-view .view-progress .mark {
+  position: absolute;
+  top: -0.2rem;
+  width: 0.15rem;
+  height: 1rem;
+  background: var(--view-muted);
+  transform: translateX(-50%);
+}
+
+.subsystem-view .view-progress .mark.reached {
+  background: var(--view-gold);
+}
+
+.subsystem-view .view-progress .points {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+    Thresholds (research, influence, reputation)
+   ========================================================================== */
+
+.subsystem-view .view-thresholds ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.subsystem-view .threshold {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-8);
+  margin-bottom: var(--spacer-8);
+}
+
+.subsystem-view .threshold .body > :first-child {
+  margin-top: 0;
+}
+
+.subsystem-view .threshold.reached .badge {
+  border-color: var(--view-gold);
+  background: var(--view-gold);
+  color: white;
+}
+
+.subsystem-view.reputation-view .threshold .badge {
+  flex: 0 0 5.5rem;
+  height: auto;
+  padding: 0.1rem var(--spacer-4);
+  border-radius: 4px;
+  border-color: var(--tier-color, var(--view-muted));
+  color: inherit;
+}
+
+.subsystem-view.reputation-view .threshold.reached .badge {
+  background: var(--tier-color);
+  border-color: var(--tier-color);
+  color: white;
+}
+
+.subsystem-view.reputation-view .threshold.current .badge {
+  box-shadow: 0 0 0 2px var(--view-gold);
+}
+
+.subsystem-view.reputation-view.tracked .threshold:not(.reached) .body {
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+    Check groups and weaknesses/resistances (research, influence)
+   ========================================================================== */
+
+.subsystem-view .check-category {
+  margin-bottom: var(--spacer-8);
+}
+
+.subsystem-view .check-category header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-8);
+  border-bottom: 1px solid var(--view-muted);
+}
+
+.subsystem-view .check-category .cap {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+}
+
+.subsystem-view .check-category .dc-adjustment {
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+}
+
+.subsystem-view .check-category li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+.subsystem-view .check-label {
+  opacity: 0.75;
+}
+
+.subsystem-view .modifier {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view .modifier .kind   { flex: 0 0 6rem; font-weight: bold; }
+.subsystem-view .modifier .text   { flex: 1; }
+.subsystem-view .modifier .amount { flex: 0 0 auto; font-weight: bold; }
+
+.subsystem-view .modifier.weakness :is(.kind, .amount)   { color: var(--view-green); }
+.subsystem-view .modifier.resistance :is(.kind, .amount) { color: var(--view-red); }
+
+.subsystem-view.tracked .modifier:not(.active) {
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+    Locations (reputation)
+   ========================================================================== */
+
+.subsystem-view .view-locations h2 .hint {
+  font-size: var(--font-size-12);
+  font-weight: normal;
+  opacity: 0.7;
+}
+
+.subsystem-view .location {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view .location i {
+  flex: 0 0 1rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.subsystem-view .location.completed i {
+  color: var(--view-green);
+  opacity: 1;
+}
+
+.subsystem-view.tracked .location:not(.completed) .text {
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+    Chases
+   ========================================================================== */
+
+.subsystem-view .view-obstacles {
+  list-style: none;
+  margin: var(--spacer-8) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view .obstacle-card .level {
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+}
+
+.subsystem-view .obstacle-card .markers {
+  display: flex;
+  gap: var(--spacer-6);
+}
+
+.subsystem-view .obstacle-card .party    { color: var(--view-green); }
+.subsystem-view .obstacle-card .opponent { color: var(--view-red); }
+
+.subsystem-view .obstacle-card .cp-bar {
+  height: 0.35rem;
+  margin: var(--spacer-6) 0 var(--spacer-2);
+  border-radius: 0.2rem;
+  background: var(--view-track);
+  overflow: hidden;
+}
+
+.subsystem-view .obstacle-card .cp-bar .fill {
+  height: 100%;
+  background: var(--view-gold);
+}
+
+.subsystem-view .obstacle-card .obstacle-options li {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-6);
+}
+
+.subsystem-view .obstacle-card .obstacle-options i {
+  color: var(--view-gold);
+}
+
+.subsystem-view .obstacle-card.current {
+  border-color: var(--view-gold);
+}
+
+.subsystem-view .obstacle-card.current .badge {
+  background: var(--view-gold);
+  border-color: var(--view-gold);
+  color: white;
+}
+
+.subsystem-view .obstacle-card.cleared {
+  opacity: 0.55;
+}
+
+.subsystem-view .obstacle-card.cleared .badge {
+  border-color: var(--view-green);
+  color: var(--view-green);
+}
+
+.subsystem-view .obstacle-card.unrevealed {
+  border-style: dashed;
+}
+
+.subsystem-view .obstacle-card.face-down {
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, currentColor 6%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.subsystem-view .obstacle-card.finish .obstacle-name {
+  font-size: var(--font-size-14);
+}
+
+/* ==========================================================================
+    Infiltration
+   ========================================================================== */
+
+.subsystem-view .view-objective {
+  margin: var(--spacer-16) 0;
+  padding-left: var(--spacer-12);
+  border-left: 3px solid var(--view-muted);
+}
+
+.subsystem-view .view-objective.current { border-left-color: var(--view-gold); }
+.subsystem-view .view-objective.cleared { border-left-color: var(--view-green); }
+
+.subsystem-view .view-objective > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+.subsystem-view .view-objective > header h2 {
+  flex: 1;
+  margin: 0;
+  border: none;
+}
+
+.subsystem-view .view-objective > header .badge {
+  flex-basis: 1.75rem;
+  height: 1.75rem;
+  font-size: inherit;
+}
+
+.subsystem-view .view-objective.current > header .badge {
+  background: var(--view-gold);
+  border-color: var(--view-gold);
+  color: white;
+}
+
+.subsystem-view .view-objective.cleared > header .badge {
+  border-color: var(--view-green);
+  color: var(--view-green);
+}
+
+.subsystem-view .view-objective .required {
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.subsystem-view .view-objective .here {
+  display: flex;
+  gap: var(--spacer-2);
+}
+
+.subsystem-view .objective-description > :last-child {
+  margin-bottom: var(--spacer-8);
+}
+
+.subsystem-view :is(.infil-obstacle, .infil-complication, .infil-opportunity) {
+  margin: var(--spacer-8) 0;
+}
+
+.subsystem-view .infil-obstacle.individual { border-left-color: var(--view-green); }
+.subsystem-view .infil-obstacle.group      { border-left-color: var(--view-blue); }
+.subsystem-view .infil-obstacle.cleared    { opacity: 0.55; }
+.subsystem-view .infil-obstacle .cleared-icon { color: var(--view-green); }
+
+.subsystem-view .infil-complication              { border-left-color: var(--view-red); }
+.subsystem-view .infil-complication > header i   { color: var(--view-red); }
+.subsystem-view .infil-complication.active       { background: color-mix(in srgb, var(--view-red) 10%, transparent); }
+.subsystem-view .infil-complication.resolved     { opacity: 0.55; }
+
+.subsystem-view .infil-opportunity               { border-left-color: var(--view-gold); }
+.subsystem-view .infil-opportunity > header i    { color: var(--view-gold); }
+.subsystem-view .infil-opportunity.used          { opacity: 0.55; }
+
+.subsystem-view .trigger-ap {
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--view-gold);
+}
+
+.subsystem-view .state {
+  font-size: var(--font-size-12);
+  opacity: 0.75;
+}
+
+.subsystem-view .state.active {
+  color: var(--view-red);
+  font-weight: bold;
+  opacity: 1;
+}
+
+.subsystem-view .pips {
+  display: flex;
+  gap: var(--spacer-4);
+  margin-top: var(--spacer-6);
+}
+
+.subsystem-view .pip {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--view-muted);
+  border-radius: 50%;
+  font-size: var(--font-size-10);
+  font-weight: bold;
+}
+
+.subsystem-view .pip.partial { border-color: var(--view-gold); }
+.subsystem-view .pip.cleared { border-color: var(--view-green); background: var(--view-green); color: white; }
+.subsystem-view .pip.past    { opacity: 0.4; border-style: dashed; }
+.subsystem-view .pip.pending { opacity: 0.25; }
+
+.subsystem-view .view-infil-section h2 {
+  margin-top: var(--spacer-16);
+}
+
+.subsystem-view .awareness-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.subsystem-view .awareness-step {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-8);
+  margin-bottom: var(--spacer-6);
+}
+
+.subsystem-view .awareness-step .ap-badge {
+  flex: 0 0 3.5rem;
+  padding: 0.1rem var(--spacer-4);
+  border: 2px solid var(--view-muted);
+  border-radius: 4px;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  text-align: center;
+}
+
+.subsystem-view .awareness-step.reached .ap-badge {
+  background: var(--view-red);
+  border-color: var(--view-red);
+  color: white;
+}
+
+.subsystem-view .awareness-step.fail .ap-badge {
+  border-color: var(--view-red);
+}
+
+.subsystem-view .awareness-step .body > :first-child { margin-top: 0; }
+.subsystem-view .awareness-step .body > :last-child  { margin-bottom: 0; }
+
+.subsystem-view.tracked .awareness-step:not(.reached) .body {
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+    Hacking
+   ========================================================================== */
+
+.subsystem-view .hack-ap.physical { border-left-color: var(--view-gold); }
+.subsystem-view .hack-ap.remote   { border-left-color: var(--view-blue); }
+.subsystem-view .hack-ap.cleared  { border-left-color: var(--view-green); }
+
+.subsystem-view .hack-ap h3 {
+  margin: var(--spacer-8) 0 var(--spacer-4);
+  font-size: var(--font-size-14);
+  border: none;
+}
+
+.subsystem-view .hack-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-6);
+  margin: var(--spacer-6) 0;
+}
+
+.subsystem-view .dc-badge.lowered { background: var(--view-green); }
+
+.subsystem-view .hack-vulnerabilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+.subsystem-view .hack-vulnerabilities li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+.subsystem-view .hack-vulnerabilities .name { font-weight: bold; }
+
+.subsystem-view .hack-vulnerabilities .amount {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--view-green);
+  white-space: nowrap;
+}
+
+.subsystem-view .hack-vulnerabilities li.exploited i { color: var(--view-green); }
+
+.subsystem-view .hack-countermeasure .state { margin-left: auto; }
+.subsystem-view .hack-countermeasure.noticed > header i { color: var(--view-gold); }
+.subsystem-view .hack-countermeasure.triggered          { background: color-mix(in srgb, var(--view-red) 10%, transparent); }
+.subsystem-view .hack-countermeasure.disabled           { opacity: 0.55; }
+
+.subsystem-view.tracked .hack-outcome:not(.reached) { opacity: 0.75; }
+.subsystem-view.tracked .hack-outcome.reached strong { color: var(--view-green); }

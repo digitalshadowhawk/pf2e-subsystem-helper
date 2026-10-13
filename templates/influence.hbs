@@ -1,0 +1,92 @@
+<section class="tab panel standard-form{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}"
+    data-tab="{{tab.id}}">
+    {{#if @root.isGM}}
+    <select name="influence.journal">
+        {{selectOptions journalChoices selected=influenceJournal blank="— Select an influence journal —"}}
+    </select>
+    <p class="hint">{{{instructions}}}</p>
+    {{/if}}
+    {{#if topics.length}}
+    <ol class="topics scrollable">
+        {{~#each topics as |topic|~}}
+        <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="influence"
+            data-topic="{{topic.pageId}}">
+            <div class="form-group">
+                {{#if @root.isGM}}
+                <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}" {{#unless
+                    topic.hasDetails}}disabled{{/unless}}></button>
+                {{/if}}
+                <label for="{{../rootId}}-influence.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
+                <div class="form-fields">
+                    <div class="track">
+                        <range-picker name="influence.topics.{{topic.pageId}}.points"
+                            id="{{../rootId}}-influence.{{topic.pageId}}.points" value="{{topic.points}}" min="0"
+                            max="{{topic.max}}" step="1" {{#unless (and @root.isGM
+                            topic.discovered)}}disabled{{/unless}}></range-picker>
+                        <datalist>
+                            {{#each topic.markers as |m|}}
+                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"
+                                {{/if}} style="--pos: {{m.pos}}"></option>
+                            {{/each}}
+                        </datalist>
+                    </div>
+                    {{#if @root.isGM}}
+                    <input type="number" class="max" name="influence.topics.{{topic.pageId}}.max"
+                        value="{{topic.storedMax}}" placeholder="{{topic.defaultMax}}" min="0" step="1" data-tooltip
+                        aria-label="Max Influence">
+                    {{else}}
+                    <span class="influence-value">{{topic.points}} / {{topic.max}}</span>
+                    {{/if}}
+                </div>
+                {{#if @root.isGM}}
+                <div class="controls split-button">
+                    <button type="button" class="ui-control icon {{topic.discoveredIcon}}"
+                        data-action="toggleTopicDiscovered" data-tooltip
+                        aria-label="{{topic.discoveredTooltip}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
+                        topic.hasResults}}disabled{{/unless}}></button>
+                </div>
+                {{/if}}
+            </div>
+            {{#if topic.hasDetails}}
+            <div class="checks">
+                {{#each topic.checks as |group|}}
+                <div class="check-group">
+                    {{#if group.label}}
+                    <strong>{{group.label}}{{#if group.adjustment}} <span class="dc-adjustment">(DC
+                            {{group.adjustment}})</span>{{/if}}</strong>
+                    {{/if}}
+                    {{#each group.checks as |check|}}
+                    <div class="check">
+                        {{{check.html}}}
+                        {{#if check.adjustment}}<span class="dc-adjustment">(DC {{check.adjustment}})</span>{{/if}}
+                        {{#if check.label}}<span class="check-label">{{check.label}}</span>{{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+                {{/each}}
+
+                {{#if topic.modifiers.length}}
+                <div class="modifiers">
+                    {{#each topic.modifiers as |mod|}}
+                    <button type="button" class="modifier {{mod.kind}}{{#if mod.active}} active{{/if}}"
+                        data-action="toggleModifier" data-key="{{mod.key}}" aria-pressed="{{mod.active}}">
+                        <i class="fa-regular {{#if mod.active}}fa-square-check{{else}}fa-square{{/if}}"></i>
+                        <span class="kind">{{mod.kindLabel}}</span>
+                        <span class="text">{{mod.text}}</span>
+                        <span class="amount">{{#if mod.skillsLabel}}{{mod.skillsLabel}} {{/if}}DC {{mod.signedLabel}}</span>
+                    </button>
+                    {{/each}}
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+        </li>
+        {{~/each~}}
+    </ol>
+    {{else}}
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain influence NPCs.{{else}}No NPCs discovered yet.{{/if}}</p>
+    {{/if}}
+</section>

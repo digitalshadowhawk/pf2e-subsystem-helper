@@ -1,0 +1,329 @@
+<div>
+    <article class="subsystem-view {{subsystem}}-view{{#if progress}} tracked{{/if}}{{#if chase.tracked}} tracked{{/if}}{{#if infiltration.tracked}} tracked{{/if}}{{#if hacking.tracked}} tracked{{/if}}{{#if tierKey}} tier-{{tierKey}}{{/if}}">
+        <header class="view-header">
+            <h1>{{name}}</h1>
+            {{#if infiltration.summary}}
+            <div class="infil-summary">
+                <span class="chase-status {{infiltration.summary.statusTone}}">{{infiltration.summary.statusLabel}}</span>
+                <span class="chase-meta"><i class="fa-solid fa-bolt"></i> {{infiltration.summary.edge}} · {{infiltration.summary.roundLabel}}</span>
+                {{#if infiltration.summary.dcLabel}}<span class="dc-badge">{{infiltration.summary.dcLabel}}</span>{{/if}}
+            </div>
+            <div class="view-progress awareness">
+                <div class="bar">
+                    <div class="fill" style="left: 0%; width: {{infiltration.summary.percent}}%"></div>
+                    {{#each infiltration.summary.marks as |m|}}
+                    <span class="mark{{#if m.reached}} reached{{/if}}" style="left: {{m.pct}}%" data-tooltip aria-label="{{m.tooltip}}"></span>
+                    {{/each}}
+                </div>
+                <span class="points">{{infiltration.summary.apLabel}}</span>
+            </div>
+            {{/if}}
+            {{#if hacking.summary}}
+            <div class="infil-summary">
+                <span class="chase-status {{hacking.summary.statusTone}}">{{hacking.summary.statusLabel}}</span>
+                <span class="chase-meta">{{hacking.summary.roundLabel}}</span>
+            </div>
+            {{/if}}
+            {{#if chase.summary}}
+            <div class="chase-summary">
+                <span class="chase-status {{chase.summary.statusTone}}">{{chase.summary.statusLabel}}</span>
+                <span class="chase-meta">{{chase.summary.typeLabel}} · {{chase.summary.roundLabel}}</span>
+            </div>
+            {{/if}}
+            {{#if progress}}
+            <div class="view-progress">
+                <div class="bar">
+                    <div class="fill" style="left: {{progress.fillLeft}}%; width: {{progress.percent}}%"></div>
+                    {{#if progress.center}}<span class="zero"></span>{{/if}}
+                    {{#each thresholds as |t|}}
+                    {{#if t.onBar}}
+                    <span class="mark{{#if t.reached}} reached{{/if}}" style="left: {{t.pct}}%"
+                        data-tooltip aria-label="{{t.tooltip}}"></span>
+                    {{/if}}
+                    {{/each}}
+                </div>
+                <span class="points" {{#if progress.tooltip}}data-tooltip aria-label="{{progress.tooltip}}"{{/if}}>{{progress.label}}</span>
+            </div>
+            {{/if}}
+        </header>
+
+        {{#if notes}}
+        <section class="view-notes">{{{notes}}}</section>
+        {{/if}}
+
+        {{#if chase}}
+        <ol class="view-obstacles">
+            {{#each chase.obstacles as |o|}}
+            <li class="obstacle-card{{#if o.cleared}} cleared{{/if}}{{#if o.current}} current{{/if}}{{#if o.hidden}} face-down{{/if}}{{#if o.unrevealed}} unrevealed{{/if}}">
+                <header>
+                    <span class="badge">{{#if o.cleared}}<i class="fa-solid fa-check"></i>{{else}}{{o.index}}{{/if}}</span>
+                    <span class="obstacle-name">{{#if o.hidden}}?{{else}}{{o.name}}{{/if}}</span>
+                    {{#unless o.hidden}}{{#if o.levelLabel}}<span class="level">{{o.levelLabel}}</span>{{/if}}{{/unless}}
+                    <span class="markers">
+                        {{#if o.party}}<i class="fa-solid fa-users party" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Chases.Party'}}"></i>{{/if}}
+                        {{#if o.opponent}}<i class="fa-solid fa-person-running opponent" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Chases.Opponent'}}"></i>{{/if}}
+                    </span>
+                    {{#unless o.hidden}}<span class="cp">{{o.cpLabel}}</span>{{/unless}}
+                </header>
+                {{#unless o.hidden}}
+                {{#if o.current}}
+                <div class="cp-bar"><div class="fill" style="width: {{o.cpPercent}}%"></div></div>
+                {{/if}}
+                {{#if o.description}}<div class="obstacle-description">{{{o.description}}}</div>{{/if}}
+                {{#if o.checks.length}}
+                <ul class="obstacle-checks">
+                    {{#each o.checks as |c|}}<li>{{{c}}}</li>{{/each}}
+                </ul>
+                {{/if}}
+                {{#if o.options.length}}
+                <ul class="obstacle-options">
+                    {{#each o.options as |opt|}}<li><i class="fa-solid fa-wand-sparkles"></i> <span>{{{opt}}}</span></li>{{/each}}
+                </ul>
+                {{/if}}
+                {{/unless}}
+            </li>
+            {{/each}}
+            <li class="obstacle-card finish{{#if chase.finish.current}} current{{/if}}">
+                <header>
+                    <span class="badge"><i class="fa-solid fa-flag-checkered"></i></span>
+                    <span class="obstacle-name">{{chase.finish.label}}</span>
+                    <span class="markers">
+                        {{#if chase.finish.party}}<i class="fa-solid fa-users party"></i>{{/if}}
+                        {{#if chase.finish.opponent}}<i class="fa-solid fa-person-running opponent"></i>{{/if}}
+                    </span>
+                </header>
+            </li>
+        </ol>
+        {{/if}}
+
+        {{#if infiltration}}
+        {{#each infiltration.objectives as |obj|}}
+        <section class="view-objective{{#if obj.current}} current{{/if}}{{#if obj.cleared}} cleared{{/if}}">
+            <header>
+                <span class="badge">{{#if obj.cleared}}<i class="fa-solid fa-check"></i>{{else}}{{obj.index}}{{/if}}</span>
+                <h2>{{obj.name}}</h2>
+                <span class="required">{{obj.requiredLabel}}</span>
+                {{#if obj.here.length}}
+                <span class="here">
+                    {{#each obj.here as |pc|}}<span class="pip none" data-tooltip aria-label="{{pc.name}}">{{pc.initials}}</span>{{/each}}
+                </span>
+                {{/if}}
+            </header>
+            {{#if obj.description}}<div class="objective-description">{{{obj.description}}}</div>{{/if}}
+            {{#each obj.obstacles as |ob|}}
+            <div class="infil-obstacle {{ob.type}}{{#if ob.cleared}} cleared{{/if}}">
+                <header>
+                    {{#if ob.cleared}}<i class="fa-solid fa-check cleared-icon"></i>{{/if}}
+                    <strong>{{ob.name}}</strong>
+                    <span class="type-badge {{ob.type}}">{{ob.typeLabel}}</span>
+                    <span class="cp">{{ob.ipLabel}}</span>
+                </header>
+                {{#if ob.pips.length}}
+                <div class="pips">
+                    {{#each ob.pips as |pip|}}<span class="pip {{pip.state}}" data-tooltip aria-label="{{pip.name}}">{{pip.initials}}</span>{{/each}}
+                </div>
+                {{/if}}
+                {{#if ob.description}}<div class="obstacle-description">{{{ob.description}}}</div>{{/if}}
+                {{#if ob.checks.length}}
+                <ul class="obstacle-checks">{{#each ob.checks as |c|}}<li>{{{c}}}</li>{{/each}}</ul>
+                {{/if}}
+                {{#if ob.criticalFailure}}
+                <p class="outcome"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.criticalFailure"}}</strong> {{{ob.criticalFailure}}}</p>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/each}}
+
+        {{#if infiltration.complications.length}}
+        <section class="view-infil-section">
+            <h2>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Complications"}}</h2>
+            {{#each infiltration.complications as |c|}}
+            <div class="infil-complication{{#if c.active}} active{{/if}}{{#if c.resolved}} resolved{{/if}}">
+                <header>
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <strong>{{c.name}}</strong>
+                    {{#if c.triggerLabel}}<span class="trigger-ap">{{c.triggerLabel}}</span>{{/if}}
+                    {{#if c.active}}<span class="state active">{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.ComplicationState.Active"}}</span>{{/if}}
+                    {{#if c.resolved}}<span class="state">{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.ComplicationState.Resolved"}}</span>{{/if}}
+                    {{#if c.points}}<span class="cp">{{c.points}} IP</span>{{/if}}
+                </header>
+                {{#if c.trigger}}<p class="outcome"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Trigger"}}</strong> {{{c.trigger}}}</p>{{/if}}
+                {{#if c.description}}<div class="obstacle-description">{{{c.description}}}</div>{{/if}}
+                {{#if c.checks.length}}
+                <ul class="obstacle-checks">{{#each c.checks as |check|}}<li>{{{check}}}</li>{{/each}}</ul>
+                {{/if}}
+                {{#each c.outcomeList as |o|}}
+                <p class="outcome"><strong>{{o.label}}</strong> {{{o.html}}}</p>
+                {{/each}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if infiltration.opportunities.length}}
+        <section class="view-infil-section">
+            <h2>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Opportunities"}}</h2>
+            {{#each infiltration.opportunities as |p|}}
+            <div class="infil-opportunity{{#if p.used}} used{{/if}}">
+                <header>
+                    <i class="fa-solid fa-star"></i>
+                    <strong>{{p.name}}</strong>
+                    {{#if p.used}}<span class="state">{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Used"}}</span>{{/if}}
+                </header>
+                {{#if p.requirements}}<p class="outcome"><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Requirements"}}</strong> {{{p.requirements}}}</p>{{/if}}
+                {{#if p.description}}<div class="obstacle-description">{{{p.description}}}</div>{{/if}}
+                {{#if p.checks.length}}
+                <ul class="obstacle-checks">{{#each p.checks as |check|}}<li>{{{check}}}</li>{{/each}}</ul>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        <section class="view-infil-section">
+            <h2>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Awareness"}}</h2>
+            <ol class="awareness-list">
+                {{#each infiltration.awareness as |t|}}
+                <li class="awareness-step{{#if t.reached}} reached{{/if}}{{#if t.fail}} fail{{/if}}">
+                    <span class="ap-badge">{{t.ap}} AP</span>
+                    <div class="body">{{{t.label}}}</div>
+                </li>
+                {{/each}}
+            </ol>
+        </section>
+        {{/if}}
+
+        {{#if hacking}}
+        {{#each hacking.accessPoints as |ap|}}
+        <section class="view-objective hack-ap {{ap.type}}{{#if ap.hacked}} cleared{{/if}}">
+            <header>
+                <span class="badge">{{#if ap.hacked}}<i class="fa-solid fa-unlock"></i>{{else}}{{ap.index}}{{/if}}</span>
+                <h2>{{ap.name}}</h2>
+                <span class="type-badge">{{ap.typeLabel}}</span>
+                <span class="required">{{ap.requiredLabel}}</span>
+            </header>
+            {{#if ap.description}}<div class="objective-description">{{{ap.description}}}</div>{{/if}}
+            {{#if ap.checks}}
+            <p class="hack-line">
+                <strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Hack"}}</strong> {{{ap.checks}}}
+                {{#if ap.reductionLabel}}<span class="dc-badge lowered">{{ap.reductionLabel}}</span>{{/if}}
+                {{#if ap.minLabel}}<span class="state">{{ap.minLabel}}</span>{{/if}}
+            </p>
+            {{/if}}
+
+            {{#if ap.vulnerabilities.length}}
+            <h3>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Vulnerabilities"}}</h3>
+            <ul class="hack-vulnerabilities">
+                {{#each ap.vulnerabilities as |v|}}
+                <li class="{{#if v.exploited}}exploited{{/if}}">
+                    {{#if @root.hacking.tracked}}<i class="fa-regular {{#if v.exploited}}fa-square-check{{else}}fa-square{{/if}}"></i>{{/if}}
+                    <span class="name">{{v.name}}</span>
+                    <span class="checks">{{{v.checks}}}</span>
+                    <span class="amount">{{v.reductionLabel}}</span>
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
+            {{#each ap.countermeasures as |cm|}}
+            <div class="infil-complication hack-countermeasure {{cm.tone}}">
+                <header>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <strong>{{cm.name}}</strong>
+                    <span class="trigger-ap">{{cm.failuresLabel}}</span>
+                    {{#if cm.persistent}}<span class="type-badge">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Persistent"}}</span>{{/if}}
+                    {{#if cm.stateLabel}}<span class="state{{#if (eq cm.tone 'triggered')}} active{{/if}}">{{cm.stateLabel}}</span>{{/if}}
+                </header>
+                {{#if cm.effect}}<div class="obstacle-description"><p>{{{cm.effect}}}</p></div>{{/if}}
+                {{#if (or cm.notice cm.disable)}}
+                <ul class="obstacle-checks">
+                    {{#if cm.notice}}<li><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Notice"}}</strong> {{{cm.notice}}}</li>{{/if}}
+                    {{#if cm.disable}}<li><strong>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Disable"}}</strong> {{{cm.disable}}}</li>{{/if}}
+                </ul>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/each}}
+
+        {{#if hacking.outcomes.length}}
+        <section class="view-infil-section">
+            <h2>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Outcomes"}}</h2>
+            {{#each hacking.outcomes as |o|}}
+            <p class="outcome hack-outcome{{#if o.reached}} reached{{/if}}"><strong>{{o.label}}</strong> {{{o.html}}}</p>
+            {{/each}}
+        </section>
+        {{/if}}
+        {{/if}}
+
+        {{#if groups.length}}
+        <section class="view-checks">
+            <h2>{{checksTitle}}</h2>
+            {{#each groups as |g|}}
+            <div class="check-category">
+                <header>
+                    {{#if g.label}}<strong>{{g.label}}</strong>{{/if}}
+                    {{#if g.adjustment}}<span class="dc-adjustment">DC {{g.adjustment}}</span>{{/if}}
+                    {{#if g.cap}}<span class="cap">{{g.cap}}</span>{{/if}}
+                </header>
+                <ul>
+                    {{#each g.checks as |c|}}
+                    <li>
+                        {{{c.html}}}
+                        {{#if c.adjustment}}<span class="dc-adjustment">DC {{c.adjustment}}</span>{{/if}}
+                        {{#if c.label}}<span class="check-label">{{c.label}}</span>{{/if}}
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if modifiers.length}}
+        <section class="view-modifiers">
+            <h2>Weaknesses &amp; Resistances</h2>
+            <ul>
+                {{#each modifiers as |m|}}
+                <li class="modifier {{m.kind}}{{#if m.active}} active{{/if}}">
+                    <span class="kind">{{m.kindLabel}}</span>
+                    <span class="text">{{{m.html}}}</span>
+                    <span class="amount">{{#if m.skillsLabel}}{{m.skillsLabel}} {{/if}}DC {{m.signedLabel}}</span>
+                </li>
+                {{/each}}
+            </ul>
+        </section>
+        {{/if}}
+
+        {{#if thresholds.length}}
+        <section class="view-thresholds">
+            <h2>{{thresholdsTitle}}</h2>
+            <ol>
+                {{#each thresholds as |t|}}
+                <li class="threshold{{#if t.reached}} reached{{/if}}{{#if t.current}} current{{/if}}{{#if t.tierKey}} tier-{{t.tierKey}}{{/if}}">
+                    <span class="badge">{{t.badge}}</span>
+                    <div class="body">{{{t.html}}}</div>
+                </li>
+                {{/each}}
+            </ol>
+        </section>
+        {{/if}}
+
+        {{#if locations.length}}
+        <section class="view-locations">
+            <h2>{{locationsTitle}} <span class="hint">{{locationsHint}}</span></h2>
+            <ul>
+                {{#each locations as |l|}}
+                <li class="location{{#if l.completed}} completed{{/if}}">
+                    {{#if ../progress}}
+                    <i class="fa-regular {{#if l.completed}}fa-square-check{{else}}fa-square{{/if}}"></i>
+                    {{/if}}
+                    <span class="text">{{{l.html}}}</span>
+                </li>
+                {{/each}}
+            </ul>
+        </section>
+        {{/if}}
+    </article>
+</div>

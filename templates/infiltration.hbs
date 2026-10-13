@@ -1,0 +1,338 @@
+<section class="tab panel standard-form{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}"
+    data-tab="{{tab.id}}">
+    {{#if @root.isGM}}
+    <select name="infiltration.journal">
+        {{selectOptions journalChoices selected=infiltrationJournal blank="— Select an infiltration journal —"}}
+    </select>
+    <p class="hint">{{{instructions}}}</p>
+    {{/if}}
+    {{#if topics.length}}
+    <ol class="topics scrollable">
+        {{~#each topics as |infil|~}}
+        <li class="topic infiltration{{#if infil.expanded}} expanded{{/if}}" data-subsystem="infiltration"
+            data-topic="{{infil.pageId}}">
+            <div class="form-group">
+                <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
+                    data-action="toggleChecks" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.Expand'}}"></button>
+                <label>{{{infil.pageLink}}}</label>
+                <div class="form-fields infil-summary">
+                    <span class="infil-status {{infil.statusTone}}">{{infil.statusLabel}}</span>
+                    <span class="infil-meta">{{infil.apLabel}}</span>
+                    <span class="infil-meta"><i class="fa-solid fa-bolt"></i> {{infil.edge}}</span>
+                    <span class="infil-meta">{{infil.roundLabel}}</span>
+                </div>
+                {{#if @root.isGM}}
+                <div class="controls split-button">
+                    <button type="button" class="ui-control icon {{infil.discoveredIcon}}"
+                        data-action="toggleTopicDiscovered" data-tooltip
+                        aria-label="{{infil.discoveredTooltip}}"></button>
+                </div>
+                {{/if}}
+            </div>
+
+            <div class="checks infil-panel">
+                {{! ---------- Threshold alerts (GM) ---------- }}
+                {{#if @root.isGM}}
+                {{#each infil.alerts as |alert|}}
+                <div class="infil-alert">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div class="alert-body">
+                        <strong>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.ThresholdReached" ap=alert.ap}}</strong>
+                        <span>{{{alert.label}}}</span>
+                        {{#each alert.linked as |c|}}
+                        <button type="button" class="alert-activate" data-action="infilComplication" data-op="activate"
+                            data-key="{{c.key}}" data-ap="{{alert.ap}}">
+                            <i class="fa-solid fa-bolt-lightning"></i> {{c.name}}
+                        </button>
+                        {{/each}}
+                    </div>
+                    <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="infilDismiss"
+                        data-ap="{{alert.ap}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.Dismiss'}}"></button>
+                </div>
+                {{/each}}
+                {{/if}}
+
+                {{! ---------- Awareness + edge ---------- }}
+                <div class="infil-awareness">
+                    <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Awareness"}}</span>
+                    <div class="form-fields">
+                        <div class="track">
+                            <range-picker name="infiltration.topics.{{infil.pageId}}.ap" value="{{infil.ap}}" min="0"
+                                max="{{infil.apMax}}" step="1" {{#unless @root.isGM}}disabled{{/unless}}></range-picker>
+                            <datalist>
+                                {{#each infil.apMarkers as |m|}}
+                                <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if
+                                    m.threshold}}class="caret" {{/if}} style="--pos: {{m.pos}}"></option>
+                                {{/each}}
+                            </datalist>
+                        </div>
+                    </div>
+                    {{#if infil.dcLabel}}<span class="dc-badge">{{infil.dcLabel}}</span>{{/if}}
+                    {{#if @root.isGM}}
+                    <div class="ap-buttons">
+                        <button type="button" class="ui-control icon fa-solid fa-minus" data-action="infilAP"
+                            data-delta="-1" data-tooltip aria-label="−1 AP"></button>
+                        <button type="button" class="ui-control icon fa-solid fa-plus" data-action="infilAP"
+                            data-delta="1" data-tooltip aria-label="+1 AP"></button>
+                        <button type="button" class="end-round" data-action="infilEndRound">
+                            <i class="fa-solid fa-hourglass-end"></i> {{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.EndRound"}}
+                        </button>
+                    </div>
+                    {{/if}}
+                </div>
+
+                <div class="infil-edge">
+                    <span class="row-label"><i class="fa-solid fa-bolt"></i> {{localize
+                        "PF2E-SUBSYSTEM-HELPER.Infiltration.Edge"}}</span>
+                    <strong class="edge-count">{{infil.edge}}</strong>
+                    {{#if @root.isGM}}
+                    <button type="button" class="ui-control icon fa-solid fa-minus" data-action="infilEdge"
+                        data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.SpendEdge'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-plus" data-action="infilEdge"
+                        data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.GainEdge'}}"></button>
+                    {{/if}}
+                </div>
+
+                {{! ---------- Active complications ---------- }}
+                {{#each infil.activeComplications as |c|}}
+                <div class="infil-card complication active">
+                    <header>
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                        <strong>{{c.name}}</strong>
+                        {{#if c.ipLabel}}<span class="ip">{{c.ipLabel}}</span>{{/if}}
+                        {{#if @root.isGM}}
+                        <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                            data-action="infilPost" data-key="{{c.key}}" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.Post'}}"></button>
+                        {{/if}}
+                    </header>
+                    {{#if c.trigger}}<p class="trigger"><strong>{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Trigger"}}</strong> {{{c.trigger}}}</p>{{/if}}
+                    {{#if c.description}}<div class="card-description">{{{c.description}}}</div>{{/if}}
+                    {{#if c.checks.length}}
+                    <ul class="card-checks">{{#each c.checks as |check|}}<li>{{{check}}}</li>{{/each}}</ul>
+                    {{/if}}
+                    <dl class="outcomes">
+                        {{#if c.outcomes.criticalSuccess}}<dt>{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.criticalSuccess"}}</dt>
+                        <dd>{{{c.outcomes.criticalSuccess}}}</dd>{{/if}}
+                        {{#if c.outcomes.success}}<dt>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.success"}}
+                        </dt>
+                        <dd>{{{c.outcomes.success}}}</dd>{{/if}}
+                        {{#if c.outcomes.failure}}<dt>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.failure"}}
+                        </dt>
+                        <dd>{{{c.outcomes.failure}}}</dd>{{/if}}
+                        {{#if c.outcomes.criticalFailure}}<dt>{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.criticalFailure"}}</dt>
+                        <dd>{{{c.outcomes.criticalFailure}}}</dd>{{/if}}
+                    </dl>
+                    {{#if @root.isGM}}
+                    <div class="infil-awards">
+                        <button type="button" class="crit-success" data-action="infilAward" data-key="{{c.key}}"
+                            data-result="critSuccess">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.critSuccess"}}</button>
+                        <button type="button" class="success" data-action="infilAward" data-key="{{c.key}}"
+                            data-result="success">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.success"}}</button>
+                        <button type="button" class="failure" data-action="infilAward" data-key="{{c.key}}"
+                            data-result="failure">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.failure"}}</button>
+                        <button type="button" class="crit-fail" data-action="infilAward" data-key="{{c.key}}"
+                            data-result="critFailure">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.critFailure"}}</button>
+                        <button type="button" class="resolve" data-action="infilComplication" data-op="resolve"
+                            data-key="{{c.key}}">
+                            <i class="fa-solid fa-check"></i> {{localize
+                            "PF2E-SUBSYSTEM-HELPER.Infiltration.Resolve"}}</button>
+                    </div>
+                    {{/if}}
+                </div>
+                {{/each}}
+
+                {{! ---------- Party roster ---------- }}
+                {{#if infil.hasParty}}
+                <div class="infil-roster">
+                    {{#each infil.roster as |pc|}}
+                    <button type="button"
+                        class="roster-pc{{#if pc.selected}} selected{{/if}}{{#if pc.done}} done{{/if}}"
+                        data-action="infilSelect" data-actor="{{pc.id}}">
+                        <img src="{{pc.img}}" alt="">
+                        <span class="pc-name">{{pc.name}}</span>
+                        <span class="pc-progress">{{#if pc.done}}<i
+                                class="fa-solid fa-check"></i>{{else}}{{pc.objectiveLabel}}{{/if}}</span>
+                    </button>
+                    {{/each}}
+                </div>
+                {{#if @root.isGM}}
+                <div class="infil-pc-controls">
+                    {{#if infil.selectedId}}
+                    <span class="pc-move">
+                        <span class="pc-move-label">{{infil.selectedName}}</span>
+                        <button type="button" class="ui-control icon fa-solid fa-backward-step"
+                            data-action="infilMovePC" data-actor="{{infil.selectedId}}" data-delta="-1" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.MoveBack'}}"></button>
+                        <button type="button" class="ui-control icon fa-solid fa-forward-step" data-action="infilMovePC"
+                            data-actor="{{infil.selectedId}}" data-delta="1" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.MoveForward'}}"></button>
+                    </span>
+                    {{/if}}
+                    <button type="button" class="undo" data-action="infilUndo" {{#unless
+                        infil.canUndo}}disabled{{/unless}}>
+                        <i class="fa-solid fa-clock-rotate-left"></i> {{localize
+                        "PF2E-SUBSYSTEM-HELPER.Infiltration.Undo"}}
+                    </button>
+                </div>
+                {{/if}}
+                {{else}}
+                <p class="hint"><i class="fa-solid fa-triangle-exclamation"></i> {{localize
+                    "PF2E-SUBSYSTEM-HELPER.Infiltration.NoPartyHint"}}</p>
+                {{/if}}
+
+                {{! ---------- Selected PC's objective ---------- }}
+                {{#if infil.selectedDone}}
+                <p class="infil-done"><i class="fa-solid fa-flag-checkered"></i>
+                    {{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.PcDone" name=infil.selectedName}}</p>
+                {{else if infil.objective}}
+                <div class="infil-objective">
+                    <header>
+                        <span class="objective-index">{{infil.objective.label}}</span>
+                        <strong>{{infil.objective.name}}</strong>
+                        <span class="required">{{infil.objective.requiredLabel}}</span>
+                    </header>
+                    {{#if infil.objective.description}}<div class="card-description">{{{infil.objective.description}}}
+                    </div>{{/if}}
+
+                    {{#each infil.objective.obstacles as |o|}}
+                    <div class="infil-card obstacle {{o.type}}{{#if o.cleared}} cleared{{/if}}">
+                        <header>
+                            {{#if o.cleared}}<i class="fa-solid fa-check cleared-icon"></i>{{/if}}
+                            <strong>{{o.name}}</strong>
+                            <span class="type-badge {{o.type}}">{{o.typeLabel}}</span>
+                            <span class="ip">{{o.ipLabel}}</span>
+                            {{#if @root.isGM}}
+                            {{#unless o.cleared}}
+                            <button type="button" class="ui-control icon fa-solid fa-users-rays"
+                                data-action="infilClearAll" data-key="{{o.key}}" data-tooltip
+                                aria-label="{{#if o.group}}{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.ClearGroup'}}{{else}}{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.ClearForAll'}}{{/if}}"></button>
+                            {{/unless}}
+                            <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                                data-action="infilPost" data-key="{{o.key}}" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.Post'}}"></button>
+                            {{/if}}
+                        </header>
+                        {{#if o.pips.length}}
+                        <div class="pips">
+                            {{#each o.pips as |pip|}}
+                            <span class="pip {{pip.state}}" data-tooltip
+                                aria-label="{{pip.name}}">{{pip.initials}}</span>
+                            {{/each}}
+                        </div>
+                        {{/if}}
+                        {{#if o.description}}<div class="card-description">{{{o.description}}}</div>{{/if}}
+                        {{#if o.checks.length}}
+                        <ul class="card-checks">{{#each o.checks as |check|}}<li>{{{check}}}</li>{{/each}}</ul>
+                        {{/if}}
+                        {{#if o.criticalFailure}}
+                        <p class="crit-fail-note"><strong>{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.criticalFailure"}}</strong>
+                            {{{o.criticalFailure}}}</p>
+                        {{/if}}
+                        {{#if @root.isGM}}
+                        {{#unless o.cleared}}
+                        <div class="infil-awards">
+                            <button type="button" class="crit-success" data-action="infilAward" data-key="{{o.key}}"
+                                data-result="critSuccess">{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.critSuccessIP"}}</button>
+                            <button type="button" class="success" data-action="infilAward" data-key="{{o.key}}"
+                                data-result="success">{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.successIP"}}</button>
+                            <button type="button" class="failure" data-action="infilAward" data-key="{{o.key}}"
+                                data-result="failure">{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.failure"}}</button>
+                            <button type="button" class="crit-fail" data-action="infilAward" data-key="{{o.key}}"
+                                data-result="critFailure">{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Award.critFailure"}}</button>
+                        </div>
+                        {{/unless}}
+                        {{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+                {{/if}}
+
+                {{! ---------- Opportunities ---------- }}
+                {{#if infil.opportunities.length}}
+                <div class="infil-section">
+                    <h4>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Opportunities"}}</h4>
+                    {{#each infil.opportunities as |p|}}
+                    <div class="infil-card opportunity{{#if p.used}} used{{/if}}">
+                        <header>
+                            <i class="fa-solid fa-star"></i>
+                            <strong>{{p.name}}</strong>
+                            {{#if @root.isGM}}
+                            <button type="button"
+                                class="ui-control icon fa-regular {{#if p.used}}fa-square-check{{else}}fa-square{{/if}}"
+                                data-action="infilOpportunity" data-key="{{p.key}}" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.MarkUsed'}}"></button>
+                            {{else if p.used}}
+                            <span class="used-label">{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Used"}}</span>
+                            {{/if}}
+                        </header>
+                        {{#if p.requirements}}<p class="requirements"><strong>{{localize
+                                "PF2E-SUBSYSTEM-HELPER.Infiltration.Requirements"}}</strong> {{{p.requirements}}}</p>
+                        {{/if}}
+                        {{#if p.description}}<div class="card-description">{{{p.description}}}</div>{{/if}}
+                        {{#if p.checks.length}}
+                        <ul class="card-checks">{{#each p.checks as |check|}}<li>{{{check}}}</li>{{/each}}</ul>
+                        {{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+                {{/if}}
+
+                {{! ---------- All complications (GM) ---------- }}
+                {{#if @root.isGM}}
+                {{#if infil.complications.length}}
+                <div class="infil-section">
+                    <h4>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Complications"}}</h4>
+                    <ul class="complication-list">
+                        {{#each infil.complications as |c|}}
+                        <li class="{{#if c.active}}active{{/if}}{{#if c.resolved}} resolved{{/if}}">
+                            <strong>{{c.name}}</strong>
+                            {{#if c.triggerLabel}}<span class="trigger-ap">{{c.triggerLabel}}</span>{{/if}}
+                            <span class="state">{{c.stateLabel}}</span>
+                            {{#unless c.active}}
+                            <button type="button" class="ui-control icon fa-solid fa-bolt-lightning"
+                                data-action="infilComplication" data-op="activate" data-key="{{c.key}}" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.Activate'}}"></button>
+                            {{/unless}}
+                            {{#if c.resolved}}
+                            <button type="button" class="ui-control icon fa-solid fa-rotate-left"
+                                data-action="infilComplication" data-op="reset" data-key="{{c.key}}" data-tooltip
+                                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Infiltration.ResetComplication'}}"></button>
+                            {{/if}}
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/if}}
+
+                <div class="infil-controls">
+                    <button type="button" data-action="infilReset">
+                        <i class="fa-solid fa-rotate-left"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Reset"}}
+                    </button>
+                </div>
+                {{/if}}
+            </div>
+        </li>
+        {{~/each~}}
+    </ol>
+    {{else}}
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain infiltrations.{{else}}No infiltrations underway.{{/if}}</p>
+    {{/if}}
+</section>
