@@ -1,0 +1,65 @@
+<section class="tab panel standard-form{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}"
+    data-tab="{{tab.id}}">
+    {{#if @root.isGM}}
+    <select name="victory.journal">
+        {{selectOptions journalChoices selected=victoryJournal blank="— Select a victory point journal —"}}
+    </select>
+    <p class="hint">{{{instructions}}}</p>
+    {{/if}}
+    {{#if topics.length}}
+    <ol class="topics scrollable">
+        {{~#each topics as |topic|~}}
+        <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="victory" data-topic="{{topic.pageId}}">
+            <div class="form-group">
+                {{#if @root.isGM}}
+                <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}"
+                    {{#unless topic.checks.length}}disabled{{/unless}}></button>
+                {{/if}}
+                <label for="{{../rootId}}-victory.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
+                <div class="form-fields">
+                    <div class="track">
+                        <range-picker name="victory.topics.{{topic.pageId}}.points"
+                            id="{{../rootId}}-victory.{{topic.pageId}}.points"
+                            value="{{topic.points}}" min="0" max="{{topic.max}}" step="1"
+                            {{#unless @root.isGM}}disabled{{/unless}}></range-picker>
+                        <datalist>
+                            {{#each topic.markers as |m|}}
+                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"{{/if}} style="--pos: {{m.pos}}"></option>
+                            {{/each}}
+                        </datalist>
+                    </div>
+                    <span class="victory-value">{{topic.points}} / {{topic.max}}</span>
+                </div>
+                {{#if @root.isGM}}
+                <div class="controls split-button">
+                    <button type="button" class="ui-control icon {{topic.discoveredIcon}}"
+                        data-action="toggleTopicDiscovered" data-tooltip aria-label="{{topic.discoveredTooltip}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}"
+                        {{#unless topic.hasResults}}disabled{{/unless}}></button>
+                </div>
+                {{/if}}
+            </div>
+            {{#if topic.checks.length}}
+            <div class="checks">
+                {{#each topic.checks as |group|}}
+                <div class="check-group">
+                    {{#if group.label}}<strong>{{group.label}}</strong>{{/if}}
+                    {{#each group.checks as |check|}}
+                    <div class="check">
+                        {{{check.html}}}
+                        {{#if check.label}}<span class="check-label">{{check.label}}</span>{{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+        </li>
+        {{~/each~}}
+    </ol>
+    {{else}}
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages track victory points.{{else}}Nothing to track yet.{{/if}}</p>
+    {{/if}}
+</section>

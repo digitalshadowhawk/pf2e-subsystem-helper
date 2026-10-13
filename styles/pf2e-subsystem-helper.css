@@ -1,19 +1,1065 @@
-.subsystem-add {
-	color: #fff;
+/* ==========================================================================
+    Variables and window layout
+   ========================================================================== */
+
+#subsystems-window {
+  --subsystems-gold: #daa520;
+  --subsystems-green: #437066;
+  --subsystems-green-light: #7aa99e;
+  --subsystems-red: #5e0000;
+  --subsystems-blue: #2e5f8a;
+  --subsystems-rust: #a0522d;
+  --spacer-6: 0.375rem;
+  --spacer-14: 0.875rem;
 }
 
-.create-subsystem-button {
-	background: transparent;
-	/*padding: 0;*/
-	line-height: normal;
-	border: 0;
+#subsystems-window .window-content > nav.tabs {
+  justify-content: space-around;
 }
 
-.create-subsystem-button > i {
-	margin-right: 0;
+#subsystems-window .panel.active {
+  --thumb-width: 0.8rem;
+  --number-width: 2.5rem;
+  --picker-gap: var(--spacer-8);
+  margin-top: 1rem;
 }
 
-.create-subsystem-button:hover, .create-subsystem-button:focus {
-	box-shadow: none;
-	text-shadow: 0 0 5px red;
+#subsystems-window .panel.active p.hint {
+  margin: 0 1.5rem;
+  color: var(--color-text-primary);
+}
+
+#subsystems-window .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#subsystems-window .window-content > .tab.panel.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+#subsystems-window .window-content > .tab.panel.active > :not(ol.topics) {
+  flex: 0 0 auto;
+}
+
+#subsystems-window .panel.active > ol.topics {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-bottom: var(--spacer-8);
+}
+#subsystems-window .panel.active > ol.topics > li {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+    Topic rows (all tabs)
+   ========================================================================== */
+
+#subsystems-window .panel.active ol.topics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-8);
+  margin: 0;
+  padding: 0 0.5rem;
+}
+
+#subsystems-window .panel.active ol.topics li {
+  overflow: hidden;
+}
+
+#subsystems-window .panel.active ol.topics li .form-group {
+  gap: var(--spacer-4);
+}
+
+#subsystems-window .panel.active .controls {
+  display: flex;
+  flex-flow: row nowrap;
+  flex: 0;
+}
+
+#subsystems-window .panel.active button.ui-control {
+  --font-size: var(--font-size-14);
+  --control-border-color: var(--subsystems-green);
+  --control-hover-border-color: var(--subsystems-green-light);
+  --control-icon-color: var(--color-text-tertiary);
+  --control-size: calc(2 * var(--font-size));
+  font-size: var(--font-size);
+}
+
+#subsystems-window :is(.chase-round-controls, .infil-controls, .ap-buttons) button,
+#subsystems-window .infil-pc-controls .undo {
+  height: 1.75rem;
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+    Sliders and threshold markers (all tabs)
+   ========================================================================== */
+
+#subsystems-window .panel.active .track {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+#subsystems-window .panel.active range-picker {
+  flex: 1;
+  gap: var(--picker-gap);
+  font-family: var(--font-sans);
+  z-index: 1;
+}
+
+#subsystems-window .panel.active range-picker input[type="number"] {
+  flex: 0 0 var(--number-width);
+  height: 1.5rem;
+}
+
+#subsystems-window .panel.active datalist {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: calc(var(--number-width) + var(--picker-gap));
+  bottom: calc(-1 * var(--spacer-2));
+  height: 1em;
+  z-index: 0;
+}
+
+#subsystems-window .panel.active datalist option {
+  position: absolute;
+  left: calc(var(--thumb-width) / 2 + (100% - var(--thumb-width)) * var(--pos));
+  transform: translateX(-50%);
+  padding: 0;
+  color: var(--color-dark-6);
+  font-size: var(--font-size-8);
+  font-weight: bold;
+}
+
+#subsystems-window .panel.active datalist option.caret {
+  color: var(--subsystems-gold);
+  font-family: var(--font-awesome);
+  font-size: var(--font-size-14);
+  font-weight: 900;
+}
+
+/* GM view: undiscovered topics have a disabled slider, so grey out its markers */
+#subsystems-window .panel.active range-picker[disabled] ~ datalist > option {
+  color: #ccc;
+}
+
+/* ==========================================================================
+    Expandable details (all tabs)
+   ========================================================================== */
+
+#subsystems-window .panel.active button.toggle-checks {
+  transition: transform 0.25s ease;
+}
+
+#subsystems-window .panel.active li.expanded button.toggle-checks {
+  transform: rotate(90deg);
+}
+
+#subsystems-window .panel.active .checks {
+  display: none;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  padding: var(--spacer-4) 0 var(--spacer-4) 2.5rem;
+}
+
+#subsystems-window .panel.active li.expanded .checks {
+  display: flex;
+}
+
+#subsystems-window .panel.active .check-group {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .panel.active .check {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+#subsystems-window .panel.active .check-label {
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window :is(.obstacle-checks, .obstacle-options),
+#subsystems-window .infil-card .card-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+}
+
+#subsystems-window :is(.obstacle-description, .card-description) > :first-child { margin-top: 0; }
+#subsystems-window :is(.obstacle-description, .card-description) > :last-child  { margin-bottom: 0; }
+
+#subsystems-window a.inline-check.dc-lowered { outline: 1px solid var(--subsystems-green); }
+#subsystems-window a.inline-check.dc-raised  { outline: 1px solid var(--subsystems-red); }
+
+/* ==========================================================================
+    Shared badges and status
+   ========================================================================== */
+
+#subsystems-window :is(.chase-status, .infil-status) {
+  padding: var(--spacer-2) var(--spacer-6);
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+#subsystems-window :is(.chase-status, .infil-status).good    { background: var(--subsystems-green); color: var(--color-light-1); }
+#subsystems-window :is(.chase-status, .infil-status).bad     { background: var(--subsystems-red);   color: var(--color-light-1); }
+#subsystems-window :is(.chase-status, .infil-status).warning { background: var(--subsystems-gold);  color: var(--color-dark-1); }
+
+#subsystems-window :is(.chase-round, .infil-meta) {
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+#subsystems-window .dc-badge {
+  padding: var(--spacer-2) var(--spacer-6);
+  border-radius: 4px;
+  background: var(--subsystems-red);
+  color: var(--color-light-1);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+#subsystems-window .type-badge {
+  padding: 0 var(--spacer-4);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: var(--font-size-11);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+#subsystems-window .panel.active :is(.chase-summary, .infil-summary) {
+  justify-content: end;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .panel.active :is(.chase-panel, .infil-panel) {
+  padding-left: 0;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window :is(.chase-awards, .infil-awards) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-4);
+}
+
+#subsystems-window :is(.chase-awards, .infil-awards) button {
+  flex: 1;
+  height: 1.75rem;
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+#subsystems-window :is(.chase-awards, .infil-awards) .crit-success { border-color: var(--subsystems-gold); }
+#subsystems-window :is(.chase-awards, .infil-awards) .success      { border-color: var(--subsystems-green); }
+#subsystems-window .infil-awards .failure                          { border-color: var(--subsystems-rust); }
+#subsystems-window :is(.chase-awards, .infil-awards) .crit-fail    { border-color: var(--subsystems-red); }
+
+/* ==========================================================================
+    Research
+   ========================================================================== */
+
+#subsystems-window .panel.active .check-group-header {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .panel.active .check-group-header strong {
+  flex: 0 0 auto;
+}
+
+#subsystems-window .panel.active .category-points {
+  flex: 1;
+  display: flex;
+  max-width: 20rem;
+}
+
+/* ==========================================================================
+    Influence and Victory Points
+   ========================================================================== */
+
+#subsystems-window .panel.active[data-tab="influence"] input.max {
+  flex: 0 0 3rem;
+  height: 1.5rem;
+  text-align: center;
+}
+
+#subsystems-window .panel.active :is(.influence-value, .victory-value) {
+  flex: 0 0 3.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+#subsystems-window .panel.active[data-tab="influence"] .dc-adjustment {
+  font-weight: normal;
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .panel.active[data-tab="influence"] .modifiers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-2);
+  margin-top: var(--spacer-4);
+}
+
+#subsystems-window .panel.active[data-tab="influence"] button.modifier {
+  --button-background-color: transparent;
+  --button-hover-background-color: rgba(0, 0, 0, 0.05);
+  justify-content: start;
+  gap: var(--spacer-6);
+  height: auto;
+  min-height: 1.75rem;
+  padding: var(--spacer-2) var(--spacer-4);
+  border: none;
+  text-align: left;
+  white-space: normal;
+}
+
+#subsystems-window .panel.active[data-tab="influence"] button.modifier:not(.active) {
+  opacity: 0.6;
+}
+
+#subsystems-window .panel.active[data-tab="influence"] button.modifier .kind   { flex: 0 0 auto; font-weight: bold; }
+#subsystems-window .panel.active[data-tab="influence"] button.modifier .text   { flex: 1; color: var(--color-text-secondary); }
+#subsystems-window .panel.active[data-tab="influence"] button.modifier .amount { flex: 0 0 auto; font-weight: bold; }
+
+#subsystems-window .panel.active[data-tab="influence"] button.modifier.weakness :is(.kind, .amount)   { color: var(--subsystems-green); }
+#subsystems-window .panel.active[data-tab="influence"] button.modifier.resistance :is(.kind, .amount) { color: var(--subsystems-red); }
+
+/* ==========================================================================
+    Reputation
+   ========================================================================== */
+
+#subsystems-window .panel.active[data-tab="reputation"] .tier {
+  --tier-color: var(--color-dark-5);
+  flex: 0 0 5.5rem;
+  padding: var(--spacer-2) var(--spacer-4);
+  border-radius: 4px;
+  background: var(--tier-color);
+  color: var(--color-light-1);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  text-align: center;
+}
+
+#subsystems-window .panel.active[data-tab="reputation"] .tier.hunted   { --tier-color: #5e0000; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.hated    { --tier-color: #8b2020; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.disliked { --tier-color: #a0522d; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.ignored  { --tier-color: #6b6b6b; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.liked    { --tier-color: #437066; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.admired  { --tier-color: #2e5f8a; }
+#subsystems-window .panel.active[data-tab="reputation"] .tier.revered  { --tier-color: #b8860b; }
+
+#subsystems-window .panel.active[data-tab="reputation"] .location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+#subsystems-window .panel.active[data-tab="reputation"] .location button.ui-control {
+  --control-size: 1.5rem;
+}
+
+#subsystems-window .panel.active[data-tab="reputation"] .location:not(.completed) .location-text {
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+    Chases
+   ========================================================================== */
+
+#subsystems-window .chase-hint {
+  margin: 0;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .chase-hint i {
+  color: var(--subsystems-gold);
+}
+
+#subsystems-window .chase-track {
+  display: flex;
+  gap: var(--spacer-4);
+  margin: 0;
+  padding: var(--spacer-4) 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+#subsystems-window .chase-card {
+  flex: 0 0 6.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacer-2);
+  min-height: 4.5rem;
+  padding: var(--spacer-4);
+  border: 1px solid var(--color-light-5);
+  border-radius: 6px;
+  text-align: center;
+  font-size: var(--font-size-12);
+}
+
+#subsystems-window .chase-card .card-index {
+  font-weight: bold;
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .chase-card .card-name {
+  flex: 1;
+  line-height: 1.2;
+}
+
+#subsystems-window .chase-card .card-markers {
+  display: flex;
+  gap: var(--spacer-6);
+  min-height: 1rem;
+  font-size: var(--font-size-14);
+}
+
+#subsystems-window .chase-card .party    { color: var(--subsystems-green); }
+#subsystems-window .chase-card .opponent { color: var(--subsystems-red); }
+
+#subsystems-window .chase-card.cleared {
+  opacity: 0.55;
+}
+
+#subsystems-window .chase-card.current {
+  border: 2px solid var(--subsystems-gold);
+  font-weight: bold;
+}
+
+#subsystems-window .chase-card.face-down {
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, currentColor 6%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+#subsystems-window .chase-card.face-down .card-name {
+  font-size: var(--font-size-20);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .chase-card.unrevealed {
+  border-style: dashed;
+}
+
+#subsystems-window .chase-card.finish {
+  flex-basis: 4rem;
+}
+
+#subsystems-window .chase-obstacle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+  padding: var(--spacer-8);
+  border: 1px solid var(--color-light-5);
+  border-radius: 6px;
+}
+
+#subsystems-window .chase-obstacle header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .chase-obstacle header strong {
+  font-size: var(--font-size-16);
+}
+
+#subsystems-window .chase-obstacle header .level {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-12);
+}
+
+#subsystems-window .chase-obstacle header .cp {
+  margin-left: auto;
+  font-weight: bold;
+}
+
+#subsystems-window .chase-obstacle .form-fields {
+  display: flex;
+}
+
+#subsystems-window .obstacle-options li {
+  display: flex;
+  align-items: first baseline;
+  gap: var(--spacer-6);
+}
+
+#subsystems-window .obstacle-options i {
+  color: var(--subsystems-gold);
+}
+
+#subsystems-window .chase-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-8) var(--spacer-16);
+}
+
+#subsystems-window :is(.chase-moves, .chase-round-controls, .chase-settings) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .chase-moves .move-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .chase-settings label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-4);
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+#subsystems-window .chase-settings input[type="number"] {
+  width: 3rem;
+  height: 1.5rem;
+  text-align: center;
+}
+
+#subsystems-window .chase-settings select {
+  height: 1.5rem;
+}
+
+/* ==========================================================================
+    Infiltration
+   ========================================================================== */
+
+#subsystems-window .infil-panel .row-label {
+  flex: 0 0 6rem;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+#subsystems-window .infil-alert {
+  display: flex;
+  align-items: start;
+  gap: var(--spacer-8);
+  padding: var(--spacer-6) var(--spacer-8);
+  border: 1px solid var(--subsystems-gold);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--subsystems-gold) 12%, transparent);
+}
+
+#subsystems-window .infil-alert > i {
+  margin-top: 0.2rem;
+  color: var(--subsystems-gold);
+}
+
+#subsystems-window .infil-alert .alert-body {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-4) var(--spacer-8);
+}
+
+#subsystems-window .infil-alert .alert-activate {
+  height: 1.5rem;
+  font-size: var(--font-size-12);
+}
+
+#subsystems-window :is(.infil-awareness, .infil-edge) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .infil-awareness .form-fields {
+  flex: 1;
+  display: flex;
+}
+
+#subsystems-window .ap-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .infil-edge .edge-count {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: var(--font-size-16);
+}
+
+#subsystems-window .infil-roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-4);
+}
+
+#subsystems-window .roster-pc {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+  height: 2rem;
+  padding: 0 var(--spacer-8) 0 var(--spacer-2);
+  border: 1px solid var(--color-light-5);
+  border-radius: 1rem;
+  font-size: var(--font-size-12);
+}
+
+#subsystems-window .roster-pc img {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#subsystems-window .roster-pc .pc-progress {
+  color: var(--color-text-secondary);
+  font-weight: bold;
+}
+
+#subsystems-window .roster-pc.selected {
+  border: 2px solid var(--subsystems-gold);
+}
+
+#subsystems-window .roster-pc.done .pc-progress {
+  color: var(--subsystems-green);
+}
+
+#subsystems-window .infil-pc-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .infil-pc-controls .pc-move {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .infil-pc-controls .pc-move-label {
+  margin-right: var(--spacer-4);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+#subsystems-window .infil-pc-controls .undo {
+  margin-left: auto;
+}
+
+#subsystems-window .infil-done {
+  margin: 0;
+  color: var(--subsystems-green);
+  font-weight: bold;
+}
+
+#subsystems-window .infil-objective {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+}
+
+#subsystems-window .infil-objective > header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-8);
+  border-bottom: 1px solid var(--color-light-5);
+}
+
+#subsystems-window .infil-objective .objective-index {
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+#subsystems-window .infil-objective > header strong {
+  font-size: var(--font-size-16);
+}
+
+#subsystems-window .infil-objective .required {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .infil-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  padding: var(--spacer-6) var(--spacer-8);
+  border: 1px solid var(--color-light-5);
+  border-left-width: 4px;
+  border-radius: 6px;
+}
+
+#subsystems-window .infil-card > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .infil-card > header .ip {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+#subsystems-window .infil-card :is(.trigger, .requirements, .crit-fail-note) {
+  margin: 0;
+}
+
+#subsystems-window .infil-card.obstacle.individual { border-left-color: var(--subsystems-green); }
+#subsystems-window .infil-card.obstacle.group      { border-left-color: var(--subsystems-blue); }
+#subsystems-window .infil-card.cleared             { opacity: 0.55; }
+#subsystems-window .infil-card .cleared-icon       { color: var(--subsystems-green); }
+
+#subsystems-window .infil-card.complication.active {
+  border-color: var(--subsystems-red);
+  background: color-mix(in srgb, var(--subsystems-red) 8%, transparent);
+}
+
+#subsystems-window .infil-card.complication.active > header i {
+  color: var(--subsystems-red);
+}
+
+#subsystems-window .infil-card.opportunity              { border-left-color: var(--subsystems-gold); }
+#subsystems-window .infil-card.opportunity > header i   { color: var(--subsystems-gold); }
+#subsystems-window .infil-card.opportunity.used         { opacity: 0.55; }
+
+#subsystems-window .infil-card .used-label {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .infil-card .outcomes {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacer-2) var(--spacer-8);
+  margin: 0;
+}
+
+#subsystems-window .infil-card .outcomes dt { font-weight: bold; }
+#subsystems-window .infil-card .outcomes dd { margin: 0; }
+
+#subsystems-window .pips {
+  display: flex;
+  gap: var(--spacer-4);
+}
+
+#subsystems-window .pip {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--color-light-5);
+  border-radius: 50%;
+  font-size: var(--font-size-10);
+  font-weight: bold;
+}
+
+#subsystems-window .pip.partial {
+  border-color: var(--subsystems-gold);
+}
+
+#subsystems-window .pip.cleared {
+  border-color: var(--subsystems-green);
+  background: var(--subsystems-green);
+  color: var(--color-light-1);
+}
+
+#subsystems-window .infil-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+}
+
+#subsystems-window .infil-section h4 {
+  margin: var(--spacer-4) 0 0;
+  border-bottom: 1px solid var(--color-light-5);
+}
+
+#subsystems-window .complication-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .complication-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .complication-list .trigger-ap {
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--subsystems-gold);
+}
+
+#subsystems-window .complication-list .state {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .complication-list li.active strong { color: var(--subsystems-red); }
+#subsystems-window .complication-list li.resolved      { opacity: 0.55; }
+
+#subsystems-window .infil-controls {
+  display: flex;
+  justify-content: end;
+}
+
+/* ==========================================================================
+    Hacking
+   ========================================================================== */
+
+#subsystems-window .hack-ap.physical { border-left-color: var(--subsystems-gold); }
+#subsystems-window .hack-ap.remote   { border-left-color: var(--subsystems-blue); }
+#subsystems-window .hack-ap.hacked   { border-color: var(--subsystems-green); }
+#subsystems-window .hack-ap > header .fa-lock { color: var(--color-text-tertiary); }
+
+#subsystems-window .hack-counters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .hack-counters .pip {
+  width: 1rem;
+  height: 1rem;
+}
+
+#subsystems-window .pip.bonus {
+  border-color: var(--subsystems-gold);
+  background: var(--subsystems-gold);
+}
+
+#subsystems-window .hack-failures {
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+#subsystems-window .hack-failures.has-failures {
+  color: var(--subsystems-red);
+  font-weight: bold;
+}
+
+#subsystems-window .hack-adjust {
+  display: flex;
+  gap: var(--spacer-2);
+  margin-left: auto;
+}
+
+#subsystems-window .hack-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-4);
+  margin: 0;
+}
+
+#subsystems-window .dc-badge.lowered { background: var(--subsystems-green); }
+
+#subsystems-window .hack-min {
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .hack-vulnerability {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .hack-vulnerability .name { flex: 1; }
+
+#subsystems-window .hack-vulnerability .amount {
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--subsystems-green);
+  white-space: nowrap;
+}
+
+#subsystems-window .hack-vulnerability.exploited .name { font-weight: bold; }
+
+#subsystems-window .hack-countermeasure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  padding: var(--spacer-4) var(--spacer-8);
+  border: 1px solid var(--color-light-5);
+  border-radius: 4px;
+}
+
+#subsystems-window .hack-countermeasure > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .hack-countermeasure .threshold {
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--subsystems-gold);
+  white-space: nowrap;
+}
+
+#subsystems-window .hack-countermeasure .state {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .hack-countermeasure.noticed > header i { color: var(--subsystems-gold); }
+#subsystems-window .hack-countermeasure.disabled            { opacity: 0.55; }
+
+#subsystems-window .hack-countermeasure.triggered {
+  border-color: var(--subsystems-red);
+  background: color-mix(in srgb, var(--subsystems-red) 8%, transparent);
+}
+
+#subsystems-window .hack-countermeasure.triggered > header i { color: var(--subsystems-red); }
+
+#subsystems-window .hack-outcome {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .hack-outcome .text      { flex: 1; }
+#subsystems-window .hack-outcome:not(.reached) { opacity: 0.7; }
+#subsystems-window .hack-outcome.reached strong { color: var(--subsystems-green); }
+
+/* ==========================================================================
+    Player view
+   ========================================================================== */
+
+#subsystems-window.player-view range-picker[disabled],
+#subsystems-window.player-view range-picker[disabled] input {
+  opacity: 1;
+  cursor: default;
+}
+
+#subsystems-window.player-view range-picker[disabled] ~ datalist > option {
+  color: var(--color-dark-6);
+}
+
+#subsystems-window.player-view range-picker[disabled] ~ datalist > option.caret {
+  color: var(--subsystems-gold);
+}
+
+#subsystems-window.player-view .location i {
+  width: 1.5rem;
+  color: var(--subsystems-green);
+  text-align: center;
+}
+
+/* ==========================================================================
+    Chat cards
+   ========================================================================== */
+
+.chat-message.pf2e-subsystem-helper .message-content h2 {
+  margin: var(--spacer-8) 0;
+  font-size: var(--font-size-20);
+  text-align: center;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacer-2);
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li {
+  display: block;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li > button {
+  --button-background-color: none;
+  --button-hover-background-color: none;
+  --button-hover-text-color: var(--button-text-color);
+  --button-size: calc(2 * var(--font-size-14));
+  --input-height: var(--button-size);
+  gap: var(--spacer-4);
+  padding-left: 0;
+  border: none;
+  user-select: none;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li > button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li > button i {
+  font-size: var(--font-size-16);
+  transition: transform 0.25s ease;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li > button:hover i {
+  color: goldenrod;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li.expanded > button i {
+  transform: rotate(90deg);
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li > p {
+  margin: var(--spacer-4) 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+.chat-message.pf2e-subsystem-helper .message-content ol li.expanded > p {
+  max-height: 1000px;
+}
+
+/* ---------- Obstacle and complication cards (chases, infiltration): plain check list ---------- */
+
+.chat-message.pf2e-subsystem-helper:is(.chase, .infiltration, .hacking) .message-content ul {
+  list-style: none;
+  margin: var(--spacer-4) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
 }

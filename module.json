@@ -1,12 +1,11 @@
 {
   "id": "pf2e-subsystem-helper",
   "title": "PF2e Subsystem Helper",
-  "description": "A module to implement various subsystems for PF2e that aren't included in the base system.",
-  "version": "#{VERSION}#",
+  "description": "Research, Influence, Reputation, Chases, Infiltration, Victory Points, and Hacking subsystems for PF2e and SF2e.",
+  "version": "1.0.0",
   "compatibility": {
-    "minimum": "12",
-    "verified": "12",
-    "maximum": "12"
+    "minimum": "14",
+    "verified": "14"
   },
   "authors": [
     {
@@ -22,21 +21,31 @@
         "id": "pf2e",
         "type": "system",
         "compatibility": {}
+      },
+      {
+        "id": "sf2e",
+        "type": "system",
+        "compatibility": {}
       }
     ]
   },
   "esmodules": [
-    "index.js"
+    "src/pf2e-subsystem-helper.mjs"
   ],
   "styles": [
-    "style.css"
+    "styles/pf2e-subsystem-helper.css",
+    "styles/subsystem-sheets.css"
   ],
   "flags": {
     "hotReload": {
       "extensions": [
+        "css",
+        "hbs",
         "json"
       ],
       "paths": [
+        "styles",
+        "templates",
         "languages"
       ]
     }
@@ -45,11 +54,9 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json",
-      "flags": {}
+      "path": "languages/en.json"
     }
   ],
-  "socket": false,
   "url": "#{URL}#",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
@@ -58,12 +65,8 @@
   "media": [
     {
       "type": "icon",
-      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4",
-      "loop": false,
-      "flags": {}
+      "url": "https://avatars.githubusercontent.com/u/10997407",
+      "loop": false
     }
-  ],
-  "protected": false,
-  "coreTranslation": false,
-  "library": false
+  ]
 }

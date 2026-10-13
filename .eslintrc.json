@@ -1,0 +1,8 @@
+{
+    "ignorePatterns": [
+        "foundry/**/*"
+    ],
+    "files": {
+        "includes": ["**", "!!dist", "!foundry"]
+    }
+}

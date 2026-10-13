@@ -1,6 +1,251 @@
 {
-    "MODULE.hello": "hello",
 	"PF2E-SUBSYSTEM-HELPER": {
-		"title": "PF2e Subsystem Helper"
+		"title": "PF2e Subsystem Helper",
+		"Tabs": {
+			"research": "Research",
+			"influence": "Influence",
+			"reputation": "Reputation",
+			"chases": "Chases",
+			"infiltration": "Infiltration",
+			"victory": "Victory Points",
+			"hacking": "Hacking"
+		},
+		"Research": {
+			"Instructions": "Track Research Points (RP) the PCs accumulate for each topic. Thresholds are indicated with <i class=\"fa-solid fa-caret-up\"></i> markers, and the results of the PCs' research can be sent to chat (GM notes will be hidden).",
+			"Topic": {
+				"ToChat": "Send Results to Chat",
+				"Discovered": "Topic Discovered",
+				"Prediscovered": "Topic Prediscovered",
+				"Undiscovered": "Topic Undiscovered",
+				"Checks": "Relevant Checks"
+			}
+		},
+		"Influence": {
+			"Instructions": "Track Influence Points (RP) the PCs accumulate for each NPC. Thresholds are indicated with <i class=\"fa-solid fa-caret-up\"></i> markers, and the results of the PCs' influence can be sent to chat (GM notes will be hidden).",
+			"Topic": {
+				"ToChat": "Send Results to Chat",
+				"Discovered": "NPC Met",
+				"Undiscovered": "NPC Unknown",
+				"Checks": "Relevant Checks"
+			},
+			"Modifier": {
+				"Weakness": "Weaknesses",
+				"Resistance": "Resistances"
+			}
+		},
+		"Reputation": {
+			"Instructions": "",
+			"Topic": {
+				"Discovered": "Faction Met",
+				"Undiscovered": "Unknown Faction",
+				"ToChat": "Send to Chat",
+				"Locations": "Locations"
+			},
+			"Tier": {
+				"Hunted": "Hunted",
+				"Hated": "Hated",
+				"Disliked": "Disliked",
+				"Ignored": "Ignored",
+				"Liked": "Liked",
+				"Admired": "Admired",
+				"Revered": "Revered"
+			}
+		},
+		"Chases": {
+			"Instructions": "Each page is a chase. Headings after the title are obstacles, in order.",
+			"Expand": "Show chase",
+			"Post": "Post current obstacle to chat",
+			"Discovered": "Visible to players",
+			"Undiscovered": "Hidden from players",
+			"Round": "Round {round}",
+			"RoundOf": "Round {round} of {limit}",
+			"Level": "Level {level}",
+			"Finish": "Finish",
+			"Party": "Party",
+			"Opponent": "Opponents",
+			"ChasePoints": "Chase Points",
+			"CritSuccess": "Crit Success +2",
+			"Success": "Success +1",
+			"CritFail": "Crit Fail -1",
+			"PartyBack": "Move party back",
+			"PartyForward": "Move party forward",
+			"OpponentBack": "Move opponents back",
+			"OpponentForward": "Move opponents forward",
+			"RevealNext": "Reveal next obstacle to players",
+			"NextRound": "Next Round",
+			"PartySize": "Party size",
+			"LengthHint": "This chase has {count} obstacle(s). GM Core suggests 6 for a short chase, 8 for medium, or 10 for long.",
+			"Reset": "Reset",
+			"ResetConfirm": "Reset positions, Chase Points, and rounds to the start of this chase type?",
+			"TypeLabel": "Type",
+			"Pace": "Pace",
+			"Rounds": "Rounds",
+			"Type": {
+				"chaseDown": "Chase Down",
+				"runAway": "Run Away",
+				"beatTheClock": "Beat the Clock",
+				"competitive": "Competitive"
+			},
+			"Status": {
+				"CaughtQuarry": "Caught them!",
+				"QuarryEscaped": "They escaped",
+				"CaughtByPursuers": "Caught!",
+				"Escaped": "Escaped!",
+				"Won": "Won the race!",
+				"Lost": "Lost the race",
+				"Even": "Neck and neck",
+				"Ahead": "{gap} ahead",
+				"Behind": "{gap} behind",
+				"MadeIt": "Made it!",
+				"OutOfTime": "Out of time",
+				"RoundsLeft": "{rounds} rounds left",
+				"NoObstacles": "No obstacles",
+				"TooFew": "Add more obstacles"
+			}
+		},
+		"Infiltration": {
+			"Instructions": "Each page is an infiltration. H2 headings with \"Objective\" start objectives; H3 headings under them are obstacles.",
+			"Expand": "Show infiltration",
+			"Discovered": "Visible to players",
+			"Undiscovered": "Hidden from players",
+			"Round": "Round {round}",
+			"Awareness": "Awareness",
+			"Edge": "Edge",
+			"SpendEdge": "Spend Edge Point",
+			"GainEdge": "Gain Edge Point",
+			"EndRound": "End Round",
+			"DcIncrease": "DC +{dc}",
+			"ThresholdReached": "{ap} AP reached",
+			"Dismiss": "Dismiss",
+			"ObjectiveOf": "Objective {index} of {count}",
+			"Required": "Overcome {required}",
+			"PcDone": "{name} has completed every objective.",
+			"NoPartyHint": "No party members found. Add the PCs to the party actor.",
+			"InfiltrationPoints": "Infiltration Points",
+			"Trigger": "Trigger",
+			"Requirements": "Requirements",
+			"Opportunities": "Opportunities",
+			"Complications": "Complications",
+			"ClearForAll": "Overcome for everyone at this objective",
+			"ClearGroup": "Overcome without checks",
+			"MoveBack": "Move back an objective",
+			"MoveForward": "Move forward an objective",
+			"Undo": "Undo",
+			"Activate": "Activate",
+			"Resolve": "Resolve",
+			"ResetComplication": "Reset",
+			"MarkUsed": "Mark used",
+			"Used": "Used",
+			"Post": "Post to chat",
+			"Reset": "Reset",
+			"ResetConfirm": "Reset objectives, awareness, rounds, and complications? Edge Points are kept.",
+			"Type": {
+				"individual": "Individual",
+				"group": "Group"
+			},
+			"Award": {
+				"critSuccessIP": "Crit +2 IP",
+				"successIP": "Success +1 IP",
+				"critSuccess": "Crit Success",
+				"success": "Success",
+				"failure": "Fail +1 AP",
+				"critFailure": "Crit Fail +2 AP"
+			},
+			"Outcome": {
+				"criticalSuccess": "Critical Success",
+				"success": "Success",
+				"failure": "Failure",
+				"criticalFailure": "Critical Failure"
+			},
+			"ComplicationState": {
+				"Inactive": "Inactive",
+				"Active": "Active",
+				"Resolved": "Resolved"
+			},
+			"Threshold": {
+				"Complication": "A complication occurs.",
+				"DcComplication": "Obstacle DCs +{dc}; a complication occurs.",
+				"Fail": "The infiltration fails."
+			},
+			"Status": {
+				"NoObjectives": "No objectives",
+				"NoParty": "No party",
+				"Discovered": "Discovered!",
+				"Infiltrated": "Infiltrated!",
+				"Objective": "Objective {current} of {count}"
+			}
+		},
+		"Victory": {
+			"Instructions": "Each page is a victory point track. Bold lead-ins like <strong>5 Victory Points</strong> set its thresholds.",
+			"Topic": {
+				"Discovered": "Visible to players",
+				"Undiscovered": "Hidden from players",
+				"ToChat": "Post reached thresholds to chat",
+				"Checks": "Show checks"
+			}
+		},
+		"Hacking": {
+			"Instructions": "Each page is a computer. Headings start access points; use <strong>Access</strong>, <strong>Vulnerability</strong>, <strong>Countermeasure (N Failures)</strong>, <strong>Notice</strong>, <strong>Disable</strong>, <strong>Success</strong>, and <strong>Critical Success</strong> lead-ins.",
+			"Expand": "Show computer",
+			"Discovered": "Visible to players",
+			"Undiscovered": "Hidden from players",
+			"Round": "Round {round}",
+			"EndRound": "End Round",
+			"AccessPointN": "Access Point {n}",
+			"VulnerabilityN": "Vulnerability {n}",
+			"CountermeasureN": "Countermeasure {n}",
+			"SuccessesOf": "{successes} / {required} successes",
+			"Failures": "{failures} failures",
+			"FailuresOf": "{failures} / {max} failures",
+			"MinDC": "min DC {dc}",
+			"TriggersAgain": "{name} triggers again",
+			"Hack": "Hack",
+			"Notice": "Notice",
+			"Disable": "Disable",
+			"Vulnerabilities": "Vulnerabilities",
+			"Countermeasures": "Countermeasures",
+			"Outcomes": "Outcomes",
+			"Persistent": "Persistent",
+			"Exploited": "Exploited",
+			"MarkNoticed": "Toggle noticed (reveals it to players)",
+			"MarkDisabled": "Toggle disabled",
+			"AddSuccess": "Add a success",
+			"RemoveSuccess": "Remove a success",
+			"AddFailure": "Add a failure",
+			"RemoveFailure": "Remove a failure",
+			"Post": "Post to chat",
+			"Dismiss": "Dismiss",
+			"Reset": "Reset",
+			"ResetConfirm": "Reset successes, failures, vulnerabilities, countermeasures, and rounds for this computer?",
+			"Type": {
+				"physical": "Physical",
+				"remote": "Remote"
+			},
+			"CmState": {
+				"hidden": "Not noticed",
+				"noticed": "Noticed",
+				"triggered": "Triggered",
+				"disabled": "Disabled"
+			},
+			"Status": {
+				"InProgress": "In progress",
+				"Countermeasures": "Countermeasure active",
+				"Hacked": "Hacked",
+				"CriticalSuccess": "Critical success"
+			},
+			"Outcome": {
+				"success": "Success",
+				"criticalSuccess": "Critical Success"
+			},
+			"Award": {
+				"critSuccess": "Crit +2",
+				"success": "Success +1",
+				"failure": "Failure +1",
+				"critFailure": "Crit Fail +2",
+				"disabled": "Disabled"
+			},
+			"SuccessesNeeded": "{required} successes needed",
+			"FailuresThreshold": "{failures} failures"
+		}
 	}
 }
