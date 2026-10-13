@@ -1,3 +1,8 @@
+# 1.0.0
+complete rewrite:
+- reimplemented all previously implemented subsystems and added Hacking from SF2e (requires either the SF2e system or SF2e Anachronism)
+- removed svelte and libwrapper dependencies, everything is now written in pure javascript, handlebars, and css
+
 # 0.0.9
 - removed hard dependency on libWrapper (implemented shim fallback)
 - added missing influence field for NPCs in the influence subsystem
