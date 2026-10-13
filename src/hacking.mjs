@@ -6,7 +6,7 @@ const PREFIX = `${LANG}.Hacking`;
 const HAS_CHECK = /@Check\[/i;
 const ACCESS_LINE = /\(?\s*(physical|remote)\s*[;,]\s*(\d+)\s+success(?:es)?\s*\)?/i;
 const FAILURES = /\(\s*(\d+)\s+failures?\s*(?:[;,]\s*([^)]*))?\)/i;
-const REDUCTION = /(?:DC\s*)?[–—--]\s*(\d+)\s*$/i;
+const REDUCTION = /(?:DC\s*)?[–—−-]\s*(\d+)\s*$/i;
 const MIN_DC = /min(?:imum)?\s+DC\s+(\d+)/i;
 
 const isHeading = (el) => /^H[1-6]$/.test(el.tagName);
@@ -31,7 +31,7 @@ function fromFirstCheck(html) {
     return (at > 0 ? html.slice(at) : html).trim();
 }
 
-const stripReduction = (html) => html.replace(/[;,]?\s*(?:DC\s*)?[–—--]\s*\d+\s*((?:<\/[a-z]+>\s*)*)$/i, "$1").trim();
+const stripReduction = (html) => html.replace(/[;,]?\s*(?:DC\s*)?[–—−-]\s*\d+\s*((?:<\/[a-z]+>\s*)*)$/i, "$1").trim();
 
 function splitBoldLabels(html, labels) {
     const template = document.createElement("template");
