@@ -1,0 +1,299 @@
+/* ==========================================================================
+   Page Builder (form that writes subsystem journal pages)
+   ========================================================================== */
+
+.page-builder {
+  --builder-gold: #daa520;
+  --builder-green: #437066;
+}
+
+.page-builder .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-builder .builder-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--spacer-4);
+}
+
+.page-builder .builder-warning {
+  margin: 0 0 var(--spacer-8);
+}
+
+.page-builder .builder-warning i {
+  color: var(--builder-gold);
+}
+
+/* ---------- Sections and cards ---------- */
+
+.page-builder .builder-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+}
+
+.page-builder .builder-section > .hint {
+  margin: 0;
+}
+
+.page-builder .builder-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  padding: var(--spacer-6) var(--spacer-8);
+  border: 1px solid var(--color-light-5);
+  border-left: 4px solid var(--builder-green);
+  border-radius: 6px;
+}
+
+.page-builder .builder-card > header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+.page-builder .builder-card > header input {
+  flex: 1;
+  font-weight: bold;
+}
+
+/* ---------- Rows ---------- */
+
+.page-builder .builder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-4);
+}
+
+.page-builder .check-row select    { flex: 0 0 9rem; }
+.page-builder .check-row .lore-name { flex: 0 0 7rem; }
+.page-builder .check-row .dc        { flex: 0 0 4rem; text-align: center; }
+.page-builder .check-row .check-label { flex: 1; min-width: 8rem; }
+
+.page-builder .modifier-row select        { flex: 0 0 8rem; }
+.page-builder .modifier-row .modifier-text { flex: 1; min-width: 12rem; }
+
+.page-builder .modifier-row .preview {
+  flex: 0 0 100%;
+  padding-left: 8.25rem;
+  font-size: var(--font-size-12);
+  color: var(--color-text-secondary);
+}
+
+.page-builder .threshold-row {
+  align-items: start;
+}
+
+.page-builder .threshold-points {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 5rem;
+}
+
+.page-builder .threshold-points input {
+  text-align: center;
+}
+
+.page-builder .threshold-points .unit {
+  font-size: var(--font-size-11);
+  color: var(--color-text-secondary);
+}
+
+.page-builder .threshold-row textarea {
+  flex: 1;
+  min-height: 3.5rem;
+  resize: vertical;
+}
+
+.page-builder .row-controls {
+  display: flex;
+  gap: var(--spacer-2);
+  margin-left: auto;
+}
+
+.page-builder .row-controls button.ui-control {
+  --control-size: 1.5rem;
+  --font-size: var(--font-size-12);
+}
+
+.page-builder button.add-row {
+  align-self: start;
+  height: 1.75rem;
+  font-size: var(--font-size-12);
+}
+
+/* ---------- Rich-text editor ---------- */
+
+.page-builder .builder-editor {
+  min-height: 8rem;
+  max-height: 16rem;
+  border: 1px solid var(--color-light-5);
+  border-radius: 4px;
+}
+
+/* ---------- Entry-point buttons (Subsystems window and page sheets) ---------- */
+
+#subsystems-window .new-page {
+  align-self: start;
+  height: 1.75rem;
+  font-size: var(--font-size-12);
+}
+
+.subsystem-view .builder-edit {
+  float: right;
+  width: auto;
+  height: 1.75rem;
+  margin-left: var(--spacer-8);
+  font-size: var(--font-size-12);
+}
+
+.page-builder .builder-card > header input.group-max { flex: 0 0 4.5rem; font-weight: normal; text-align: center; }
+.page-builder .threshold-row select.tier { flex: 0 0 11rem; }
+.page-builder .location-row .location-text { flex: 1; }
+
+/* ---------- Chase obstacles ---------- */
+
+.page-builder .builder-section:has(> .obstacle-card) {
+  counter-reset: obstacle;
+}
+
+.page-builder .obstacle-card {
+  counter-increment: obstacle;
+}
+
+.page-builder .obstacle-card .obstacle-index::before {
+  content: counter(obstacle);
+}
+
+.page-builder .obstacle-card .obstacle-index {
+  display: grid;
+  place-items: center;
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--builder-green);
+  border-radius: 50%;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.page-builder .builder-card > header input.obstacle-number {
+  flex: 0 0 5.5rem;
+  font-weight: normal;
+  text-align: center;
+}
+
+.page-builder .builder-card .row-label {
+  margin-top: var(--spacer-4);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  color: var(--color-text-secondary);
+}
+
+.page-builder .option-row .option-text {
+  flex: 1;
+}
+
+.page-builder .obstacle-card .builder-editor {
+  min-height: 5rem;
+}
+
+/* ---------- Infiltration ---------- */
+
+.page-builder .builder-section:has(> .objective-card) {
+  counter-reset: objective;
+}
+
+.page-builder .objective-card {
+  counter-increment: objective;
+  border-left-color: var(--builder-gold);
+}
+
+.page-builder .objective-card .objective-index::before {
+  content: counter(objective);
+}
+
+.page-builder .objective-card .objective-index {
+  display: grid;
+  place-items: center;
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--builder-gold);
+  border-radius: 50%;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.page-builder .builder-card.nested {
+  margin-left: var(--spacer-8);
+}
+
+.page-builder .infil-obstacle-card.individual { border-left-color: var(--builder-green); }
+.page-builder .infil-obstacle-card.group      { border-left-color: #3b6ea5; }
+
+.page-builder .builder-card > header .obstacle-type {
+  flex: 0 0 7rem;
+}
+
+.page-builder .complication-card            { border-left-color: #8b1a1a; }
+.page-builder .complication-card > header i { color: #8b1a1a; }
+.page-builder .opportunity-card             { border-left-color: var(--builder-gold); }
+.page-builder .opportunity-card > header i  { color: var(--builder-gold); }
+
+/* "Trigger", "Requirements", outcome lines: label on the left, text field filling the rest */
+.page-builder .lead-field {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-6);
+}
+
+.page-builder .lead-field > span {
+  flex: 0 0 7.5rem;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+.page-builder .lead-field > input {
+  flex: 1;
+}
+
+/* ---------- Hacking ---------- */
+
+.page-builder .access-card.physical { border-left-color: var(--builder-gold); }
+.page-builder .access-card.remote   { border-left-color: #3b6ea5; }
+
+.page-builder .vulnerability-card   { border-left-color: var(--builder-green); }
+.page-builder .countermeasure-card  { border-left-color: #8b1a1a; }
+.page-builder .countermeasure-card > header i { color: #8b1a1a; }
+
+.page-builder .builder-card > header .reduction {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+.page-builder .builder-card > header .reduction input {
+  flex: 0 0 3.5rem;
+}
+
+.page-builder .builder-card > header .persistent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+.page-builder .lead-field > textarea {
+  flex: 1;
+  min-height: 3rem;
+  resize: vertical;
+}
+
+.page-builder select.discovery { flex: 0 0 8.5rem; }

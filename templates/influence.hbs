@@ -4,6 +4,11 @@
     <select name="influence.journal">
         {{selectOptions journalChoices selected=influenceJournal blank="— Select an influence journal —"}}
     </select>
+    {{#if influenceJournal}}
+    <button type="button" class="new-page" data-action="newPage" data-subsystem="influence">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -47,11 +52,14 @@
                     <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
                         data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
                         topic.hasResults}}disabled{{/unless}}></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
             {{#if topic.hasDetails}}
             <div class="checks">
+                {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.checks as |group|}}
                 <div class="check-group">
                     {{#if group.label}}
@@ -59,7 +67,14 @@
                             {{group.adjustment}})</span>{{/if}}</strong>
                     {{/if}}
                     {{#each group.checks as |check|}}
-                    <div class="check">
+                    <div
+                        class="check{{#if check.secret}}{{#unless check.secret.revealed}} undiscovered{{/unless}}{{/if}}">
+                        {{#if check.secret.id}}
+                        <button type="button"
+                            class="ui-control icon fa-solid {{#if check.secret.revealed}}fa-eye{{else}}fa-eye-slash{{/if}} discover"
+                            data-action="toggleSecret" data-secret="{{check.secret.id}}" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Influence.ToggleDiscovered'}}"></button>
+                        {{/if}}
                         {{{check.html}}}
                         {{#if check.adjustment}}<span class="dc-adjustment">(DC {{check.adjustment}})</span>{{/if}}
                         {{#if check.label}}<span class="check-label">{{check.label}}</span>{{/if}}
@@ -71,13 +86,22 @@
                 {{#if topic.modifiers.length}}
                 <div class="modifiers">
                     {{#each topic.modifiers as |mod|}}
-                    <button type="button" class="modifier {{mod.kind}}{{#if mod.active}} active{{/if}}"
-                        data-action="toggleModifier" data-key="{{mod.key}}" aria-pressed="{{mod.active}}">
-                        <i class="fa-regular {{#if mod.active}}fa-square-check{{else}}fa-square{{/if}}"></i>
-                        <span class="kind">{{mod.kindLabel}}</span>
-                        <span class="text">{{mod.text}}</span>
-                        <span class="amount">{{#if mod.skillsLabel}}{{mod.skillsLabel}} {{/if}}DC {{mod.signedLabel}}</span>
-                    </button>
+                    <div class="modifier-row{{#if mod.secret}}{{#unless mod.secret.revealed}} undiscovered{{/unless}}{{/if}}">
+                        {{#if mod.secret.id}}
+                        <button type="button"
+                            class="ui-control icon fa-solid {{#if mod.secret.revealed}}fa-eye{{else}}fa-eye-slash{{/if}} discover"
+                            data-action="toggleSecret" data-secret="{{mod.secret.id}}" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Influence.ToggleDiscovered'}}"></button>
+                        {{/if}}
+                        <button type="button" class="modifier {{mod.kind}}{{#if mod.active}} active{{/if}}"
+                            data-action="toggleModifier" data-key="{{mod.key}}" aria-pressed="{{mod.active}}">
+                            <i class="fa-regular {{#if mod.active}}fa-square-check{{else}}fa-square{{/if}}"></i>
+                            <span class="kind">{{mod.kindLabel}}</span>
+                            <span class="text">{{{mod.text}}}</span>
+                            <span class="amount">{{#if mod.skillsLabel}}{{mod.skillsLabel}} {{/if}}DC
+                                {{mod.signedLabel}}</span>
+                        </button>
+                    </div>
                     {{/each}}
                 </div>
                 {{/if}}
@@ -87,6 +111,7 @@
         {{~/each~}}
     </ol>
     {{else}}
-    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain influence NPCs.{{else}}No NPCs discovered yet.{{/if}}</p>
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain influence NPCs.{{else}}No NPCs discovered
+        yet.{{/if}}</p>
     {{/if}}
 </section>

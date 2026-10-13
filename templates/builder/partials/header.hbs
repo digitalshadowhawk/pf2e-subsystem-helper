@@ -1,0 +1,17 @@
+{{! Shared: rewrite warning, page name, notes editor. Context: editing, model, namePlaceholder }}
+{{#if editing}}
+<p class="hint builder-warning"><i class="fa-solid fa-circle-info"></i>
+    {{localize "PF2E-SUBSYSTEM-HELPER.Builder.RewriteWarning"}}</p>
+{{/if}}
+
+{{! ---------- Name and notes ---------- }}
+<div class="form-group">
+    <label>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Name"}}</label>
+    <div class="form-fields">
+        <input type="text" name="name" value="{{model.name}}" required placeholder="{{localize @root.namePlaceholder}}">
+    </div>
+</div>
+<fieldset class="builder-section">
+    <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Notes"}}</legend>
+    <div data-editor="notes"></div>
+</fieldset>

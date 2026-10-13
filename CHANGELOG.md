@@ -1,3 +1,23 @@
+# 1.1.0
+New Features
+- added subsystem builder application as an alternative to manually editing journal pages
+- added "New Page" button in subsystems window
+- added edit button directly to subsystem window and to journal pages
+- added setting to allow GMs to decide whether to open the builder or default journal editor when clicking the edit button
+- addedd the ability to set influence checks, weaknesses, and resistances as "undiscovered|discovered|always known" with secret block formatting and a toggle button
+
+Improvements
+- Influence weaknesses and resistances can now apply to specific checks and lores
+- Victory Point sliders can now be adjusted while hidden from players
+- Notes sections (ie. any unformatted or grouped text) now display for all subsystems
+
+Fixes
+- Hacking - regex pattern further safeguarded from text editor corruption
+- Hacking - unnamed countermeasures and vulnerabilities stay unnamed when edited
+- Influence Points now correctly referred to as (IP) instead of (RP)
+- Reputation - removed check groups from this subsystem as there's no RAW reason to have them there.
+- general code cleanup
+
 # 1.0.0
 complete rewrite:
 - reimplemented all previously implemented subsystems and added Hacking from SF2e (requires either the SF2e system or SF2e Anachronism)

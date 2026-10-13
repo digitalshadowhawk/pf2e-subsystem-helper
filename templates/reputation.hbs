@@ -4,6 +4,11 @@
     <select name="reputation.journal">
         {{selectOptions journalChoices selected=reputationJournal blank="— Select a reputation journal —"}}
     </select>
+    {{#if reputationJournal}}
+    <button type="button" class="new-page" data-action="newPage" data-subsystem="reputation">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -20,7 +25,8 @@
                     <div class="track">
                         <range-picker name="reputation.topics.{{topic.pageId}}.points"
                             id="{{../rootId}}-reputation.{{topic.pageId}}.points" value="{{topic.total}}"
-                            min="{{topic.min}}" max="{{topic.max}}" step="1" {{#unless (and @root.isGM topic.discovered)}}disabled{{/unless}}></range-picker>
+                            min="{{topic.min}}" max="{{topic.max}}" step="1" {{#unless (and @root.isGM
+                            topic.discovered)}}disabled{{/unless}}></range-picker>
                         <datalist>
                             {{#each topic.markers as |m|}}
                             <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"
@@ -39,11 +45,14 @@
                     <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
                         data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
                         topic.hasResults}}disabled{{/unless}}></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
             {{#if topic.hasDetails}}
             <div class="checks locations">
+                {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.locations as |loc|}}
                 <div class="location{{#if loc.completed}} completed{{/if}}">
                     {{#if @root.isGM}}
@@ -62,6 +71,7 @@
         {{~/each~}}
     </ol>
     {{else}}
-    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain factions.{{else}}No factions discovered yet.{{/if}}</p>
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain factions.{{else}}No factions discovered
+        yet.{{/if}}</p>
     {{/if}}
 </section>

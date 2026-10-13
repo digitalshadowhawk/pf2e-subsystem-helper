@@ -4,6 +4,10 @@
     <select name="victory.journal">
         {{selectOptions journalChoices selected=victoryJournal blank="— Select a victory point journal —"}}
     </select>
+    {{#if victoryJournal}}<button type="button" class="new-page" data-action="newPage" data-subsystem="victory">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -13,19 +17,19 @@
             <div class="form-group">
                 {{#if @root.isGM}}
                 <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
-                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}"
-                    {{#unless topic.checks.length}}disabled{{/unless}}></button>
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}" {{#unless (or
+                    topic.checks.length topic.notes)}}disabled{{/unless}}></button>
                 {{/if}}
                 <label for="{{../rootId}}-victory.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
                 <div class="form-fields">
                     <div class="track">
                         <range-picker name="victory.topics.{{topic.pageId}}.points"
-                            id="{{../rootId}}-victory.{{topic.pageId}}.points"
-                            value="{{topic.points}}" min="0" max="{{topic.max}}" step="1"
-                            {{#unless @root.isGM}}disabled{{/unless}}></range-picker>
+                            id="{{../rootId}}-victory.{{topic.pageId}}.points" value="{{topic.points}}" min="0"
+                            max="{{topic.max}}" step="1" {{#unless @root.isGM}}disabled{{/unless}}></range-picker>
                         <datalist>
                             {{#each topic.markers as |m|}}
-                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"{{/if}} style="--pos: {{m.pos}}"></option>
+                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"
+                                {{/if}} style="--pos: {{m.pos}}"></option>
                             {{/each}}
                         </datalist>
                     </div>
@@ -34,15 +38,20 @@
                 {{#if @root.isGM}}
                 <div class="controls split-button">
                     <button type="button" class="ui-control icon {{topic.discoveredIcon}}"
-                        data-action="toggleTopicDiscovered" data-tooltip aria-label="{{topic.discoveredTooltip}}"></button>
+                        data-action="toggleTopicDiscovered" data-tooltip
+                        aria-label="{{topic.discoveredTooltip}}"></button>
                     <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
-                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}"
-                        {{#unless topic.hasResults}}disabled{{/unless}}></button>
+                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
+                        topic.hasResults}}disabled{{/unless}}></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}"
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
-            {{#if topic.checks.length}}
+            {{#if (or topic.checks.length topic.notes)}}
             <div class="checks">
+                {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.checks as |group|}}
                 <div class="check-group">
                     {{#if group.label}}<strong>{{group.label}}</strong>{{/if}}
@@ -60,6 +69,7 @@
         {{~/each~}}
     </ol>
     {{else}}
-    <p class="hint">{{#if @root.isGM}}Select a journal whose pages track victory points.{{else}}Nothing to track yet.{{/if}}</p>
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages track victory points.{{else}}Nothing to track
+        yet.{{/if}}</p>
     {{/if}}
 </section>

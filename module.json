@@ -2,14 +2,14 @@
   "id": "pf2e-subsystem-helper",
   "title": "PF2e Subsystem Helper",
   "description": "Research, Influence, Reputation, Chases, Infiltration, Victory Points, and Hacking subsystems for PF2e and SF2e.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14"
   },
   "authors": [
     {
-      "name": "Digitalshadowhawk",
+      "name": "Hawk",
       "url": "https://github.com/digitalshadowhawk/",
       "discord": "digitalshadowhawk",
       "flags": {}
@@ -34,22 +34,10 @@
   ],
   "styles": [
     "styles/pf2e-subsystem-helper.css",
-    "styles/subsystem-sheets.css"
+    "styles/subsystem-sheets.css",
+    "styles/page-builder.css"
   ],
-  "flags": {
-    "hotReload": {
-      "extensions": [
-        "css",
-        "hbs",
-        "json"
-      ],
-      "paths": [
-        "styles",
-        "templates",
-        "languages"
-      ]
-    }
-  },
+  "flags": {},
   "languages": [
     {
       "lang": "en",

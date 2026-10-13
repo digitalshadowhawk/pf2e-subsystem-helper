@@ -1,37 +1,33 @@
 import { adjustCheckHtml } from "./utils.mjs";
 
-/* ==========================================================================
-   Influence weaknesses/resistances: which checks they apply to
-
-   A modifier is limited to specific skills when its text names them as checks:
-     "Diplomacy checks", "Deception or Intimidation checks", "Society and Lore checks",
-     "the Diplomacy DC". Anything else ("all checks", "Influence checks", or no
-   skill named) applies to every check, as before.
-   ========================================================================== */
-
 const SKILLS = [
     "acrobatics", "arcana", "athletics", "computers", "crafting", "deception", "diplomacy",
     "intimidation", "medicine", "nature", "occultism", "performance", "piloting", "religion",
-    "society", "stealth", "survival", "thievery", "perception", "lore"
+    "society", "stealth", "survival", "thievery", "perception"
 ];
 
-const SKILL = `(?:${SKILLS.join("|")})`;
-const JOIN = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+)`;
-/** One or more skills in a row, followed by "check(s)" or "DC(s)". */
-const SKILL_LIST = new RegExp(String.raw`\b${SKILL}(?:${JOIN}${SKILL})*\s+(?:checks?|DCs?)\b`, "gi");
+const word = (w) => `[${w[0].toUpperCase()}${w[0]}]${w.slice(1)}`;
 
-/** Skills a weakness/resistance is limited to, from its text. Empty = applies to all checks. */
+const ITEM = String.raw`(?:(?:[A-Z][\w'’-]*\s+){0,4}[Ll]ore|${SKILLS.map(word).join("|")})`;
+const JOIN = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+)`;
+const SKILL_LIST = new RegExp(String.raw`\b${ITEM}(?:${JOIN}${ITEM})*\s+(?:[Cc]hecks?|DCs?)\b`, "g");
+const LIST_ITEM = new RegExp(ITEM, "g");
+
+function itemSlug(item) {
+    const words = item.trim().split(/\s+/);
+    if (words.at(-1).toLowerCase() !== "lore") return words[0].toLowerCase();
+    const name = words.slice(0, -1).join(" ").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return name ? `${name}-lore` : "lore";
+}
+
 export function modifierSkills(text) {
     const skills = new Set();
     for (const match of String(text ?? "").matchAll(SKILL_LIST)) {
-        for (const word of match[0].toLowerCase().match(/[a-z]+/g)) {
-            if (SKILLS.includes(word)) skills.add(word);
-        }
+        for (const item of match[0].matchAll(LIST_ITEM)) skills.add(itemSlug(item[0]));
     }
     return [...skills];
 }
 
-/** The statistic an inline check rolls, from enriched HTML or a raw @Check. */
 export function checkStatistic(html) {
     const slug = html.match(/data-pf2-check="([^"]+)"/)?.[1]
         ?? html.match(/@Check\[(?:type:)?([\w-]+)/i)?.[1]
@@ -39,7 +35,6 @@ export function checkStatistic(html) {
     return slug.toLowerCase();
 }
 
-/** Whether a modifier limited to `skills` affects a check rolling `statistic`. */
 export function modifierApplies(skills, statistic) {
     if (!skills?.length) return true;
     if (!statistic) return false;
@@ -47,8 +42,7 @@ export function modifierApplies(skills, statistic) {
 }
 
 /**
- * Total DC change for one check from the active modifiers.
- * @param {{active: boolean, value: number, skills: string[]}[]} modifiers   value is negative for weaknesses
+ * @param {{active: boolean, value: number, skills: string[]}[]} modifiers
  * @param {string} html   The check's HTML
  */
 export function checkAdjustment(modifiers, html) {
@@ -58,15 +52,13 @@ export function checkAdjustment(modifiers, html) {
         .reduce((sum, m) => sum + m.value, 0);
 }
 
-/** "Diplomacy, Deception" for display, or "" when a modifier applies to everything. */
-export const skillsLabel = (skills) => (skills ?? []).map((s) => s.capitalize()).join(", ");
+export const skillsLabel = (skills) => (skills ?? [])
+    .map((s) => (s === "lore" ? "Any Lore" : s.split("-").map((w) => w.capitalize()).join(" ")))
+    .join(", ");
 
 const signed = (n) => (n > 0 ? `+${n}` : `${n}`);
 
 /**
- * Apply active weaknesses/resistances to check groups, check by check.
- * Discovery groups are never adjusted. When every check in a group gets the same change,
- * the group carries the label ("DC +2"); otherwise each affected check carries its own.
  * @param {object[]} groups      Check groups: {label, checks: {html, label}[]}
  * @param {object[]} modifiers   {active, value, skills}
  */

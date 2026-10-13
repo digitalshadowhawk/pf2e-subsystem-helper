@@ -1,0 +1,116 @@
+<div class="builder-body standard-form">
+    {{> "modules/pf2e-subsystem-helper/templates/builder/partials/header.hbs"}}
+
+    {{! ---------- Access points ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.AccessPoints"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.AccessPointsHint"}}</p>
+        {{#each view.accessPoints as |ap ai|}}
+        <div class="builder-card access-card {{ap.type}}">
+            <header>
+                <i class="fa-solid fa-lock"></i>
+                <input type="text" name="{{ap.path}}.name" value="{{ap.name}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.AccessPointName'}}">
+                <select class="obstacle-type" name="{{ap.path}}.type">
+                    {{selectOptions @root.accessChoices selected=ap.type}}
+                </select>
+                <input type="number" class="obstacle-number" name="{{ap.path}}.required" value="{{ap.required}}"
+                    min="1" step="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.SuccessesHint'}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Successes'}}">
+                <input type="number" class="obstacle-number" name="{{ap.path}}.minDC" value="{{ap.minDC}}"
+                    min="0" step="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MinDCHint'}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MinDC'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow" data-path="accessPoints"
+                        data-index="{{ai}}" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow" data-path="accessPoints"
+                        data-index="{{ai}}" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow" data-path="accessPoints"
+                        data-index="{{ai}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                </span>
+            </header>
+            <div data-editor="{{ap.path}}.description"></div>
+
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.HackChecks"}}</span>
+            {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=ap.checks path=ap.checksPath}}
+
+            {{! Vulnerabilities }}
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Vulnerabilities"}}</span>
+            {{#each ap.vulnerabilities as |v vi|}}
+            <div class="builder-card nested vulnerability-card">
+                <header>
+                    <input type="text" name="{{v.path}}.name" value="{{v.name}}"
+                        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.VulnerabilityName'}}">
+                    <span class="reduction">
+                        <span>DC −</span>
+                        <input type="number" class="obstacle-number" name="{{v.path}}.reduction" value="{{v.reduction}}"
+                            min="1" step="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ReductionHint'}}">
+                    </span>
+                    <span class="row-controls">
+                        <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                            data-path="{{ap.path}}.vulnerabilities" data-index="{{vi}}" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                    </span>
+                </header>
+                {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=v.checks path=v.checksPath}}
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="{{ap.path}}.vulnerabilities">
+                <i class="fa-solid fa-unlock-keyhole"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddVulnerability"}}
+            </button>
+
+            {{! Countermeasures }}
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Countermeasures"}}</span>
+            {{#each ap.countermeasures as |cm ci|}}
+            <div class="builder-card nested countermeasure-card">
+                <header>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input type="text" name="{{cm.path}}.name" value="{{cm.name}}"
+                        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.CountermeasureName'}}">
+                    <input type="number" class="obstacle-number" name="{{cm.path}}.failures" value="{{cm.failures}}"
+                        min="1" step="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.FailuresHint'}}"
+                        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.FailuresShort'}}">
+                    <label class="persistent" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.PersistentHint'}}">
+                        <input type="checkbox" name="{{cm.path}}.persistent" {{#if cm.persistent}}checked{{/if}}>
+                        {{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Persistent"}}
+                    </label>
+                    <span class="row-controls">
+                        <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                            data-path="{{ap.path}}.countermeasures" data-index="{{ci}}" data-tooltip
+                            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                    </span>
+                </header>
+                <label class="lead-field">
+                    <span>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Effect"}}</span>
+                    <input type="text" name="{{cm.path}}.effect" value="{{cm.effect}}"
+                        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EffectPlaceholder'}}">
+                </label>
+                <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Notice"}}</span>
+                {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=cm.notice path=cm.noticePath}}
+                <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Disable"}}</span>
+                {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=cm.disable path=cm.disablePath}}
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="{{ap.path}}.countermeasures">
+                <i class="fa-solid fa-shield-halved"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddCountermeasure"}}
+            </button>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="accessPoints">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddAccessPoint"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Outcomes ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Outcomes"}}</legend>
+        <label class="lead-field">
+            <span>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Outcome.criticalSuccess"}}</span>
+            <textarea name="outcomes.criticalSuccess" rows="2">{{view.outcomes.criticalSuccess}}</textarea>
+        </label>
+        <label class="lead-field">
+            <span>{{localize "PF2E-SUBSYSTEM-HELPER.Hacking.Outcome.success"}}</span>
+            <textarea name="outcomes.success" rows="2">{{view.outcomes.success}}</textarea>
+        </label>
+    </fieldset>
+</div>

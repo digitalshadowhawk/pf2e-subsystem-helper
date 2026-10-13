@@ -4,6 +4,11 @@
     <select name="research.journal">
         {{selectOptions journalChoices selected=journal blank="— Select a research journal —"}}
     </select>
+    {{#if journal}}
+    <button type="button" class="new-page" data-action="newPage" data-subsystem="research">
+        <i class="fa-solid fa-pen-ruler"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.NewPage"}}
+    </button>
+    {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
@@ -13,8 +18,8 @@
             <div class="form-group">
                 {{#if @root.isGM}}
                 <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
-                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}" {{#unless
-                    topic.checks.length}}disabled{{/unless}}></button>
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}" {{#unless (or
+                    topic.checks.length topic.notes)}}disabled{{/unless}}></button>
                 {{/if}}
                 <label for="{{../rootId}}-research.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
                 <div class="form-fields">
@@ -39,11 +44,14 @@
                     <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
                         data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
                         topic.hasResults}}disabled{{/unless}}></button>
+                    <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
+                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
-            {{#if topic.checks.length}}
+            {{#if (or topic.checks.length topic.notes)}}
             <div class="checks">
+                {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.checks as |group|}}
                 {{#each topic.checks as |group|}}
                 <div class="check-group">
@@ -77,6 +85,7 @@
         {{~/each~}}
     </ol>
     {{else}}
-    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain research topics.{{else}}No research topics discovered yet.{{/if}}</p>
+    <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain research topics.{{else}}No research topics
+        discovered yet.{{/if}}</p>
     {{/if}}
 </section>

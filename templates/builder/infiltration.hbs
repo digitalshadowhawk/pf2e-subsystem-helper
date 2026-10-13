@@ -1,0 +1,163 @@
+<div class="builder-body standard-form">
+    {{> "modules/pf2e-subsystem-helper/templates/builder/partials/header.hbs"}}
+
+    {{! ---------- Objectives ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Objectives"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.ObjectivesHint"}}</p>
+        {{#each view.objectives as |o oi|}}
+        <div class="builder-card objective-card">
+            <header>
+                <span class="objective-index"></span>
+                <input type="text" name="{{o.path}}.name" value="{{o.name}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ObjectiveName'}}">
+                <input type="number" class="obstacle-number" name="{{o.path}}.required" value="{{o.required}}"
+                    min="1" step="1" placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Required'}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RequiredHint'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow" data-path="objectives"
+                        data-index="{{oi}}" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow" data-path="objectives"
+                        data-index="{{oi}}" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow" data-path="objectives"
+                        data-index="{{oi}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveObjective'}}"></button>
+                </span>
+            </header>
+            <div data-editor="{{o.path}}.description"></div>
+
+            {{#each o.obstacles as |ob bi|}}
+            <div class="builder-card nested infil-obstacle-card {{ob.type}}">
+                <header>
+                    <input type="text" name="{{ob.path}}.name" value="{{ob.name}}"
+                        placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ObstacleName'}}">
+                    <input type="number" class="obstacle-number" name="{{ob.path}}.points" value="{{ob.points}}"
+                        min="1" step="1" placeholder="IP" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.InfiltrationPoints'}}">
+                    <select class="obstacle-type" name="{{ob.path}}.type">
+                        {{selectOptions @root.typeChoices selected=ob.type}}
+                    </select>
+                    <span class="row-controls">
+                        <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow" data-path="{{o.path}}.obstacles"
+                            data-index="{{bi}}" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                        <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow" data-path="{{o.path}}.obstacles"
+                            data-index="{{bi}}" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                        <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow" data-path="{{o.path}}.obstacles"
+                            data-index="{{bi}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveObstacle'}}"></button>
+                    </span>
+                </header>
+                <div data-editor="{{ob.path}}.description"></div>
+                <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Checks"}}</span>
+                {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=ob.checks path=ob.checksPath}}
+                <label class="lead-field">
+                    <span>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Outcome.criticalFailure"}}</span>
+                    <input type="text" name="{{ob.path}}.criticalFailure" value="{{ob.criticalFailure}}">
+                </label>
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="{{o.path}}.obstacles">
+                <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddObstacle"}}
+            </button>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="objectives">
+            <i class="fa-solid fa-flag"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddObjective"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Complications ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Complications"}}</legend>
+        {{#each view.complications as |c ci|}}
+        <div class="builder-card complication-card">
+            <header>
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <input type="text" name="{{c.path}}.name" value="{{c.name}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ComplicationName'}}">
+                <input type="number" class="obstacle-number" name="{{c.path}}.points" value="{{c.points}}"
+                    min="1" step="1" placeholder="IP" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ComplicationPointsHint'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow" data-path="complications"
+                        data-index="{{ci}}" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow" data-path="complications"
+                        data-index="{{ci}}" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow" data-path="complications"
+                        data-index="{{ci}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                </span>
+            </header>
+            <label class="lead-field">
+                <span>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Trigger"}}</span>
+                <input type="text" name="{{c.path}}.trigger" value="{{c.trigger}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.TriggerPlaceholder'}}">
+            </label>
+            <div data-editor="{{c.path}}.description"></div>
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Checks"}}</span>
+            {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=c.checks path=c.checksPath}}
+            {{#each c.outcomeFields as |f|}}
+            <label class="lead-field">
+                <span>{{f.label}}</span>
+                <input type="text" name="{{c.path}}.outcomes.{{f.key}}" value="{{f.value}}">
+            </label>
+            {{/each}}
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="complications">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddComplication"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Opportunities ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Opportunities"}}</legend>
+        {{#each view.opportunities as |p pi|}}
+        <div class="builder-card opportunity-card">
+            <header>
+                <i class="fa-solid fa-star"></i>
+                <input type="text" name="{{p.path}}.name" value="{{p.name}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.OpportunityName'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow" data-path="opportunities"
+                        data-index="{{pi}}" data-delta="-1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow" data-path="opportunities"
+                        data-index="{{pi}}" data-delta="1" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow" data-path="opportunities"
+                        data-index="{{pi}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                </span>
+            </header>
+            <label class="lead-field">
+                <span>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Requirements"}}</span>
+                <input type="text" name="{{p.path}}.requirements" value="{{p.requirements}}">
+            </label>
+            <div data-editor="{{p.path}}.description"></div>
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Checks"}}</span>
+            {{> "modules/pf2e-subsystem-helper/templates/builder/partials/check-rows.hbs" checks=p.checks path=p.checksPath}}
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="opportunities">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddOpportunity"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Awareness ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Infiltration.Awareness"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.AwarenessHint"}}</p>
+        {{#each view.awareness as |a ai|}}
+        <div class="builder-row threshold-row">
+            <span class="threshold-points">
+                <input type="number" name="awareness.{{ai}}.ap" value="{{a.ap}}" min="1" step="1">
+                <span class="unit">AP</span>
+            </span>
+            <textarea name="awareness.{{ai}}.html" rows="2"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.AwarenessPlaceholder'}}">{{a.html}}</textarea>
+            <span class="row-controls">
+                <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow" data-path="awareness"
+                    data-index="{{ai}}" data-tooltip aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+            </span>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="awareness">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddAwareness"}}
+        </button>
+    </fieldset>
+</div>

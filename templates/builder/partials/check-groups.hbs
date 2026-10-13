@@ -1,0 +1,66 @@
+{{! Shared: check groups. Context: model.groups, skillChoices, groupsHint, groupPlaceholder, showMax }}
+    {{! ---------- Check groups ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.CheckGroups"}}</legend>
+        <p class="hint">{{localize @root.groupsHint}}</p>
+        {{#each model.groups as |group gi|}}
+        <div class="builder-card" data-row="group">
+            <header>
+                <input type="text" name="groups.{{gi}}.label" value="{{group.label}}"
+                    placeholder="{{localize @root.groupPlaceholder}}">
+                {{#if @root.showMax}}
+                <input type="number" class="group-max" name="groups.{{gi}}.max" value="{{group.max}}" min="0" step="1"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Max'}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MaxHint'}}">
+                {{/if}}
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="groups" data-index="{{gi}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="groups" data-index="{{gi}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow"
+                        data-path="groups" data-index="{{gi}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveGroup'}}"></button>
+                </span>
+            </header>
+
+            {{#each group.checks as |check ci|}}
+            <div class="builder-row check-row" data-row="check">
+                <select name="groups.{{gi}}.checks.{{ci}}.skill">
+                    {{selectOptions @root.skillChoices selected=check.skill}}
+                </select>
+                <input type="text" class="lore-name" name="groups.{{gi}}.checks.{{ci}}.lore" value="{{check.lore}}"
+                    data-lore placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LoreName'}}"
+                    {{#unless (eq check.skill "lore")}}hidden{{/unless}}>
+                <input type="number" class="dc" name="groups.{{gi}}.checks.{{ci}}.dc" value="{{check.dc}}"
+                    min="0" step="1" placeholder="DC">
+                <input type="text" class="check-label" name="groups.{{gi}}.checks.{{ci}}.label" value="{{check.label}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.CheckLabel'}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.extra" value="{{check.extra}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.suffix" value="{{check.suffix}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.secret" value="{{check.secret}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.secretId" value="{{check.secretId}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveCheck'}}"></button>
+                </span>
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="groups.{{gi}}.checks">
+                <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddCheck"}}
+            </button>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="groups">
+            <i class="fa-solid fa-layer-group"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddGroup"}}
+        </button>
+    </fieldset>

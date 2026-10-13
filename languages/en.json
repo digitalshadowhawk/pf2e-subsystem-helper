@@ -1,6 +1,16 @@
 {
 	"PF2E-SUBSYSTEM-HELPER": {
 		"title": "PF2e Subsystem Helper",
+		"Settings": {
+			"EditInJournal": {
+				"Name": "Edit Pages in the Journal Editor",
+				"Hint": "When enabled, the edit button in the Subsystems window opens the page in the standard journal editor instead of the Page Builder form."
+			}
+		},
+		"EditPage": {
+			"Form": "Edit with form",
+			"Journal": "Edit in journal"
+		},
 		"Tabs": {
 			"research": "Research",
 			"influence": "Influence",
@@ -15,13 +25,12 @@
 			"Topic": {
 				"ToChat": "Send Results to Chat",
 				"Discovered": "Topic Discovered",
-				"Prediscovered": "Topic Prediscovered",
 				"Undiscovered": "Topic Undiscovered",
 				"Checks": "Relevant Checks"
 			}
 		},
 		"Influence": {
-			"Instructions": "Track Influence Points (RP) the PCs accumulate for each NPC. Thresholds are indicated with <i class=\"fa-solid fa-caret-up\"></i> markers, and the results of the PCs' influence can be sent to chat (GM notes will be hidden).",
+			"Instructions": "Track Influence Points (IP) the PCs accumulate for each NPC. Thresholds are indicated with <i class=\"fa-solid fa-caret-up\"></i> markers, and the results of the PCs' influence can be sent to chat (GM notes will be hidden).",
 			"Topic": {
 				"ToChat": "Send Results to Chat",
 				"Discovered": "NPC Met",
@@ -31,10 +40,11 @@
 			"Modifier": {
 				"Weakness": "Weaknesses",
 				"Resistance": "Resistances"
-			}
+			},
+			"ToggleDiscovered": "Toggle discovered (reveals to players)"
 		},
 		"Reputation": {
-			"Instructions": "",
+			"Instructions": "Track each faction's reputation. Tiers are marked on the slider, and completed locations each add +1.",
 			"Topic": {
 				"Discovered": "Faction Met",
 				"Undiscovered": "Unknown Faction",
@@ -185,7 +195,7 @@
 			}
 		},
 		"Hacking": {
-			"Instructions": "Each page is a computer. Headings start access points; use <strong>Access</strong>, <strong>Vulnerability</strong>, <strong>Countermeasure (N Failures)</strong>, <strong>Notice</strong>, <strong>Disable</strong>, <strong>Success</strong>, and <strong>Critical Success</strong> lead-ins.",
+			"Instructions": "Each page is a computer. Headings start access points; use <strong>Access</strong>, <strong>Vulnerability</strong>, <strong>Countermeasure (X Failures)</strong>, <strong>Notice</strong>, <strong>Disable</strong>, <strong>Success</strong>, and <strong>Critical Success</strong> lead-ins.",
 			"Expand": "Show computer",
 			"Discovered": "Visible to players",
 			"Undiscovered": "Hidden from players",
@@ -246,6 +256,117 @@
 			},
 			"SuccessesNeeded": "{required} successes needed",
 			"FailuresThreshold": "{failures} failures"
+		},
+		"Builder": {
+			"NewPage": "New page",
+			"EditWithForm": "Edit with form",
+			"Create": "Create page",
+			"Save": "Save page",
+			"RewriteWarning": "Saving rewrites this page from the form. Text the form doesn't recognize is kept in Notes, but its position and any custom formatting are normalized.",
+			"NeedsName": "Give the page a name before saving.",
+			"NoJournal": "Select a journal for this subsystem first.",
+			"Name": "Name",
+			"Notes": "Notes",
+			"Lore": "Lore...",
+			"LoreName": "Lore name",
+			"CheckLabel": "Label (optional)",
+			"AllChecks": "All checks",
+			"CheckGroups": "Check groups",
+			"CheckGroupsHint": "Each group is a bold label followed by its checks. A group labeled Discovery is never adjusted by weaknesses or resistances.",
+			"GroupLabel": "Group label (e.g. Influence Skills)",
+			"AddGroup": "Add group",
+			"RemoveGroup": "Remove group",
+			"AddCheck": "Add check",
+			"RemoveCheck": "Remove check",
+			"Modifiers": "Weaknesses & resistances",
+			"ModifiersHint": "Write each one as a sentence. \"by X\" sets the amount (default 2); naming skills as checks (\"Diplomacy checks\") limits it to them. The line under each shows how it will be read.",
+			"ModifierPlaceholder": "Flattery lowers the DC of Diplomacy checks by 2.",
+			"AddModifier": "Add weakness or resistance",
+			"Thresholds": "Thresholds",
+			"InfluenceThresholdsHint": "What the PCs gain at each Influence total. Thresholds are sorted when you save.",
+			"InfluenceUnit": "Influence",
+			"ThresholdPlaceholder": "What happens at this threshold...",
+			"AddThreshold": "Add threshold",
+			"InfluenceNamePlaceholder": "NPC name",
+			"MoveUp": "Move up",
+			"MoveDown": "Move down",
+			"Remove": "Remove",
+			"ResearchNamePlaceholder": "Research topic",
+			"ResearchGroupLabel": "Category (e.g. Gather Information)",
+			"ResearchGroupsHint": "Each category is a bold label followed by its checks. Set a max to cap how many points that category can contribute.",
+			"ResearchUnit": "Research Points",
+			"ResearchThresholdsHint": "What the PCs learn at each Research Point total. The highest is the topic's maximum.",
+			"Max": "Max",
+			"MaxHint": "Most points this category can contribute (leave blank for no cap)",
+			"VictoryNamePlaceholder": "Track name",
+			"VictoryGroupsHint": "Groups of checks that earn Victory Points. (Group label is optional)",
+			"VictoryUnit": "Victory Points",
+			"VictoryThresholdsHint": "What happens at each Victory Point total. The highest is the track's maximum.",
+			"GroupLabelGeneric": "Group label",
+			"ReputationNamePlaceholder": "Faction name",
+			"ReputationThresholdsHint": "What each reputation tier means. Tiers are written top-down (Revered first) when you save.",
+			"Locations": "Locations",
+			"LocationsHint": "Each line adds +1 reputation when the GM marks it complete.",
+			"LocationPlaceholder": "Helped at the cathedral fire",
+			"AddLocation": "Add location",
+			"ChaseNamePlaceholder": "Chase name",
+			"Obstacles": "Obstacles",
+			"ObstaclesHint": "In chase order. Leave Chase Points blank to use the party-size default.",
+			"ObstacleName": "Obstacle name",
+			"Level": "Level",
+			"LevelHint": "Obstacle level (optional)",
+			"ChasePoints": "CP",
+			"ChasePointsHint": "Chase Points needed (blank = party size - 1)",
+			"Checks": "Checks",
+			"Options": "Options",
+			"OptionPlaceholder": "A non-check way past this obstacle...",
+			"AddOption": "Add option",
+			"AddObstacle": "Add obstacle",
+			"RemoveObstacle": "Remove obstacle",
+			"InfiltrationNamePlaceholder": "Infiltration name",
+			"Objectives": "Objectives",
+			"ObjectivesHint": "In order. Each objective's obstacles are what PCs overcome to move past it.",
+			"ObjectiveName": "Objective name",
+			"Required": "Req.",
+			"RequiredHint": "Obstacles a PC must clear to move on (blank = 1)",
+			"InfiltrationPoints": "Infiltration Points needed",
+			"AddObjective": "Add objective",
+			"RemoveObjective": "Remove objective",
+			"ComplicationName": "Complication name",
+			"ComplicationPointsHint": "Infiltration Points to overcome it (optional)",
+			"TriggerPlaceholder": "The first time the PCs reach 5 AP...",
+			"AddComplication": "Add complication",
+			"OpportunityName": "Opportunity name",
+			"AddOpportunity": "Add opportunity",
+			"AwarenessHint": "Leave empty to use the default 5/10/15/20 thresholds. \"DCs increase by X\" (or naming skills) raises check DCs; mentioning failure ends the infiltration.",
+			"AwarenessPlaceholder": "Obstacle DCs increase by 1.",
+			"AddAwareness": "Add threshold",
+			"HackingNamePlaceholder": "Computer name",
+			"AccessPoints": "Access points",
+			"AccessPointsHint": "Each access point is hacked separately. Hacking more than one, or getting double the successes on one, is a critical success.",
+			"AccessPointName": "Access point name",
+			"Successes": "Succ.",
+			"SuccessesHint": "Successes needed to hack this access point",
+			"MinDC": "Min DC",
+			"MinDCHint": "Vulnerabilities can't lower the Hack DC below this (optional)",
+			"HackChecks": "Hack checks",
+			"VulnerabilityName": "Vulnerability (e.g. Sticky note under the keyboard)",
+			"ReductionHint": "How much exploiting this lowers the Hack DC",
+			"AddVulnerability": "Add vulnerability",
+			"CountermeasureName": "Countermeasure name (optional)",
+			"FailuresShort": "Fail.",
+			"FailuresHint": "Failures on this access point before it triggers",
+			"PersistentHint": "Triggers again every round until disabled",
+			"Effect": "Effect",
+			"EffectPlaceholder": "What happens when it triggers...",
+			"AddCountermeasure": "Add countermeasure",
+			"AddAccessPoint": "Add access point",
+			"DiscoveryHint": "Undiscovered items are hidden from players until revealed",
+			"Discovery": {
+				"known": "Always known",
+				"hidden": "Undiscovered",
+				"revealed": "Discovered"
+			}
 		}
 	}
 }

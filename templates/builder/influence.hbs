@@ -1,0 +1,142 @@
+<div class="builder-body standard-form">
+    {{#if editing}}
+    <p class="hint builder-warning"><i class="fa-solid fa-circle-info"></i>
+        {{localize "PF2E-SUBSYSTEM-HELPER.Builder.RewriteWarning"}}</p>
+    {{/if}}
+
+    {{! ---------- Name and notes ---------- }}
+    <div class="form-group">
+        <label>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Name"}}</label>
+        <div class="form-fields">
+            <input type="text" name="name" value="{{model.name}}" required
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.InfluenceNamePlaceholder'}}">
+        </div>
+    </div>
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Notes"}}</legend>
+        <div data-editor="notes"></div>
+    </fieldset>
+
+    {{! ---------- Check groups ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.CheckGroups"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.CheckGroupsHint"}}</p>
+        {{#each model.groups as |group gi|}}
+        <div class="builder-card" data-row="group">
+            <header>
+                <input type="text" name="groups.{{gi}}.label" value="{{group.label}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.GroupLabel'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="groups" data-index="{{gi}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="groups" data-index="{{gi}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow"
+                        data-path="groups" data-index="{{gi}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveGroup'}}"></button>
+                </span>
+            </header>
+
+            {{#each group.checks as |check ci|}}
+            <div class="builder-row check-row" data-row="check">
+                <select name="groups.{{gi}}.checks.{{ci}}.skill">
+                    {{selectOptions @root.skillChoices selected=check.skill}}
+                </select>
+                <input type="text" class="lore-name" name="groups.{{gi}}.checks.{{ci}}.lore" value="{{check.lore}}"
+                    data-lore placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LoreName'}}"
+                    {{#unless (eq check.skill "lore")}}hidden{{/unless}}>
+                <input type="number" class="dc" name="groups.{{gi}}.checks.{{ci}}.dc" value="{{check.dc}}"
+                    min="0" step="1" placeholder="DC">
+                <input type="text" class="check-label" name="groups.{{gi}}.checks.{{ci}}.label" value="{{check.label}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.CheckLabel'}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.extra" value="{{check.extra}}">
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.suffix" value="{{check.suffix}}">
+                <select class="discovery" name="groups.{{gi}}.checks.{{ci}}.secret" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.DiscoveryHint'}}">
+                    {{selectOptions @root.discoveryChoices selected=check.secret}}
+                </select>
+                <input type="hidden" name="groups.{{gi}}.checks.{{ci}}.secretId" value="{{check.secretId}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                        data-path="groups.{{gi}}.checks" data-index="{{ci}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveCheck'}}"></button>
+                </span>
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="groups.{{gi}}.checks">
+                <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddCheck"}}
+            </button>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="groups">
+            <i class="fa-solid fa-layer-group"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddGroup"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Weaknesses and resistances ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Modifiers"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.ModifiersHint"}}</p>
+        {{#each modifiers as |mod mi|}}
+        <div class="builder-row modifier-row" data-row="modifier">
+            <select name="modifiers.{{mi}}.kind">
+                {{selectOptions @root.kindChoices selected=mod.kind}}
+            </select>
+            <input type="text" class="modifier-text" name="modifiers.{{mi}}.text" value="{{mod.text}}"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ModifierPlaceholder'}}">
+            <select class="discovery" name="modifiers.{{mi}}.secret" data-tooltip
+                aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.DiscoveryHint'}}">
+                {{selectOptions @root.discoveryChoices selected=mod.secret}}
+            </select>
+            <input type="hidden" name="modifiers.{{mi}}.secretId" value="{{mod.secretId}}">
+            <span class="row-controls">
+                <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                    data-path="modifiers" data-index="{{mi}}" data-delta="-1" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                    data-path="modifiers" data-index="{{mi}}" data-delta="1" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                    data-path="modifiers" data-index="{{mi}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+            </span>
+            <span class="preview" data-preview>{{mod.preview}}</span>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="modifiers">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddModifier"}}
+        </button>
+    </fieldset>
+
+    {{! ---------- Thresholds ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Thresholds"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.InfluenceThresholdsHint"}}</p>
+        {{#each model.thresholds as |t ti|}}
+        <div class="builder-row threshold-row" data-row="threshold">
+            <span class="threshold-points">
+                <input type="number" name="thresholds.{{ti}}.points" value="{{t.points}}" min="0" step="1">
+                <span class="unit">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.InfluenceUnit"}}</span>
+            </span>
+            <textarea name="thresholds.{{ti}}.html" rows="2"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ThresholdPlaceholder'}}">{{t.html}}</textarea>
+            <span class="row-controls">
+                <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                    data-path="thresholds" data-index="{{ti}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+            </span>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="thresholds">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddThreshold"}}
+        </button>
+    </fieldset>
+</div>

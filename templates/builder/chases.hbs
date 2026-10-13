@@ -1,0 +1,90 @@
+<div class="builder-body standard-form">
+    {{> "modules/pf2e-subsystem-helper/templates/builder/partials/header.hbs"}}
+
+    {{! ---------- Obstacles ---------- }}
+    <fieldset class="builder-section">
+        <legend>{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Obstacles"}}</legend>
+        <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.ObstaclesHint"}}</p>
+        {{#each model.obstacles as |o oi|}}
+        <div class="builder-card obstacle-card" data-row="obstacle">
+            <header>
+                <span class="obstacle-index"></span>
+                <input type="text" name="obstacles.{{oi}}.name" value="{{o.name}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ObstacleName'}}">
+                <input type="number" class="obstacle-number" name="obstacles.{{oi}}.level" value="{{o.level}}"
+                    min="-1" step="1" placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Level'}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LevelHint'}}">
+                <input type="number" class="obstacle-number" name="obstacles.{{oi}}.chasePoints" value="{{o.chasePoints}}"
+                    min="1" step="1" placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ChasePoints'}}" data-tooltip
+                    aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.ChasePointsHint'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="obstacles" data-index="{{oi}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="obstacles" data-index="{{oi}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-trash" data-action="removeRow"
+                        data-path="obstacles" data-index="{{oi}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveObstacle'}}"></button>
+                </span>
+            </header>
+
+            <div data-editor="obstacles.{{oi}}.description"></div>
+
+            {{! Checks }}
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Checks"}}</span>
+            {{#each o.checks as |check ci|}}
+            <div class="builder-row check-row" data-row="check">
+                <select name="obstacles.{{oi}}.checks.{{ci}}.skill">
+                    {{selectOptions @root.skillChoices selected=check.skill}}
+                </select>
+                <input type="text" class="lore-name" name="obstacles.{{oi}}.checks.{{ci}}.lore" value="{{check.lore}}"
+                    data-lore placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.LoreName'}}"
+                    {{#unless (eq check.skill "lore")}}hidden{{/unless}}>
+                <input type="number" class="dc" name="obstacles.{{oi}}.checks.{{ci}}.dc" value="{{check.dc}}"
+                    min="0" step="1" placeholder="DC">
+                <input type="text" class="check-label" name="obstacles.{{oi}}.checks.{{ci}}.label" value="{{check.label}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.CheckLabel'}}">
+                <input type="hidden" name="obstacles.{{oi}}.checks.{{ci}}.extra" value="{{check.extra}}">
+                <input type="hidden" name="obstacles.{{oi}}.checks.{{ci}}.suffix" value="{{check.suffix}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-up" data-action="moveRow"
+                        data-path="obstacles.{{oi}}.checks" data-index="{{ci}}" data-delta="-1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveUp'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-arrow-down" data-action="moveRow"
+                        data-path="obstacles.{{oi}}.checks" data-index="{{ci}}" data-delta="1" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.MoveDown'}}"></button>
+                    <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                        data-path="obstacles.{{oi}}.checks" data-index="{{ci}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.RemoveCheck'}}"></button>
+                </span>
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="obstacles.{{oi}}.checks">
+                <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddCheck"}}
+            </button>
+
+            {{! Options }}
+            <span class="row-label">{{localize "PF2E-SUBSYSTEM-HELPER.Builder.Options"}}</span>
+            {{#each o.options as |opt pi|}}
+            <div class="builder-row option-row" data-row="option">
+                <input type="text" class="option-text" name="obstacles.{{oi}}.options.{{pi}}.html" value="{{opt.html}}"
+                    placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.OptionPlaceholder'}}">
+                <span class="row-controls">
+                    <button type="button" class="ui-control icon fa-solid fa-xmark" data-action="removeRow"
+                        data-path="obstacles.{{oi}}.options" data-index="{{pi}}" data-tooltip
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.Remove'}}"></button>
+                </span>
+            </div>
+            {{/each}}
+            <button type="button" class="add-row" data-action="addRow" data-path="obstacles.{{oi}}.options">
+                <i class="fa-solid fa-wand-sparkles"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddOption"}}
+            </button>
+        </div>
+        {{/each}}
+        <button type="button" class="add-row" data-action="addRow" data-path="obstacles">
+            <i class="fa-solid fa-plus"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Builder.AddObstacle"}}
+        </button>
+    </fieldset>
+</div>
