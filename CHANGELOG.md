@@ -1,3 +1,7 @@
+# 1.1.1
+Fixes
+- Research - removed duplicated code in the research page of the subsystem window causing duplicated entries when reading from the journal. Existing journal entries don't need any editing to take advantage of this fix.
+
 # 1.1.0
 New Features
 - added subsystem builder application as an alternative to manually editing journal pages

@@ -53,7 +53,6 @@
             <div class="checks">
                 {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.checks as |group|}}
-                {{#each topic.checks as |group|}}
                 <div class="check-group">
                     <div class="check-group-header">
                         {{#if group.label}}<strong>{{group.label}}</strong>{{/if}}
@@ -77,7 +76,6 @@
                     </div>
                     {{/each}}
                 </div>
-                {{/each}}
                 {{/each}}
             </div>
             {{/if}}
