@@ -1,3 +1,8 @@
+# 1.1.2
+Fixes
+- added missing localization for journal sheet type names
+- changed Infiltration player character buttons to match styling elsewhere
+
 # 1.1.1
 Fixes
 - Research - removed duplicated code in the research page of the subsystem window causing duplicated entries when reading from the journal. Existing journal entries don't need any editing to take advantage of this fix.
