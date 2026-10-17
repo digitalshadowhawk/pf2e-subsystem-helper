@@ -1,3 +1,7 @@
+# 1.2.0
+Improvements
+- added increase/decrease buttons to reputation entries
+
 # 1.1.2
 Fixes
 - added missing localization for journal sheet type names
