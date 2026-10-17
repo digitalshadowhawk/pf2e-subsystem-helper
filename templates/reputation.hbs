@@ -34,6 +34,14 @@
                             {{/each}}
                         </datalist>
                     </div>
+                    {{#if @root.isGM}}
+                    <div class="rep-buttons">
+                        <button type="button" class="ui-control icon fa-solid fa-minus" data-action="adjustReputation"
+                            data-delta="-1" data-tooltip aria-label="-1 Reputation"></button>
+                        <button type="button" class="ui-control icon fa-solid fa-plus" data-action="adjustReputation"
+                            data-delta="1" data-tooltip aria-label="+1 Reputation"></button>
+                    </div>
+                    {{/if}}
                     <span class="tier {{topic.tierKey}}" data-tooltip
                         aria-label="Base {{topic.points}} + {{topic.bonus}} from locations">{{topic.tierLabel}}</span>
                 </div>

@@ -80,6 +80,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             toggleModifier: Subsystems.#onToggleModifier,
             // Reputation
             toggleLocation: Subsystems.#onToggleLocation,
+            adjustReputation: Subsystems.#onAdjustReputation,
             // Chases
             chaseAward: Subsystems.#onChaseAward,
             chaseMove: Subsystems.#onChaseMove,
@@ -773,6 +774,21 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             if (completed.has(key)) completed.delete(key);
             else completed.add(key);
             entry.completed = [...completed];
+        });
+    }
+
+    /** 
+     * @this {Subsystems}
+     */
+    static async #onAdjustReputation(event, target) {
+        if (!game.user.isGM) return;
+        const topicId = topicOf(target);
+        const delta = Number(target.dataset.delta) || 0;
+        const { total = 0, bonus = 0 } = this.#reputation.get(topicId) ?? {};
+        const next = Math.clamp(total + delta, REPUTATION.min, REPUTATION.max);
+        if (next === total) return;
+        await this.#updateTopic("reputation", topicId, (entry) => {
+            entry.points = next - bonus;
         });
     }
 

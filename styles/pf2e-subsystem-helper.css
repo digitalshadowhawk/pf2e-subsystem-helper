@@ -633,6 +633,12 @@
   gap: var(--spacer-4);
 }
 
+#subsystems-window .rep-buttons {
+  display: flex;
+  gap: var(--spacer-2);
+  flex: 0 0 auto;
+}
+
 #subsystems-window .roster-pc {
   display: flex;
   flex: 0 0 auto;
