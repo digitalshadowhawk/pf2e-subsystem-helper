@@ -368,5 +368,15 @@
 				"revealed": "Discovered"
 			}
 		}
+	},
+	"Sheets": {
+		"Chase": "Chase Sheet",
+		"Infiltration": "Infiltration Sheet",
+		"Influence": "Influence Sheet",
+		"Reputation": "Reputation Sheet",
+		"Research": "Research Sheet",
+		"Victory": "Victory Points Sheet",
+		"Hacking": "Hacking Sheet"
+
 	}
 }
