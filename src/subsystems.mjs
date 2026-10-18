@@ -208,7 +208,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             [ChasePageSheet, `${LANG}.Sheets.Chase`],
             [InfiltrationPageSheet, `${LANG}.Sheets.Infiltration`],
             [VictoryPageSheet, `${LANG}.Sheets.Victory`],
-            ...(hasComputers() ? [[HackingPageSheet, `${LANG}.Sheets.Hacking`]] : [])
+            [HackingPageSheet, `${LANG}.Sheets.Hacking`]
         ]) {
             DocumentSheetConfig.registerSheet(foundry.documents.JournalEntryPage, MODULE_ID, cls, {
                 types: ["text"], makeDefault: false, label
