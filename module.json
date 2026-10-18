@@ -2,7 +2,7 @@
   "id": "pf2e-subsystem-helper",
   "title": "PF2e Subsystem Helper",
   "description": "Research, Influence, Reputation, Chases, Infiltration, Victory Points, and Hacking subsystems for PF2e and SF2e.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "compatibility": {
     "minimum": "14",
     "verified": "14"

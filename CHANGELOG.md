@@ -1,3 +1,8 @@
+# 1.2.1
+Fixes
+- actually put localization for journal sheet type names in the right spot
+- removed logic gating hacking journal sheet registration to prevent erorrs when loading before anachronism
+
 # 1.2.0
 Improvements
 - added increase/decrease buttons to reputation entries
