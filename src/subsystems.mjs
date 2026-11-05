@@ -368,7 +368,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 sliderEditable: isGM && state.discovered && !hasCategories,
                 categoriesEditable: isGM && state.discovered,
                 expanded: this.#expanded.has(topic.pageId),
-                markers: sliderMarkers(max, topic.thresholds),
+                markers: sliderMarkers(max, isGM ? topic.thresholds : topic.thresholds.filter((t) => t <= state.points)),
                 hasResults: state.discovered && topic.thresholds.some((t) => t <= total),
                 notes: details.notes
             };

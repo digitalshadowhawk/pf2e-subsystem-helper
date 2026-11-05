@@ -83,7 +83,7 @@
   flex: 0;
 }
 
-#subsystems-window .panel.active button.ui-control {
+#subsystems-window .panel.active .ui-control {
   --font-size: var(--font-size-14);
   --control-border-color: var(--subsystems-green);
   --control-hover-border-color: var(--subsystems-green-light);
@@ -1101,7 +1101,20 @@
   cursor: default;
 }
 
-#subsystems-window .bastion-status {
-  pointer-events: auto;
+#subsystems-window .controls .bastion-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--control-size);
+  height: var(--control-size);
+  border: 1px solid var(--control-border-color);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: var(--control-icon-color);
   cursor: help;
+}
+
+#subsystems-window .topic.bastion .controls .bastion-status + button {
+  border-radius: 0 4px 4px 0;
 }

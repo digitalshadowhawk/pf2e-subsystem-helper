@@ -1,3 +1,8 @@
+# 1.3.1
+Fixes
+- cleaned up some css to make the bastions integration discovered indicators match base research
+- changed base research to only show carets under the research track to players when they're discovered, to avoid spoiling the thresholds
+
 # 1.3.0
 New Features
 - added read-only adapter for Bastion of Blasphemies research data, including player-facing view of that data
