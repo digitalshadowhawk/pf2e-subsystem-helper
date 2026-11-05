@@ -11,7 +11,7 @@
     {{/if}}
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
-    {{#if topics.length}}
+    {{#if (or topics.length bastionTopics.length)}}
     <ol class="topics scrollable">
         {{~#each topics as |topic|~}}
         <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="research" data-topic="{{topic.pageId}}">
@@ -81,6 +81,39 @@
             {{/if}}
         </li>
         {{~/each~}}
+        {{#if bastionTopics.length}}
+        <li class="bastion-heading">
+            <i class="fa-solid fa-chess-rook"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Bastion.Heading"}}
+        </li>
+        {{~#each bastionTopics as |topic|~}}
+        <li class="topic bastion{{#unless topic.discovered}} undiscovered{{/unless}}"
+            data-subsystem="bastion" data-topic="{{topic.pageId}}">
+            <div class="form-group">
+                <label>{{{topic.pageLink}}}</label>
+                <div class="form-fields">
+                    <div class="track">
+                        <range-picker value="{{topic.points}}" min="0" max="{{topic.max}}" step="1" disabled
+                            data-tooltip="{{topic.readOnlyTooltip}}"></range-picker>
+                        <datalist>
+                            {{#each topic.markers as |m|}}
+                            <option label="{{#if m.threshold}}&#xf0d8;{{else}}|{{/if}}" {{#if m.threshold}}class="caret"{{/if}} style="--pos: {{m.pos}}"></option>
+                            {{/each}}
+                        </datalist>
+                    </div>
+                </div>
+                {{#if @root.isGM}}
+                <div class="controls split-button">
+                    <span class="ui-control icon {{topic.discoveredIcon}} bastion-status" data-tooltip
+                        aria-label="{{topic.discoveredTooltip}}"></span>
+                    <button type="button" class="ui-control icon fa-solid fa-message-arrow-up-right"
+                        data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}"
+                        {{#unless topic.hasResults}}disabled{{/unless}}></button>
+                </div>
+                {{/if}}
+            </div>
+        </li>
+        {{~/each~}}
+        {{/if}}
     </ol>
     {{else}}
     <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain research topics.{{else}}No research topics

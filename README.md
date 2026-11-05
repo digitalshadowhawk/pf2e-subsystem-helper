@@ -253,3 +253,7 @@ Description...
 - **Outcomes:** `**Critical Success**` and `**Success**` anywhere on the page. A critical success is twice the required successes on one access point, or hacking more than one.
 
 <img width="3061" height="1873" alt="image" src="https://github.com/user-attachments/assets/16a90683-16d6-49ad-b3bc-bcab8954380a" />
+
+# Integrations
+
+**Optional:** Bastion of Blasphemies. If you own Paizo’s official Bastion of Blasphemies module, the Research tab can also show research progress from its Campaign Manager, read-only, so players can follow along. It’s completely optional; nothing in this module needs it.

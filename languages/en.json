@@ -376,6 +376,14 @@
 			"Research": "Research Sheet",
 			"Victory": "Victory Points Sheet",
 			"Hacking": "Hacking Sheet"
+		},
+		"Bastion": {
+			"Heading": "Bastion of Blasphemies",
+			"ReadOnly": "Managed in the Bastion of Blasphemies Campaign Manager",
+			"Setting": {
+				"Name": "Show Bastion of Blasphemies Research",
+				"Hint": "List research topics from the Bastion of Blasphemies Campaign Manager in the Research tab. Progress and discovery are read from the adventure and can only be changed in its Campaign Manager; players see discovered topics."
+			}
 		}
 	}
 }

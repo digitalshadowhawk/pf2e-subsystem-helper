@@ -7,10 +7,12 @@ import { SubsystemPageSheet, ResearchPageSheet, InfluencePageSheet, ReputationPa
 import { applyAP, applyResult, buildInfiltrationView, clearForAll, infiltrationChatContent, infiltrationDefaults, movePC, parseInfiltration } from "./infiltration.mjs";
 import { adjustAccessPoint, applyCountermeasure, applyHackResult, buildHackingView, endHackingRound, hackingChatContent, hackingDefaults, parseComputer, toggleVulnerability } from "./hacking.mjs";
 import { PageBuilder } from "./page-builder.mjs";
+import { BASTION_SETTING, bastionActive, bastionResearchTopics } from "./bastion.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 const availableSubsystems = () => SUBSYSTEMS.filter((id) => id !== "hacking" || hasComputers());
+const bastionEnabled = () => bastionActive() && game.settings.get(MODULE_ID, "bastionResearch");
 
 /* -------------------------------------------- */
 /*  Module-level helpers                        */
@@ -178,6 +180,20 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             onChange: () => subsystems.manager?.render()
         });
 
+        game.settings.register(MODULE_ID, "bastionResearch", {
+            name: `${LANG}.Bastion.Setting.Name`,
+            hint: `${LANG}.Bastion.Setting.Hint`,
+            scope: "world",
+            config: bastionActive(),
+            type: Boolean,
+            default: true,
+            onChange: () => subsystems.manager?.render()
+        });
+
+        Hooks.on("updateSetting", (setting) => {
+            if (setting.key === BASTION_SETTING && bastionEnabled()) subsystems.manager?.render();
+        });
+
         Hooks.on("renderChatMessageHTML", (message, element) => {
             const flags = message.flags[MODULE_ID];
             const subsystem = flags?.results ?? (flags?.researchThresholds ? "research" : null);
@@ -234,6 +250,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
 
         this.topics = {
             research: textPages(this.journals.research).map((p) => parseTopic(p, PATTERNS.research)),
+            bastion: bastionEnabled() ? bastionResearchTopics() : [],
             influence: textPages(this.journals.influence).map((p) => parseTopic(p, PATTERNS.influence)),
             reputation: textPages(this.journals.reputation).map((p) => parseTopic(p, PATTERNS.reputation, tierThreshold)),
             chases: textPages(this.journals.chases)
@@ -354,6 +371,26 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 markers: sliderMarkers(max, topic.thresholds),
                 hasResults: state.discovered && topic.thresholds.some((t) => t <= total),
                 notes: details.notes
+            };
+        }));
+
+        const bastionPrefix = `${LANG}.Bastion`;
+        const bastion = this.topics.bastion.filter((t) => isGM || t.discovered);
+        partContext.bastionTopics = await Promise.all(bastion.map(async (topic) => {
+            const max = topic.thresholds.at(-1) ?? 0;
+            const points = Math.min(topic.points, max);
+            return {
+                ...topic,
+                ...visibilityControl(topic.discovered, prefix),
+                points,
+                max,
+                pageLink: isGM && topic.page
+                    ? topic.page.toAnchor({ name: topic.name }).outerHTML
+                    : foundry.utils.escapeHTML(topic.name),
+                readOnlyTooltip: _loc(`${bastionPrefix}.ReadOnly`),
+                toChatTooltip: _loc(`${prefix}.ToChat`),
+                markers: sliderMarkers(max, isGM ? topic.thresholds : topic.thresholds.filter((t) => t <= points)),
+                hasResults: topic.results.some((r) => isReached(r.threshold, points))
             };
         }));
     }
@@ -683,11 +720,12 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         if (!game.user.isGM) return;
         const { subsystem, topic: topicId } = target.closest("[data-topic]").dataset;
         const topic = this.topics[subsystem].find((t) => t.pageId === topicId);
-        const state = this.data[subsystem].topics[topicId];
+        if (!topic) return;
+        const points = subsystem === "bastion" ? topic.points : this.data[subsystem].topics[topicId]?.points ?? 0;
 
         const reached = subsystem === "reputation"
-            ? topic.results.filter((r) => tierReached(r.token, this.#reputation.get(topicId)?.total ?? state.points))
-            : topic.results.filter((r) => isReached(r.threshold, state.points));
+            ? topic.results.filter((r) => tierReached(r.token, this.#reputation.get(topicId)?.total ?? points))
+            : topic.results.filter((r) => isReached(r.threshold, points));
 
         const list = document.createElement("ol");
         for (const { label, element } of reached) {
@@ -702,7 +740,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         const content = `<h2>${topic.name}</h2>\n${list.outerHTML}`;
-        const flags = { [MODULE_ID]: { results: subsystem } };
+        const flags = { [MODULE_ID]: { results: subsystem === "bastion" ? "research" : subsystem } };
         await ChatMessage.implementation.create({ speaker: { user: game.user.id }, content, flags });
     }
 

@@ -1,3 +1,7 @@
+# 1.3.0
+New Features
+- added read-only adapter for Bastion of Blasphemies research data, including player-facing view of that data
+
 # 1.2.1
 Fixes
 - actually put localization for journal sheet type names in the right spot
