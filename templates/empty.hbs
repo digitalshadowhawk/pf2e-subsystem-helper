@@ -1,0 +1,12 @@
+<section class="subsystems-empty">
+    <i class="fa-solid fa-layer-group"></i>
+    <h3>{{localize "PF2E-SUBSYSTEM-HELPER.Empty.Title"}}</h3>
+    {{#if isGM}}
+    <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Empty.GMHint"}}</p>
+    <button type="button" data-action="openSettings">
+        <i class="fa-solid fa-gears"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Empty.OpenSettings"}}
+    </button>
+    {{else}}
+    <p class="hint">{{localize "PF2E-SUBSYSTEM-HELPER.Empty.PlayerHint"}}</p>
+    {{/if}}
+</section>

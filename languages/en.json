@@ -5,11 +5,21 @@
 			"EditInJournal": {
 				"Name": "Edit Pages in the Journal Editor",
 				"Hint": "When enabled, the edit button in the Subsystems window opens the page in the standard journal editor instead of the Page Builder form."
+			},
+			"EnabledSubsystems": {
+				"Name": "Enabled Subsystems",
+				"Hint": "Choose which subsystems appear as tabs in the Subsystems window. Hacking also needs the Computers skill (Starfinder 2e, or a module that adds it). Turning one off hides it but keeps its data."
 			}
 		},
 		"EditPage": {
 			"Form": "Edit with form",
 			"Journal": "Edit in journal"
+		},
+		"Empty": {
+			"Title": "No Subsystems Enabled",
+			"GMHint": "Turn subsystems on under Enabled Subsystems in this module's settings. Hacking also needs the Computers skill.",
+			"PlayerHint": "Your GM hasn't enabled any subsystems yet.",
+			"OpenSettings": "Open Settings"
 		},
 		"Tabs": {
 			"research": "Research",

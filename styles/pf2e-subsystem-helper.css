@@ -1118,3 +1118,35 @@
 #subsystems-window .topic.bastion .controls .bastion-status + button {
   border-radius: 0 4px 4px 0;
 }
+
+/* ---------- Empty state (no subsystems enabled) ---------- */
+
+#subsystems-window .subsystems-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacer-8);
+  padding: var(--spacer-16);
+  text-align: center;
+}
+
+#subsystems-window .subsystems-empty > i {
+  font-size: 2.5rem;
+  color: var(--color-text-tertiary);
+}
+
+#subsystems-window .subsystems-empty h3 {
+  margin: 0;
+  border: none;
+}
+
+#subsystems-window .subsystems-empty p.hint {
+  max-width: 28rem;
+  margin: 0;
+}
+
+#subsystems-window .subsystems-empty button {
+  width: auto;
+}

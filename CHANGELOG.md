@@ -1,3 +1,7 @@
+# 1.4.0
+New Features
+- added the ability to toggle unused subsystems off
+
 # 1.3.1
 Fixes
 - cleaned up some css to make the bastions integration discovered indicators match base research

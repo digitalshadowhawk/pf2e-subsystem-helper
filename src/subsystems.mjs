@@ -11,7 +11,10 @@ import { BASTION_SETTING, bastionActive, bastionResearchTopics } from "./bastion
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-const availableSubsystems = () => SUBSYSTEMS.filter((id) => id !== "hacking" || hasComputers());
+const availableSubsystems = () => {
+    const enabled = game.settings.get(MODULE_ID, "enabledSubsystems");
+    return SUBSYSTEMS.filter((id) => enabled.has(id) && (id !== "hacking" || hasComputers()));
+};
 const bastionEnabled = () => bastionActive() && game.settings.get(MODULE_ID, "bastionResearch");
 
 /* -------------------------------------------- */
@@ -78,6 +81,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             newPage: Subsystems.#onNewPage,
             editPage: Subsystems.#onEditPage,
             toggleSecret: Subsystems.#onToggleSecret,
+            openSettings: Subsystems.#onOpenSettings,
             // Influence
             toggleModifier: Subsystems.#onToggleModifier,
             // Reputation
@@ -136,6 +140,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /** @override */
     static PARTS = {
         tabs: { template: "templates/generic/tab-navigation.hbs" },
+        empty: { template: `modules/${MODULE_ID}/templates/empty.hbs` },
         ...Object.fromEntries(SUBSYSTEMS.map((id) => [id, {
             template: `modules/${MODULE_ID}/templates/${id}.hbs`,
             scrollable: ["ol.topics"]
@@ -167,6 +172,24 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 for (const app of foundry.applications.instances.values()) {
                     if (app instanceof SubsystemPageSheet && app.rendered) app.render();
                 }
+            }
+        });
+
+        const { SetField, StringField } = foundry.data.fields;
+        game.settings.register(MODULE_ID, "enabledSubsystems", {
+            name: `${LANG}.Settings.EnabledSubsystems.Name`,
+            hint: `${LANG}.Settings.EnabledSubsystems.Hint`,
+            scope: "world",
+            config: true,
+            type: new SetField(new StringField({
+                choices: Object.fromEntries(SUBSYSTEMS.map((id) => [id, `${LANG}.Tabs.${id}`]))
+            })),
+            default: [...SUBSYSTEMS],
+            onChange: async () => {
+                const manager = subsystems.manager;
+                if (!manager?.rendered) return;
+                await manager.close({ animate: false });
+                manager.render({ force: true });
             }
         });
 
@@ -283,13 +306,18 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         const parts = super._configureRenderParts(options);
         const available = availableSubsystems();
         for (const id of SUBSYSTEMS) if (!available.includes(id)) delete parts[id];
+        if (availableSubsystems().length) delete parts.empty;
+        else delete parts.tabs;
         return parts;
     }
 
     /** @override */
     _prepareTabs(group) {
-        const tabs = super._prepareTabs(group);
         const available = availableSubsystems();
+        if (group === "subsystems" && available.length && !available.includes(this.tabGroups.subsystems)) {
+            this.tabGroups.subsystems = available[0];
+        }
+        const tabs = super._prepareTabs(group);
         for (const id of SUBSYSTEMS) if (!available.includes(id)) delete tabs[id];
         return tabs;
     }
@@ -306,6 +334,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             case "infiltration": await this.#prepareInfiltrationContext(partContext); break;
             case "victory": await this.#prepareVictoryContext(partContext); break;
             case "hacking": await this.#prepareHackingContext(partContext); break;
+            case "empty": partContext.isGM = game.user.isGM; break;
         }
         return partContext;
     }
@@ -1237,5 +1266,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             .filter((p) => p.type === "text" && p.getFlag("core", "sheetClass") !== sheetClass)
             .map((p) => ({ _id: p.id, "flags.core.sheetClass": sheetClass }));
         if (updates.length) await journal.updateEmbeddedDocuments("JournalEntryPage", updates);
+    }
+
+    static #onOpenSettings() {
+        game.settings.sheet.render({ force: true });
     }
 }
