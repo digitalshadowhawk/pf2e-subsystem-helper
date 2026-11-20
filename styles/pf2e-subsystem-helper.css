@@ -437,6 +437,202 @@
   color: var(--color-text-secondary);
 }
 
+/* ---------- Reputation locations: number, level, tags ---------- */
+
+:is(#subsystems-window, .subsystem-view) .location {
+  flex-wrap: wrap;
+}
+
+:is(#subsystems-window, .subsystem-view) .location-number {
+  flex: 0 0 auto;
+  min-width: 1.75rem;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+:is(#subsystems-window, .subsystem-view) .location-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-4);
+  margin-left: auto;
+}
+
+:is(#subsystems-window, .subsystem-view) :is(.location-level, .location-tag) {
+  padding: 0 var(--spacer-6);
+  border-radius: 4px;
+  font-size: var(--font-size-11);
+  white-space: nowrap;
+}
+
+:is(#subsystems-window, .subsystem-view) .location-level {
+  background: var(--subsystems-green, #437066);
+  color: var(--color-light-1);
+  font-weight: bold;
+}
+
+:is(#subsystems-window, .subsystem-view) .location-tag {
+  border: 1px solid var(--color-light-5);
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .panel.active[data-tab="reputation"] .location.undiscovered :is(.location-number, .location-text, .location-meta) {
+  opacity: 0.5;
+}
+
+#subsystems-window.player-view .location:not(.completed) i {
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .panel.active[data-tab="reputation"] .research-result .result-threshold.tier {
+  flex: 0 0 auto;
+  background: var(--tier-color);
+  color: var(--color-light-1);
+}
+
+/* ---------- Reputation: filter bar ---------- */
+
+#subsystems-window [hidden] {
+  display: none !important;
+}
+
+/* One row: view toggle | Faction | Tag | Level | Search (takes the slack) | Clear */
+#subsystems-window .rep-filters {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) minmax(7rem, 1fr) auto minmax(9rem, 2fr) auto;
+  align-items: end;
+  gap: var(--spacer-8);
+  margin: var(--spacer-4) 0.5rem var(--spacer-8);
+}
+
+#subsystems-window .rep-filters .filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-2);
+  min-width: 0;
+  margin: 0;
+  font-size: var(--font-size-12);
+  font-weight: bold;
+}
+
+#subsystems-window .rep-filters .filter :is(select, input) {
+  width: 100%;
+  height: 1.75rem;
+  font-weight: normal;
+}
+
+#subsystems-window .rep-filters .level-range {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-2);
+}
+
+#subsystems-window .rep-filters .level-range input {
+  width: 3.25rem;
+  text-align: center;
+}
+
+#subsystems-window .rep-filters :is(.rep-view, .clear-filters) {
+  align-self: end;
+}
+
+#subsystems-window .rep-filters .clear-filters {
+  width: auto;
+  height: 1.75rem;
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}
+
+#subsystems-window .rep-view button.active {
+  --control-icon-color: var(--subsystems-gold);
+  border-color: var(--subsystems-gold);
+}
+
+/* Filtering opens factions that have matching locations */
+#subsystems-window .panel.active li.filter-match .checks {
+  display: flex;
+}
+
+/* ---------- Reputation: All Locations table ---------- */
+
+#subsystems-window .window-content > .tab.panel.active > div.rep-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  margin: 0 0.5rem;
+}
+
+#subsystems-window .rep-table table {
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-collapse: collapse;
+  background: none;
+}
+
+#subsystems-window .rep-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--spacer-4) var(--spacer-6);
+  border: none;
+  border-bottom: 2px solid var(--subsystems-green);
+  background: #e9e5da;                 /* opaque, so rows don't show through while scrolling */
+  text-align: left;
+  white-space: nowrap;
+}
+
+#subsystems-window .rep-table th button.sort {
+  --button-background-color: transparent;
+  --button-hover-background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-4);
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: none;
+  font-weight: bold;
+}
+
+#subsystems-window .rep-table th button.sort:focus { outline: none; box-shadow: none; }
+#subsystems-window .rep-table th button.sort:focus-visible { outline: 1px solid var(--subsystems-gold); }
+#subsystems-window .rep-table th button.sort.active { color: var(--subsystems-green); }
+
+#subsystems-window .rep-table td {
+  padding: var(--spacer-4) var(--spacer-6);
+  border: none;
+  vertical-align: middle;
+}
+
+#subsystems-window .rep-table tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
+
+#subsystems-window .rep-table :is(th, td):is(.col-number, .col-level) { width: 3rem; text-align: center; }
+#subsystems-window .rep-table .col-faction { white-space: nowrap; }
+#subsystems-window .rep-table .col-tags .location-tag { display: inline-block; margin: 1px var(--spacer-2) 1px 0; }
+#subsystems-window .rep-table :is(th, td).col-gained { width: 1%; white-space: nowrap; text-align: center; }
+
+/* Eye and checkbox side by side */
+#subsystems-window .rep-table .col-gained button.ui-control {
+  --control-size: 1.5rem;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+#subsystems-window .rep-table tr.undiscovered :is(.col-number, .col-name, .col-level, .col-faction, .col-tags) {
+  opacity: 0.5;
+}
+
+#subsystems-window.player-view .rep-table tr:not(.completed) .col-gained i {
+  color: var(--color-text-secondary);
+}
+
+#subsystems-window .filter-empty {
+  margin: var(--spacer-8) 1.5rem;
+  text-align: center;
+}
+
 /* ==========================================================================
     Chases
    ========================================================================== */

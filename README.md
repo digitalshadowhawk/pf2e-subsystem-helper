@@ -114,6 +114,8 @@ Helped at the Sandpoint Cathedral fire        <-- each line is +1 reputation whe
 Cleared the smuggler's tunnel
 ```
 
+Location details (optional): start a line with a number (12.), and add the level and tags in parentheses: 12. The Rusty Dragon (Level 3; tavern, social): .... Either part can be left out: (Level 3), (Tags: tavern, social).
+
 - **Thresholds:** lead-ins named after the reputation tiers: `Revered` (30+), `Admired` (15+), `Liked` (5+), `Ignored` (-4 to 4), `Disliked` (-5 or less), `Hated` (-15 or less), `Hunted` (-30 or less). Use whichever tiers matter; the page sheet lists them top-down.
 - **Locations:** lines under a `**Locations**` label (or a heading with "Location" in it). The GM ticks them off in the window, and each one adds +1 on top of the slider value. The slider will account for these when you drag it, so if you uncheck a location, the total will decrease from where you last moved the slider.
 - **No checks:** in the rules, Reputation changes only through favors and disservices, so reputation pages don't use check groups. Any checks on the page are kept as notes.

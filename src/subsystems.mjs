@@ -8,6 +8,8 @@ import { applyAP, applyResult, buildInfiltrationView, clearForAll, infiltrationC
 import { adjustAccessPoint, applyCountermeasure, applyHackResult, buildHackingView, endHackingRound, hackingChatContent, hackingDefaults, parseComputer, toggleVulnerability } from "./hacking.mjs";
 import { PageBuilder } from "./page-builder.mjs";
 import { BASTION_SETTING, bastionActive, bastionResearchTopics } from "./bastion.mjs";
+import { hasLocationKey } from "./location-meta.mjs";
+import { applyLocationFilters, emptyFilters, plainText, sortLocationRows } from "./location-filters.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -86,7 +88,11 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
             toggleModifier: Subsystems.#onToggleModifier,
             // Reputation
             toggleLocation: Subsystems.#onToggleLocation,
+            toggleLocationDiscovered: Subsystems.#onToggleLocationDiscovered,
             adjustReputation: Subsystems.#onAdjustReputation,
+            reputationView: Subsystems.#onReputationView,
+            reputationSort: Subsystems.#onReputationSort,
+            reputationClearFilters: Subsystems.#onReputationClearFilters,
             // Chases
             chaseAward: Subsystems.#onChaseAward,
             chaseMove: Subsystems.#onChaseMove,
@@ -154,6 +160,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     #expanded = new Set();
     #researchCategories = new Map();
     #reputation = new Map();
+    #reputationView = "factions";
+    #locationSort = { key: "number", dir: 1 };
+    #locationFilters = emptyFilters();
     #infilSelected = new Map();
     #infilHistory = new Map();
 
@@ -340,8 +349,44 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     /** @override */
+    async _preFirstRender(context, options) {
+        await super._preFirstRender(context, options);
+        await foundry.applications.handlebars.loadTemplates([
+            `modules/${MODULE_ID}/templates/partials/reputation-filters.hbs`,
+            `modules/${MODULE_ID}/templates/partials/reputation-table.hbs`
+        ]);
+    }
+
+    /** @override */
     async _onRender(context, options) {
         await super._onRender(context, options);
+        const repPanel = this.element.querySelector(".tab[data-tab='reputation']");
+        const filterBar = repPanel?.querySelector(".rep-filters");
+        if (filterBar) {
+            if (!filterBar.dataset.bound) {
+                filterBar.dataset.bound = "true";
+                filterBar.addEventListener("change", (event) => event.stopPropagation());
+                filterBar.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter") event.preventDefault();
+                });
+                filterBar.addEventListener("input", (event) => {
+                    const field = event.target.dataset.filter;
+                    if (!field) return;
+                    const value = event.target.value;
+                    this.#locationFilters[field] = field.endsWith("Level")
+                        ? (value === "" || Number.isNaN(Number(value)) ? null : Number(value))
+                        : value;
+                    applyLocationFilters(repPanel, this.#locationFilters);
+                });
+            }
+            for (const input of filterBar.querySelectorAll("[data-filter]")) {
+                const field = input.dataset.filter;
+                const value = this.#locationFilters[field] ?? "";
+                input.value = value;
+                if (input.tagName === "SELECT" && input.value !== String(value)) this.#locationFilters[field] = "";
+            }
+            applyLocationFilters(repPanel, this.#locationFilters);
+        }
         this.element.classList.toggle("player-view", !game.user.isGM);
     }
 
@@ -351,16 +396,21 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         return SubsystemPageSheet.parse(html, page.name, options);
     }
 
-    async #thresholdResults(results, points, { discovered, page }) {
+    /**
+     * @param {object[]} results
+     * @param {(result: object) => boolean} reachedFn
+     */
+    async #thresholdResults(results, reachedFn, { discovered, page }) {
         const isGM = game.user.isGM;
         return Promise.all(results
-            .map((r) => ({ ...r, reached: isReached(r.threshold, points) }))
+            .map((r) => ({ ...r, reached: reachedFn(r) }))
             .filter((r) => isGM || (discovered && r.reached))
             .map(async (r) => {
                 const element = r.element.cloneNode(true);
-                element.querySelector("strong, b")?.remove();      // the "N Research Points" lead-in becomes the badge
+                element.querySelector("strong, b")?.remove();      // the lead-in ("5 Research Points", "Liked") becomes the badge
                 return {
                     label: r.label,
+                    tierKey: r.label.toLowerCase(),
                     reached: r.reached,
                     html: await enrich(element.innerHTML.trim(), { relativeTo: page, secrets: isGM })
                 };
@@ -399,7 +449,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
 
             const total = hasCategories ? Math.min(checks.reduce((sum, g) => sum + g.points, 0), max) : state.points;
 
-            const thresholdResults = await this.#thresholdResults(topic.results, total, { discovered: state.discovered, page });
+            const thresholdResults = await this.#thresholdResults(topic.results, (r) => isReached(r.threshold, total), { discovered: state.discovered, page });
 
             return {
                 ...topic,
@@ -429,7 +479,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         partContext.bastionTopics = await Promise.all(bastion.map(async (topic) => {
             const max = topic.thresholds.at(-1) ?? 0;
             const points = Math.min(topic.points, max);
-            const thresholdResults = await this.#thresholdResults(topic.results, points, topic);
+            const thresholdResults = await this.#thresholdResults(topic.results, (r) => isReached(r.threshold, points), topic);
             return {
                 ...topic,
                 ...visibilityControl(topic.discovered, prefix),
@@ -485,7 +535,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 max,
                 storedMax: state.max,
                 defaultMax,
-                pageLink: page.toAnchor({ name: topic.name }).outerHTML,
+                pageLink: isGM
+                    ? page.toAnchor({ name: topic.name }).outerHTML
+                    : foundry.utils.escapeHTML(topic.name),
                 toChatTooltip: _loc(`${prefix}.Topic.ToChat`),
                 checksTooltip: _loc(`${prefix}.Topic.Checks`),
                 checks,
@@ -502,23 +554,43 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
 
     async #prepareReputationContext(partContext) {
         const prefix = `${LANG}.Reputation`;
+        const isGM = game.user.isGM;
         const journal = this.journals.reputation;
         const span = REPUTATION.max - REPUTATION.min;
         partContext.instructions = await enrich(_loc(`${prefix}.Instructions`));
 
         partContext.topics = await Promise.all(this.#visibleTopics("reputation").map(async (topic) => {
             const page = journal.pages.get(topic.pageId);
-            const state = this.data.reputation.topics[topic.pageId] ?? { discovered: false, points: 0, completed: [] };
+            const state = this.data.reputation.topics[topic.pageId]
+                ?? { discovered: false, points: 0, completed: [], discoveredLocations: [] };
 
-            const completed = new Set(state.completed ?? []);
-            const locations = (await parseReputationLocations(page)).map((l) => ({ ...l, completed: completed.has(l.key) }));
+            const completedKeys = new Set(state.completed ?? []);
+            const discoveredKeys = new Set(state.discoveredLocations ?? []);
+            const locations = (await parseReputationLocations(page)).map((l) => {
+                const completed = hasLocationKey(completedKeys, l);
+                const discovered = completed || hasLocationKey(discoveredKeys, l);
+                const name = plainText(l.html);
+                return {
+                    ...l,
+                    name,
+                    completed,
+                    discovered,
+                    discoveredIcon: discovered ? "fa-solid fa-eye" : "fa-solid fa-eye-slash",
+                    discoveredTooltip: _loc(`${prefix}.Location.${discovered ? "Discovered" : "Undiscovered"}`),
+                    // For the filters
+                    tagData: l.tags.join("|"),
+                    search: [l.number, name, ...l.tags, topic.name].filter(Boolean).join(" ").toLowerCase()
+                };
+            });
             const { notes } = await this.#pageDetails(page, {
                 pattern: PATTERNS.reputation, toThreshold: tierThreshold, collectLocations: true
             });
             const bonus = locations.filter((l) => l.completed).length;
             const total = Math.clamp(state.points + bonus, REPUTATION.min, REPUTATION.max);
-            const shown = game.user.isGM ? locations : locations.filter((l) => l.completed);
+            const shown = isGM ? locations : locations.filter((l) => l.discovered);
             this.#reputation.set(topic.pageId, { total, bonus });
+            const thresholdResults = await this.#thresholdResults(topic.results,
+                (r) => tierReached(r.token, total), { discovered: state.discovered, page });
 
             const tier = reputationTier(total);
             const markerValues = [...new Set([...REPUTATION.ticks, ...topic.thresholds])]
@@ -535,11 +607,12 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 max: REPUTATION.max,
                 tierKey: tier.toLowerCase(),
                 tierLabel: _loc(`${prefix}.Tier.${tier}`),
-                pageLink: page.toAnchor({ name: topic.name }).outerHTML,
+                pageLink: isGM
+                    ? page.toAnchor({ name: topic.name }).outerHTML
+                    : foundry.utils.escapeHTML(topic.name),
                 toChatTooltip: _loc(`${prefix}.Topic.ToChat`),
                 locationsTooltip: _loc(`${prefix}.Topic.Locations`),
                 locations: shown,
-                hasDetails: shown.length > 0,
                 expanded: this.#expanded.has(topic.pageId),
                 markers: markerValues.map((n) => ({
                     threshold: topic.thresholds.includes(n),
@@ -547,9 +620,38 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 })),
                 hasResults: state.discovered && topic.results.some((r) => tierReached(r.token, total)),
                 notes,
-                hasDetails: shown.length > 0 || !!notes
+                thresholdResults,
+                hasDetails: shown.length > 0 || !!notes || thresholdResults.length > 0
             };
         }));
+
+        partContext.view = this.#reputationView;
+
+        let order = 0;
+        const rows = partContext.topics.flatMap((t) => t.locations.map((l) => ({
+            ...l,
+            topic: t.pageId,
+            faction: t.name,
+            order: order++
+        })));
+        partContext.locationRows = sortLocationRows(rows, this.#locationSort);
+
+        partContext.filterFactions = Object.fromEntries(partContext.topics.map((t) => [t.pageId, t.name]));
+        partContext.filterTags = [...new Set(rows.flatMap((r) => r.tags))]
+            .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+        const sort = this.#locationSort;
+        const column = (key, sortable = true) => ({
+            key,
+            sortable,
+            label: _loc(`${prefix}.Table.${key}`),
+            active: sortable && sort.key === key,
+            icon: sort.dir > 0 ? "fa-caret-up" : "fa-caret-down"
+        });
+        partContext.sortColumns = [
+            column("number"), column("name"), column("level"), column("faction"),
+            column("tags", false), column("gained", false)
+        ];
     }
 
     async #prepareChaseContext(partContext) {
@@ -666,7 +768,9 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 ...visibilityControl(state.discovered, `${prefix}.Topic`, "eye"),
                 points: Math.min(state.points, max),
                 max,
-                pageLink: page.toAnchor({ name: topic.name }).outerHTML,
+                pageLink: isGM
+                    ? page.toAnchor({ name: topic.name }).outerHTML
+                    : foundry.utils.escapeHTML(topic.name),
                 toChatTooltip: _loc(`${prefix}.Topic.ToChat`),
                 checksTooltip: _loc(`${prefix}.Topic.Checks`),
                 checks,
@@ -824,6 +928,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         new PageBuilder({ subsystem, page }).render({ force: true });
     }
 
+    /** @this {Subsystems} */
     static async #onToggleSecret(event, target) {
         if (!game.user.isGM) return;
         const { subsystem, topic } = target.closest("[data-topic]").dataset;
@@ -858,16 +963,35 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
     /*  Reputation actions                          */
     /* -------------------------------------------- */
 
+    async #toggleLocationKey(target, list) {
+        if (!game.user.isGM) return;
+        const { key, legacyKey } = target.dataset;
+        await this.#updateTopic("reputation", topicOf(target), (entry) => {
+            const lists = {
+                completed: new Set(entry.completed ?? []),
+                discoveredLocations: new Set(entry.discoveredLocations ?? [])
+            };
+            if (legacyKey) {
+                for (const keys of Object.values(lists)) if (keys.delete(legacyKey)) keys.add(key);
+            }
+            const keys = lists[list];
+            const adding = !keys.has(key);
+            if (adding) keys.add(key);
+            else keys.delete(key);
+            if (list === "completed" && adding) lists.discoveredLocations.add(key);
+            entry.completed = [...lists.completed];
+            entry.discoveredLocations = [...lists.discoveredLocations];
+        });
+    }
+
     /** @this {Subsystems} */
     static async #onToggleLocation(event, target) {
-        if (!game.user.isGM) return;
-        const key = target.dataset.key;
-        await this.#updateTopic("reputation", topicOf(target), (entry) => {
-            const completed = new Set(entry.completed ?? []);
-            if (completed.has(key)) completed.delete(key);
-            else completed.add(key);
-            entry.completed = [...completed];
-        });
+        await this.#toggleLocationKey(target, "completed");
+    }
+
+    /** @this {Subsystems} */
+    static async #onToggleLocationDiscovered(event, target) {
+        await this.#toggleLocationKey(target, "discoveredLocations");
     }
 
     /** 
@@ -883,6 +1007,26 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         await this.#updateTopic("reputation", topicId, (entry) => {
             entry.points = next - bonus;
         });
+    }
+
+    /** @this {Subsystems} */
+    static #onReputationView(event, target) {
+        this.#reputationView = target.dataset.view === "table" ? "table" : "factions";
+        this.render();
+    }
+
+    /** @this {Subsystems} */
+    static #onReputationSort(event, target) {
+        const key = target.dataset.sort;
+        const current = this.#locationSort;
+        this.#locationSort = { key, dir: current.key === key ? -current.dir : 1 };
+        this.render();
+    }
+
+    /** @this {Subsystems} */
+    static #onReputationClearFilters() {
+        this.#locationFilters = emptyFilters();
+        this.render();
     }
 
     /* -------------------------------------------- */
@@ -1294,6 +1438,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         if (updates.length) await journal.updateEmbeddedDocuments("JournalEntryPage", updates);
     }
 
+    /** @this {Subsystems} */
     static #onOpenSettings() {
         game.settings.sheet.render({ force: true });
     }

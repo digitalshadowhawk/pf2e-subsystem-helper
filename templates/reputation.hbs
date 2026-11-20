@@ -12,6 +12,11 @@
     <p class="hint">{{{instructions}}}</p>
     {{/if}}
     {{#if topics.length}}
+    {{> "modules/pf2e-subsystem-helper/templates/partials/reputation-filters.hbs"}}
+    {{/if}}
+    {{#if (and topics.length (eq view "table"))}}
+    {{> "modules/pf2e-subsystem-helper/templates/partials/reputation-table.hbs"}}
+    {{else if topics.length}}
     <ol class="topics scrollable">
         {{~#each topics as |topic|~}}
         <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="reputation"
@@ -54,7 +59,8 @@
                         data-action="resultsToChat" data-tooltip aria-label="{{topic.toChatTooltip}}" {{#unless
                         topic.hasResults}}disabled{{/unless}}></button>
                     <button type="button" class="ui-control icon fa-solid fa-pen-ruler" data-action="editPage"
-                        data-tooltip="{{@root.editTooltip}}" aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
+                        data-tooltip="{{@root.editTooltip}}"
+                        aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Builder.EditWithForm'}}"></button>
                 </div>
                 {{/if}}
             </div>
@@ -62,22 +68,47 @@
             <div class="checks locations">
                 {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.locations as |loc|}}
-                <div class="location{{#if loc.completed}} completed{{/if}}">
+                <div class="location{{#if loc.completed}} completed{{/if}}{{#unless loc.discovered}} undiscovered{{/unless}}"
+                    data-location data-tags="{{loc.tagData}}" data-level="{{loc.level}}" data-search="{{loc.search}}">
                     {{#if @root.isGM}}
+                    <button type="button" class="ui-control icon {{loc.discoveredIcon}}"
+                        data-action="toggleLocationDiscovered" data-key="{{loc.key}}"
+                        data-legacy-key="{{loc.legacyKey}}" data-tooltip aria-label="{{loc.discoveredTooltip}}"
+                        aria-pressed="{{loc.discovered}}"></button>
                     <button type="button"
                         class="ui-control icon fa-regular {{#if loc.completed}}fa-square-check{{else}}fa-square{{/if}}"
-                        data-action="toggleLocation" data-key="{{loc.key}}" aria-pressed="{{loc.completed}}"></button>
+                        data-action="toggleLocation" data-key="{{loc.key}}" data-legacy-key="{{loc.legacyKey}}"
+                        aria-pressed="{{loc.completed}}"></button>
                     {{else}}
-                    <i class="fa-regular fa-square-check"></i>
+                    <i class="fa-regular {{#if loc.completed}}fa-square-check{{else}}fa-square{{/if}}"></i>
                     {{/if}}
+                    {{#if loc.number}}<span class="location-number">{{loc.number}}</span>{{/if}}
                     <span class="location-text">{{{loc.html}}}</span>
+                    {{#if (or (ne loc.level null) loc.tags.length)}}
+                    <span class="location-meta">
+                        {{#if (ne loc.level null)}}<span class="location-level">{{localize
+                            "PF2E-SUBSYSTEM-HELPER.Reputation.Level" level=loc.level}}</span>{{/if}}
+                        {{#each loc.tags as |tag|}}<span class="location-tag">{{tag}}</span>{{/each}}
+                    </span>
+                    {{/if}}
                 </div>
                 {{/each}}
+                {{#if topic.thresholdResults.length}}
+                <ol class="research-results">
+                    {{#each topic.thresholdResults as |result|}}
+                    <li class="research-result{{#unless result.reached}} unreached{{/unless}}">
+                        <span class="result-threshold tier {{result.tierKey}}">{{result.label}}</span>
+                        <div class="result-text">{{{result.html}}}</div>
+                    </li>
+                    {{/each}}
+                </ol>
+                {{/if}}
             </div>
             {{/if}}
         </li>
         {{~/each~}}
     </ol>
+    <p class="hint filter-empty" hidden>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.NoMatches"}}</p>
     {{else}}
     <p class="hint">{{#if @root.isGM}}Select a journal whose pages contain factions.{{else}}No factions discovered
         yet.{{/if}}</p>

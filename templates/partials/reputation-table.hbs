@@ -1,0 +1,46 @@
+{{!-- "All locations" view: every visible location across all factions. --}}
+<div class="rep-table">
+    <table>
+        <thead>
+            <tr>
+                {{#each sortColumns as |col|}}
+                <th class="col-{{col.key}}">
+                    {{#if col.sortable}}
+                    <button type="button" class="sort{{#if col.active}} active{{/if}}" data-action="reputationSort"
+                        data-sort="{{col.key}}">
+                        {{col.label}}{{#if col.active}} <i class="fa-solid {{col.icon}}"></i>{{/if}}
+                    </button>
+                    {{else}}{{col.label}}{{/if}}
+                </th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each locationRows as |row|}}
+            <tr class="{{#if row.completed}}completed{{/if}}{{#unless row.discovered}} undiscovered{{/unless}}"
+                data-location data-topic="{{row.topic}}" data-tags="{{row.tagData}}" data-level="{{row.level}}"
+                data-search="{{row.search}}">
+                <td class="col-number">{{row.number}}</td>
+                <td class="col-name">{{{row.html}}}</td>
+                <td class="col-level">{{row.level}}</td>
+                <td class="col-faction">{{row.faction}}</td>
+                <td class="col-tags">{{#each row.tags as |tag|}}<span class="location-tag">{{tag}}</span>{{/each}}</td>
+                <td class="col-gained">
+                    {{#if @root.isGM}}
+                    <button type="button" class="ui-control icon {{row.discoveredIcon}}"
+                        data-action="toggleLocationDiscovered" data-key="{{row.key}}" data-legacy-key="{{row.legacyKey}}"
+                        data-tooltip aria-label="{{row.discoveredTooltip}}" aria-pressed="{{row.discovered}}"></button>
+                    <button type="button"
+                        class="ui-control icon fa-regular {{#if row.completed}}fa-square-check{{else}}fa-square{{/if}}"
+                        data-action="toggleLocation" data-key="{{row.key}}" data-legacy-key="{{row.legacyKey}}"
+                        aria-pressed="{{row.completed}}"></button>
+                    {{else}}
+                    <i class="fa-regular {{#if row.completed}}fa-square-check{{else}}fa-square{{/if}}"></i>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <p class="hint filter-empty" hidden>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.NoMatches"}}</p>
+</div>

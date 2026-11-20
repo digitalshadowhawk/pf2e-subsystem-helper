@@ -740,7 +740,7 @@ export const BUILDERS = {
                     ...groupsToHtml(groupsFromParsed(parsed.groups))
                 ]),
                 thresholds: parsed.thresholds.map((t) => ({ tier: tierKey(t.token), html: restoreChecks(t.html) })),
-                locations: parsed.locations.map((l) => ({ html: restoreChecks(l.html) }))
+                locations: parsed.locations.map((l) => ({ html: restoreChecks(l.source ?? l.html) }))
             };
         },
 

@@ -24,7 +24,8 @@ export class SubsystemData extends foundry.abstract.DataModel {
             reputation: subsystem({
                 discovered: new fields.BooleanField({ initial: false }),
                 points: new fields.NumberField({ required: true, nullable: false, integer: true, min: -50, max: 50, initial: 0 }),
-                completed: new fields.ArrayField(new fields.StringField({ blank: false }), { initial: [] })
+                completed: new fields.ArrayField(new fields.StringField({ blank: false }), { initial: [] }),
+                discoveredLocations: new fields.ArrayField(new fields.StringField({ required: true, blank: false })),
             }),
             chases: subsystem({
                 discovered: new fields.BooleanField({ initial: false }),

@@ -1,0 +1,44 @@
+{{!-- Shared filter bar for both Reputation views. Inputs have no name: they never reach the settings form. --}}
+<div class="rep-filters">
+    <div class="rep-view split-button">
+        <button type="button" class="ui-control icon fa-solid fa-list{{#if (eq view "factions")}} active{{/if}}"
+            data-action="reputationView" data-view="factions" data-tooltip
+            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Reputation.Filters.ByFaction'}}"
+            aria-pressed="{{eq view "factions"}}"></button>
+        <button type="button" class="ui-control icon fa-solid fa-table-list{{#if (eq view "table")}} active{{/if}}"
+            data-action="reputationView" data-view="table" data-tooltip
+            aria-label="{{localize 'PF2E-SUBSYSTEM-HELPER.Reputation.Filters.AllLocations'}}"
+            aria-pressed="{{eq view "table"}}"></button>
+    </div>
+    <label class="filter">
+        <span>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Faction"}}</span>
+        <select data-filter="faction">
+            {{selectOptions filterFactions blank=(localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.All")}}
+        </select>
+    </label>
+    <label class="filter">
+        <span>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Tag"}}</span>
+        <select data-filter="tag" {{#unless filterTags.length}}disabled{{/unless}}>
+            <option value="">{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.All"}}</option>
+            {{#each filterTags as |tag|}}<option value="{{tag}}">{{tag}}</option>{{/each}}
+        </select>
+    </label>
+    <label class="filter level">
+        <span>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Level"}}</span>
+        <span class="level-range">
+            <input type="number" data-filter="minLevel" step="1"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Min'}}">
+            <span>-</span>
+            <input type="number" data-filter="maxLevel" step="1"
+                placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Max'}}">
+        </span>
+    </label>
+    <label class="filter text-search">
+        <span>{{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Search"}}</span>
+        <input type="text" data-filter="search"
+            placeholder="{{localize 'PF2E-SUBSYSTEM-HELPER.Reputation.Filters.SearchPlaceholder'}}">
+    </label>
+    <button type="button" class="clear-filters" data-action="reputationClearFilters">
+        <i class="fa-solid fa-rotate-left"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Reputation.Filters.Clear"}}
+    </button>
+</div>

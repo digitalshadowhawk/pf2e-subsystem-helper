@@ -1,5 +1,7 @@
 import { CATEGORY_MAX, PATTERNS, kindOfModifier } from "./utils.mjs";
 import { modifierSkills } from "./modifiers.mjs";
+import { parseLocationMeta, withLocationKeys } from "./location-meta.mjs";
+
 
 /* ==========================================================================
    Page parsers used by the Subsystems window
@@ -108,7 +110,11 @@ export async function parseReputationLocations(page) {
             inLocations = /location/i.test(text);
             continue;
         }
-        if (inLocations && text) locations.push({ key: `location-${locations.length}`, html: el.innerHTML });
+        if (inLocations && text) locations.push({
+            key: `location-${locations.length}`,
+            source: el.innerHTML,
+            ...parseLocationMeta(el.innerHTML)
+        });
     }
-    return locations;
+    return withLocationKeys(locations);
 }

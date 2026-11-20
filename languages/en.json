@@ -55,6 +55,7 @@
 		},
 		"Reputation": {
 			"Instructions": "Track each faction's reputation. Tiers are marked on the slider, and completed locations each add +1.",
+			"Level": "Level {level}",
 			"Topic": {
 				"Discovered": "Faction Met",
 				"Undiscovered": "Unknown Faction",
@@ -69,6 +70,32 @@
 				"Liked": "Liked",
 				"Admired": "Admired",
 				"Revered": "Revered"
+			},
+			"Location": {
+				"Discovered": "Location known to the players",
+				"Undiscovered": "Location hidden from the players"
+			},
+			"Filters": {
+				"ByFaction": "By faction",
+				"AllLocations": "All locations",
+				"Faction": "Faction",
+				"Tag": "Tag",
+				"Level": "Level",
+				"Min": "Min",
+				"Max": "Max",
+				"Search": "Search",
+				"SearchPlaceholder": "Name, number, or tag…",
+				"Clear": "Clear filters",
+				"All": "All",
+				"NoMatches": "No locations match these filters."
+			},
+			"Table": {
+				"number": "#",
+				"name": "Location",
+				"level": "Level",
+				"faction": "Faction",
+				"tags": "Tags",
+				"gained": "Rep Gained"
 			}
 		},
 		"Chases": {

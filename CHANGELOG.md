@@ -1,3 +1,9 @@
+# 1.5.0
+New Features
+- added discovery options, location numbers, location levels, and tags to each location in the Reputation subsystem
+- added "all locations"/"by faction" views for those locations
+- added search and sort functionality to those locations, regardless of view
+
 # 1.4.1
 Improvements
 - removed clickable journal links from player view

@@ -3,6 +3,7 @@ import { PATTERNS, CATEGORY_MAX, REPUTATION, adjustCheckHtml, kindOfModifier, re
 import { parseInfiltration, infiltrationDefaults, infiltrationStatus, currentDC, failThreshold } from "./infiltration.mjs";
 import { hackingDefaults, hackingStatus, parseComputer, reduceChecks } from "./hacking.mjs";
 import { applyModifiersToGroups, modifierSkills, skillsLabel } from "./modifiers.mjs";
+import { parseLocationMeta, withLocationKeys, hasLocationKey } from "./location-meta.mjs";
 
 const { JournalEntryPageProseMirrorSheet } = foundry.applications.sheets.journal;
 
@@ -226,7 +227,11 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
 
                 if (isLocationSection()) {
                     consumePending();
-                    locations.push({ key: `location-${locations.length}`, html: el.innerHTML });
+                    locations.push({
+                        key: `location-${locations.length}`,
+                        source: el.innerHTML,
+                        ...parseLocationMeta(el.innerHTML)
+                    });
                     continue;
                 }
             }
@@ -258,7 +263,7 @@ export class SubsystemPageSheet extends JournalEntryPageProseMirrorSheet {
                 };
             }),
             modifiers,
-            locations
+            locations: withLocationKeys(locations)
         };
     }
 }
@@ -405,7 +410,7 @@ export class ReputationPageSheet extends SubsystemPageSheet {
         const toPct = (n) => ((Math.clamp(n, min, max) - min) / (max - min)) * 100;
 
         const completed = new Set(state?.completed ?? []);
-        const locations = parsed.locations.map((l) => ({ ...l, completed: completed.has(l.key) }));
+        const locations = parsed.locations.map((l) => ({ ...l, completed: hasLocationKey(completed, l) }));
         const bonus = locations.filter((l) => l.completed).length;
         const base = state?.points ?? 0;
         const total = state ? Math.clamp(base + bonus, min, max) : 0;
