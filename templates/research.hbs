@@ -16,11 +16,9 @@
         {{~#each topics as |topic|~}}
         <li class="topic{{#if topic.expanded}} expanded{{/if}}" data-subsystem="research" data-topic="{{topic.pageId}}">
             <div class="form-group">
-                {{#if @root.isGM}}
                 <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
-                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}" {{#unless (or
-                    topic.checks.length topic.notes)}}disabled{{/unless}}></button>
-                {{/if}}
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}"
+                    {{#unless topic.hasDetails}}disabled{{/unless}}></button>
                 <label for="{{../rootId}}-research.{{topic.pageId}}.points">{{{topic.pageLink}}}</label>
                 <div class="form-fields">
                     <div class="track">
@@ -49,7 +47,7 @@
                 </div>
                 {{/if}}
             </div>
-            {{#if (or topic.checks.length topic.notes)}}
+            {{#if topic.hasDetails}}
             <div class="checks">
                 {{#if topic.notes}}<div class="topic-notes">{{{topic.notes}}}</div>{{/if}}
                 {{#each topic.checks as |group|}}
@@ -77,6 +75,16 @@
                     {{/each}}
                 </div>
                 {{/each}}
+                {{#if topic.thresholdResults.length}}
+                <ol class="research-results">
+                    {{#each topic.thresholdResults as |result|}}
+                    <li class="research-result{{#unless result.reached}} unreached{{/unless}}">
+                        <span class="result-threshold">{{result.label}}</span>
+                        <div class="result-text">{{{result.html}}}</div>
+                    </li>
+                    {{/each}}
+                </ol>
+                {{/if}}
             </div>
             {{/if}}
         </li>
@@ -86,9 +94,12 @@
             <i class="fa-solid fa-chess-rook"></i> {{localize "PF2E-SUBSYSTEM-HELPER.Bastion.Heading"}}
         </li>
         {{~#each bastionTopics as |topic|~}}
-        <li class="topic bastion{{#unless topic.discovered}} undiscovered{{/unless}}"
+        <li class="topic bastion{{#if topic.expanded}} expanded{{/if}}{{#unless topic.discovered}} undiscovered{{/unless}}"
             data-subsystem="bastion" data-topic="{{topic.pageId}}">
             <div class="form-group">
+                <button type="button" class="ui-control icon fa-solid fa-caret-right toggle-checks"
+                    data-action="toggleChecks" data-tooltip aria-label="{{topic.checksTooltip}}"
+                    {{#unless topic.hasDetails}}disabled{{/unless}}></button>
                 <label>{{{topic.pageLink}}}</label>
                 <div class="form-fields">
                     <div class="track">
@@ -111,6 +122,18 @@
                 </div>
                 {{/if}}
             </div>
+            {{#if topic.hasDetails}}
+            <div class="checks">
+                <ol class="research-results">
+                    {{#each topic.thresholdResults as |result|}}
+                    <li class="research-result{{#unless result.reached}} unreached{{/unless}}">
+                        <span class="result-threshold">{{result.label}}</span>
+                        <div class="result-text">{{{result.html}}}</div>
+                    </li>
+                    {{/each}}
+                </ol>
+            </div>
+            {{/if}}
         </li>
         {{~/each~}}
         {{/if}}

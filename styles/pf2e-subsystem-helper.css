@@ -309,6 +309,44 @@
   max-width: 20rem;
 }
 
+#subsystems-window .research-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+  align-self: stretch;
+  margin: var(--spacer-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#subsystems-window .research-result {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacer-8);
+}
+
+#subsystems-window .research-result .result-threshold {
+  flex: 0 0 auto;
+  padding: 0 var(--spacer-6);
+  border-radius: 4px;
+  background: var(--subsystems-gold);
+  color: var(--color-dark-1);
+  font-size: var(--font-size-12);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+#subsystems-window .research-result .result-text > :first-child { margin-top: 0; }
+#subsystems-window .research-result .result-text > :last-child  { margin-bottom: 0; }
+
+#subsystems-window .research-result.unreached {
+  opacity: 0.5;
+}
+
+#subsystems-window .research-result.unreached .result-threshold {
+  background: var(--color-light-5);
+}F
+
 /* ==========================================================================
     Influence and Victory Points
    ========================================================================== */

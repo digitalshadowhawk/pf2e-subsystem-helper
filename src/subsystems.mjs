@@ -351,6 +351,22 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         return SubsystemPageSheet.parse(html, page.name, options);
     }
 
+    async #thresholdResults(results, points, { discovered, page }) {
+        const isGM = game.user.isGM;
+        return Promise.all(results
+            .map((r) => ({ ...r, reached: isReached(r.threshold, points) }))
+            .filter((r) => isGM || (discovered && r.reached))
+            .map(async (r) => {
+                const element = r.element.cloneNode(true);
+                element.querySelector("strong, b")?.remove();      // the "N Research Points" lead-in becomes the badge
+                return {
+                    label: r.label,
+                    reached: r.reached,
+                    html: await enrich(element.innerHTML.trim(), { relativeTo: page, secrets: isGM })
+                };
+            }));
+    }
+
     #visibleTopics(subsystem) {
         const topics = this.topics[subsystem];
         if (game.user.isGM) return topics;
@@ -383,13 +399,16 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
 
             const total = hasCategories ? Math.min(checks.reduce((sum, g) => sum + g.points, 0), max) : state.points;
 
+            const thresholdResults = await this.#thresholdResults(topic.results, total, { discovered: state.discovered, page });
+
             return {
                 ...topic,
                 ...state,
                 ...visibilityControl(state.discovered, prefix),
                 points: total,
                 max,
-                pageLink: page.toAnchor({ name: topic.name }).outerHTML,
+                pageLink: isGM
+                    ? page.toAnchor({ name: topic.name }).outerHTML : foundry.utils.escapeHTML(topic.name),
                 toChatTooltip: _loc(`${prefix}.ToChat`),
                 checksTooltip: _loc(`${prefix}.Checks`),
                 checks,
@@ -397,9 +416,11 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                 sliderEditable: isGM && state.discovered && !hasCategories,
                 categoriesEditable: isGM && state.discovered,
                 expanded: this.#expanded.has(topic.pageId),
-                markers: sliderMarkers(max, isGM ? topic.thresholds : topic.thresholds.filter((t) => t <= state.points)),
+                markers: sliderMarkers(max, isGM ? topic.thresholds : topic.thresholds.filter((t) => t <= total)),
                 hasResults: state.discovered && topic.thresholds.some((t) => t <= total),
-                notes: details.notes
+                notes: details.notes,
+                thresholdResults,
+                hasDetails: !!(checks.length || details.notes || thresholdResults.length)
             };
         }));
 
@@ -408,6 +429,7 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
         partContext.bastionTopics = await Promise.all(bastion.map(async (topic) => {
             const max = topic.thresholds.at(-1) ?? 0;
             const points = Math.min(topic.points, max);
+            const thresholdResults = await this.#thresholdResults(topic.results, points, topic);
             return {
                 ...topic,
                 ...visibilityControl(topic.discovered, prefix),
@@ -418,8 +440,12 @@ export class Subsystems extends HandlebarsApplicationMixin(ApplicationV2) {
                     : foundry.utils.escapeHTML(topic.name),
                 readOnlyTooltip: _loc(`${bastionPrefix}.ReadOnly`),
                 toChatTooltip: _loc(`${prefix}.ToChat`),
+                checksTooltip: _loc(`${prefix}.Checks`),
+                expanded: this.#expanded.has(topic.pageId),
                 markers: sliderMarkers(max, isGM ? topic.thresholds : topic.thresholds.filter((t) => t <= points)),
-                hasResults: topic.results.some((r) => isReached(r.threshold, points))
+                hasResults: topic.results.some((r) => isReached(r.threshold, points)),
+                thresholdResults,
+                hasDetails: thresholdResults.length > 0
             };
         }));
     }

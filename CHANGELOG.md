@@ -1,3 +1,9 @@
+# 1.4.1
+Improvements
+- removed clickable journal links from player view
+- added research threshold data under research topics
+- unreached thresholds show grayed out to GMs, and don't show to players
+
 # 1.4.0
 New Features
 - added the ability to toggle unused subsystems off
